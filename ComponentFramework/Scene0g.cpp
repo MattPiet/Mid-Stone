@@ -30,7 +30,7 @@ bool Scene0g::OnCreate() {
 	sphere = new Body();
 	sphere->OnCreate();
 
-	mesh = new Mesh("meshes/Sphere.obj");
+	mesh = new Mesh("meshes/JellyfishHead.obj");
 	mesh->OnCreate();
 
 	shader = new Shader("shaders/defaultVert.glsl", "shaders/defaultFrag.glsl");
