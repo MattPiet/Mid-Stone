@@ -1,5 +1,5 @@
-#include "GuiWindow.h"
-#include "Debug.h"
+#include "../../include/UI/GuiWindow.h"
+#include "../../include/Utils/Debug.h"
 
  ///ImGui includes
 #include <imgui.h>

@@ -3,10 +3,9 @@
 #include <crtdbg.h>
 
 #include <string>
-#include "SceneManager.h"
-#include "Debug.h"
+#include "include/Core/SceneManager.h"
+#include "include/Utils/Debug.h"
 
-  
 int main(int argc, char* args[]) {
 	static_assert(sizeof(void*) == 4, "This program is not ready for 64-bit build");
 

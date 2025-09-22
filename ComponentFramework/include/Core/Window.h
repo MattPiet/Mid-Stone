@@ -6,7 +6,7 @@
 #include <SDL_opengl.h>
 #include <string>
 #include <iostream>
-#include "Debug.h"
+#include "../../include/Utils/Debug.h"
 
 // Plan:
 // 1. The error occurs because you are trying to cast an SDL_Window* to a GLFWwindow*.

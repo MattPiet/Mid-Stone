@@ -1,5 +1,5 @@
-#include "Shader.h"
-#include "Debug.h"
+#include "../../include/Graphics/Shader.h"
+#include "../../include/Utils/Debug.h"
 #include <fstream>
 #include <string.h>
 

@@ -1,8 +1,8 @@
-#include "Mesh.h"
+#include "../../include/Graphics/Mesh.h"
 
 
 #define TINYOBJLOADER_IMPLEMENTATION
-#include "tiny_obj_loader.h"
+#include "../../third_party/tiny_obj_loader.h"
 
 Mesh::Mesh(const char* filename_):dateLength{0}, drawmode{0}, 
 vao{0}, vbo{0} {

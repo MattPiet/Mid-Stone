@@ -1,14 +1,15 @@
 #include <SDL.h>
-#include "SceneManager.h"
-#include "Timer.h"
-#include "Window.h"
-#include "GuiWindow.h"
-#include "Scene0g.h"
-#include "Scene0p.h"
-#include "Debug.h"
+#include "../../include/Core/SceneManager.h"
+#include "../../include/Utils/Debug.h"
+#include "../../include/Core/Timer.h"
+#include "../../include/Core/Window.h"
+#include "../../include/UI//GuiWindow.h"
+#include "../../include/Scenes/Scene0g.h"
+#include "../../include/Scenes/Scene0p.h"
 
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
+
 #include <imgui_impl_opengl3.h>
 
 
