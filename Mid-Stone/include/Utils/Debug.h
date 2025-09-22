@@ -6,13 +6,13 @@
 #include <fstream>
 #include <ctime>
 
-enum class MessageType : unsigned short {
-	TYPE_NONE = 0,
-	TYPE_FATAL_ERROR,
-	TYPE_ERROR,
-	TYPE_WARNING,
-	TYPE_TRACE,
-	TYPE_INFO
+enum class Message_type : uint8_t {
+	type_none = 0,
+	type_fatal_error,
+	type_error,
+	type_warning,
+	type_trace,
+	type_info
 };
 
 class Debug {
@@ -42,7 +42,7 @@ public:
 		const std::string& fileName_, const int line_);
 
 private:
-	static void Log(const MessageType type_,
+	static void Log(const Message_type type_,
 		const std::string& message_,
 		const std::string& fileName_,
 		const int line_);

@@ -1,14 +1,16 @@
 #include <SDL.h>
-#include "SceneManager.h"
-#include "Timer.h"
-#include "Window.h"
-#include "GuiWindow.h"
-#include "Scene0g.h"
-#include "Scene0p.h"
-#include "Debug.h"
+
+#include "Core/SceneManager.h"
+#include "Utils/Debug.h"
+#include "Core/Timer.h"
+#include "Core/Window.h"
+#include "UI//GuiWindow.h"
+#include "Scenes/Scene0g.h"
+#include "Scenes/Scene0p.h"
 
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
+
 #include <imgui_impl_opengl3.h>
 
 
@@ -74,7 +76,7 @@ bool SceneManager::Initialize(std::string name_, int width_, int height_) {
 	}
 
 	/********************************   Default first scene   ***********************/
-	BuildNewScene(SCENE_NUMBER::SCENE0g);
+	BuildNewScene(Scene_number::scene0_g);
 	/********************************************************************************/
 	return true;
 }
@@ -115,7 +117,7 @@ void SceneManager::Run() {
 			imguiWin->EndFrame();
 		}
 		else if (window) {
-			SDL_GL_SwapWindow(window->getWindow());
+			SDL_GL_SwapWindow(window->GetWindow());
 		}
 
 		SDL_Delay(timer->GetSleepTime(fps));
@@ -147,7 +149,7 @@ void SceneManager::HandleEvents() {
 			case SDL_SCANCODE_F3:
 			case SDL_SCANCODE_F4:
 			case SDL_SCANCODE_F5:
-				BuildNewScene(SCENE_NUMBER::SCENE0g);
+				BuildNewScene(Scene_number::scene0_g);
 				break;
 
 			default:
@@ -164,7 +166,7 @@ void SceneManager::HandleEvents() {
 	}
 }
 
-bool SceneManager::BuildNewScene(SCENE_NUMBER scene) {
+bool SceneManager::BuildNewScene(Scene_number scene) {
 	bool status;
 
 	if (currentScene != nullptr) {
@@ -174,12 +176,12 @@ bool SceneManager::BuildNewScene(SCENE_NUMBER scene) {
 	}
 
 	switch (scene) {
-	case SCENE_NUMBER::SCENE0g:
+	case Scene_number::scene0_g:
 		currentScene = new Scene0g();
 		status = currentScene->OnCreate();
 		break;
 
-	case SCENE_NUMBER::SCENE0p:
+	case Scene_number::scene0_p:
 		currentScene = new Scene0p();
 		status = currentScene->OnCreate();
 		break;

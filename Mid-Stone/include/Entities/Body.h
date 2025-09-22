@@ -27,7 +27,7 @@ public:
 	void Update(float deltaTime);
 	void Render() const;
 	void ApplyForce(Vec3 force);
-	void setAccel(const Vec3 &accel_) { accel = accel_;}
+	void SetAccel(const Vec3 &accel_) { accel = accel_;}
 };
 
 #endif

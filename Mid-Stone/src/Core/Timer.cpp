@@ -1,6 +1,6 @@
 #include <typeinfo>
 #include <iostream>
-#include "Timer.h"
+#include "Core/Timer.h"
 
 Timer::Timer() : prevTicks{0}, currentTicks{0} {}
 
@@ -41,12 +41,12 @@ float Timer::GetCurrentTicks() const {
 Uint32 Timer::singleEventID = 0; /// initialize the static member
 
 void Timer::SetSingleEvent(Uint32 interval, void* param){ 
-	SDL_TimerID id = SDL_AddTimer(interval, callBackFuncion, (void*)param);
+	SDL_TimerID id = SDL_AddTimer(interval, CallBackFuncion, (void*)param);
 	
 }
 
 
-Uint32 Timer::callBackFuncion(void* userdata, SDL_TimerID timerID, Uint32 interval) {
+Uint32 Timer::CallBackFuncion(void* userdata, SDL_TimerID timerID, Uint32 interval) {
     SDL_Event event;
     SDL_UserEvent userevent;
 

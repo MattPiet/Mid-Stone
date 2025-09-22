@@ -1,5 +1,5 @@
-#include "GuiWindow.h"
-#include "Debug.h"
+#include "UI/GuiWindow.h"
+#include "Utils/Debug.h"
 
  ///ImGui includes
 #include <imgui.h>
@@ -26,8 +26,8 @@ bool GuiWindow::OnCreate(std::string name, int width_, int height_) {
     context = SDL_GL_CreateContext(window);
 
     int major, minor;
-    getInstalledOpenGLInfo(&major, &minor);
-    setAttributes(major, minor);
+    GetInstalledOpenGlInfo(&major, &minor);
+    SetAttributes(major, minor);
 
     GLenum err = glewInit();
     if (err != GLEW_OK) {
@@ -75,7 +75,7 @@ void GuiWindow::EndFrame() {
     SDL_GL_SwapWindow(window);
 }
 
-void GuiWindow::getInstalledOpenGLInfo(int* major, int* minor) {
+void GuiWindow::GetInstalledOpenGlInfo(int* major, int* minor) {
     const GLubyte* version = glGetString(GL_VERSION);
     const GLubyte* vendor = glGetString(GL_VENDOR);
     const GLubyte* renderer = glGetString(GL_RENDERER);
@@ -90,7 +90,7 @@ void GuiWindow::getInstalledOpenGLInfo(int* major, int* minor) {
     Debug::Info("GLSL Version: " + std::string((char*)glslVersion), __FILE__, __LINE__);
 }
 
-void GuiWindow::setAttributes(int major, int minor) {
+void GuiWindow::SetAttributes(int major, int minor) {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, major);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, minor);

@@ -23,7 +23,7 @@ private:
 	unsigned int prevTicks;
 	unsigned int currentTicks;
 	static unsigned int singleEventID;
-	static Uint32 callBackFuncion(void* userdata, SDL_TimerID timerID, Uint32 interval);
+	static Uint32 CallBackFuncion(void* userdata, SDL_TimerID timerID, Uint32 interval);
 };
 
 

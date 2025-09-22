@@ -84,7 +84,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\GameDevM\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\GameDevM\imgui;$(SolutionDir)\$(ProjectName)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -130,7 +130,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Body.cpp" />
     <ClCompile Include="C:\GameDevM\imgui\imgui.cpp" />
     <ClCompile Include="C:\GameDevM\imgui\imgui_demo.cpp" />
     <ClCompile Include="C:\GameDevM\imgui\imgui_draw.cpp" />
@@ -139,19 +138,19 @@
     <ClCompile Include="C:\GameDevM\imgui\imgui_impl_sdl3.cpp" />
     <ClCompile Include="C:\GameDevM\imgui\imgui_tables.cpp" />
     <ClCompile Include="C:\GameDevM\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="Debug.cpp" />
-    <ClCompile Include="GuiWindow.cpp" />
-    <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="Scene0p.cpp" />
-    <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Scene0g.cpp" />
-    <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="Timer.cpp" />
-    <ClCompile Include="Window.cpp" />
+    <ClCompile Include="src\Core\SceneManager.cpp" />
+    <ClCompile Include="src\Core\Timer.cpp" />
+    <ClCompile Include="src\Core\Window.cpp" />
+    <ClCompile Include="src\Entities\Body.cpp" />
+    <ClCompile Include="src\Graphics\Mesh.cpp" />
+    <ClCompile Include="src\Graphics\Shader.cpp" />
+    <ClCompile Include="src\Scenes\Scene0g.cpp" />
+    <ClCompile Include="src\Scenes\Scene0p.cpp" />
+    <ClCompile Include="src\UI\GuiWindow.cpp" />
+    <ClCompile Include="src\Utils\Debug.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Body.h" />
     <ClInclude Include="C:\GameDevM\imgui\imconfig.h" />
     <ClInclude Include="C:\GameDevM\imgui\imgui.h" />
     <ClInclude Include="C:\GameDevM\imgui\imgui_impl_glfw.h" />
@@ -162,24 +161,25 @@
     <ClInclude Include="C:\GameDevM\imgui\imstb_rectpack.h" />
     <ClInclude Include="C:\GameDevM\imgui\imstb_textedit.h" />
     <ClInclude Include="C:\GameDevM\imgui\imstb_truetype.h" />
-    <ClInclude Include="Debug.h" />
-    <ClInclude Include="GuiWindow.h" />
-    <ClInclude Include="Mesh.h" />
-    <ClInclude Include="Scene0p.h" />
-    <ClInclude Include="SceneManager.h" />
-    <ClInclude Include="Scene.h" />
-    <ClInclude Include="Scene0g.h" />
-    <ClInclude Include="Shader.h" />
-    <ClInclude Include="Timer.h" />
-    <ClInclude Include="tiny_obj_loader.h" />
-    <ClInclude Include="Window.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="GameEngineLog.txt" />
+    <ClInclude Include="include\Core\SceneManager.h" />
+    <ClInclude Include="include\Core\Timer.h" />
+    <ClInclude Include="include\Core\Window.h" />
+    <ClInclude Include="include\Entities\Body.h" />
+    <ClInclude Include="include\Graphics\Mesh.h" />
+    <ClInclude Include="include\Graphics\Shader.h" />
+    <ClInclude Include="include\Scenes\Scene.h" />
+    <ClInclude Include="include\Scenes\Scene0g.h" />
+    <ClInclude Include="include\Scenes\Scene0p.h" />
+    <ClInclude Include="include\UI\GuiWindow.h" />
+    <ClInclude Include="include\Utils\Debug.h" />
+    <ClInclude Include="third_party\tiny_obj_loader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\defaultFrag.glsl" />
     <None Include="shaders\defaultVert.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

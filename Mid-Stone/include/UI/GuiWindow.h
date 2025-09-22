@@ -24,7 +24,7 @@ private:
     int width;
     int height;
 
-    void getInstalledOpenGLInfo(int* major, int* minor);
-    void setAttributes(int major, int minor);
+    void GetInstalledOpenGlInfo(int* major, int* minor);
+    void SetAttributes(int major, int minor);
 };
 

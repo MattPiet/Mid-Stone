@@ -2,12 +2,12 @@
 #include <iostream>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_image.h>
-#include "Scene0p.h"
+#include "Scenes/Scene0p.h"
 #include <MMath.h>
-#include "Debug.h"
-#include "Mesh.h"
-#include "Shader.h"
-#include "Body.h"
+#include "Utils/Debug.h"
+#include "Graphics/Mesh.h"
+#include "Graphics/Shader.h"
+#include "Entities/Body.h"
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"

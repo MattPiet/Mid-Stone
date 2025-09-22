@@ -20,15 +20,15 @@ public:
 	void HandleEvents();
 
 private:
-	enum class SCENE_NUMBER {
-		SCENE0g = 0,
-		SCENE0p,
-		SCENE1,
-		SCENE2,
-		SCENE3,
-		SCENE4,
-		SCENE5,
-		SCENE6
+	enum class Scene_number : uint8_t {
+		scene0_g = 0,
+		scene0_p,
+		scene1,
+		scene2,
+		scene3,
+		scene4,
+		scene5,
+		scene6
 	};
 
 	Scene* currentScene;
@@ -41,7 +41,7 @@ private:
 	bool isRunning;
 	bool fullScreen;
 
-	bool BuildNewScene(SCENE_NUMBER scene_);
+	bool BuildNewScene(Scene_number scene_);
 };
 
 #endif // SCENEMANAGER_H

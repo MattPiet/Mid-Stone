@@ -1,4 +1,5 @@
-#include "Debug.h"
+#include "Utils/Debug.h"
+
 #include <chrono>
 using namespace std::chrono;
 
@@ -18,11 +19,11 @@ void Debug::DebugInit(const std::string& logFileName_) {
 	out.close();
 }
 
-void Debug::Log(const MessageType type_, const std::string& message_, const std::string& fileName_, const int line_) {
+void Debug::Log(const Message_type type_, const std::string& message_, const std::string& fileName_, const int line_) {
 	std::ofstream out;
 	std::string msg;
 	out.open(logFileName, std::ios::out | std::ios::app);
-	if (type_ == MessageType::TYPE_INFO) {
+	if (type_ == Message_type::type_info) {
 		msg = message_;
 	} else {
 		msg = message_ + " in file: " + fileName_ + " on line: " + std::to_string(line_);
@@ -36,21 +37,21 @@ void Debug::Log(const MessageType type_, const std::string& message_, const std:
 }
 
 void Debug::Info(const std::string& message_, const std::string& fileName_, const int line_) {
-	Log(MessageType::TYPE_INFO, "[INFO]: " + message_, fileName_, line_);
+	Log(Message_type::type_info, "[INFO]: " + message_, fileName_, line_);
 }
 
 void Debug::Trace(const std::string& message_, const std::string& fileName_, const int line_) {
-	Log(MessageType::TYPE_TRACE, "[TRACE]: " + message_, fileName_, line_);
+	Log(Message_type::type_trace, "[TRACE]: " + message_, fileName_, line_);
 }
 
 void Debug::Warning(const std::string& message_, const std::string& fileName_, const int line_) {
-	Log(MessageType::TYPE_WARNING, "[WARNING]: " + message_, fileName_, line_);
+	Log(Message_type::type_warning, "[WARNING]: " + message_, fileName_, line_);
 }
 
 void Debug::Error(const std::string& message_, const std::string& fileName_, const int line_) {
-	Log(MessageType::TYPE_ERROR, "[ERROR]: " + message_, fileName_, line_);
+	Log(Message_type::type_error, "[ERROR]: " + message_, fileName_, line_);
 }
 
 void Debug::FatalError(const std::string& message_, const std::string& fileName_, const int line_) {
-	Log(MessageType::TYPE_FATAL_ERROR, "[FATAL ERROR]: " + message_, fileName_, line_);
+	Log(Message_type::type_fatal_error, "[FATAL ERROR]: " + message_, fileName_, line_);
 }
