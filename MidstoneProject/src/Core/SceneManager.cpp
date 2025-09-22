@@ -7,6 +7,8 @@
 #include "../../include/Scenes/Scene0g.h"
 #include "../../include/Scenes/Scene0p.h"
 
+#include "Core/SceneManager.h"
+
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
 
