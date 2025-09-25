@@ -1,4 +1,4 @@
-#include "Entities/Body.h"
+#include <Entities/Body.h>
 
 Body::Body(): pos{}, vel{}, accel{}, mass{0.0f}, mesh{nullptr},texture{nullptr} {
 }

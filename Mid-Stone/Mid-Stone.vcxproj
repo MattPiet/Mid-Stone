@@ -143,8 +143,11 @@
     <ClCompile Include="src\Core\Timer.cpp" />
     <ClCompile Include="src\Core\Window.cpp" />
     <ClCompile Include="src\Entities\Body.cpp" />
+    <ClCompile Include="src\Graphics\AnimationClip.cpp" />
+    <ClCompile Include="src\Graphics\Animator.cpp" />
     <ClCompile Include="src\Graphics\Mesh.cpp" />
     <ClCompile Include="src\Graphics\Shader.cpp" />
+    <ClCompile Include="src\Scenes\AnimationScene.cpp" />
     <ClCompile Include="src\Scenes\Scene0g.cpp" />
     <ClCompile Include="src\Scenes\Scene0p.cpp" />
     <ClCompile Include="src\UI\GuiWindow.cpp" />
@@ -165,8 +168,11 @@
     <ClInclude Include="include\Core\Timer.h" />
     <ClInclude Include="include\Core\Window.h" />
     <ClInclude Include="include\Entities\Body.h" />
+    <ClInclude Include="include\Graphics\AnimationClip.h" />
+    <ClInclude Include="include\Graphics\Animator.h" />
     <ClInclude Include="include\Graphics\Mesh.h" />
     <ClInclude Include="include\Graphics\Shader.h" />
+    <ClInclude Include="include\Scenes\AnimationScene.h" />
     <ClInclude Include="include\Scenes\Scene.h" />
     <ClInclude Include="include\Scenes\Scene0g.h" />
     <ClInclude Include="include\Scenes\Scene0p.h" />

@@ -1,5 +1,5 @@
-#include "Core/Window.h"
-#include "Utils/Debug.h"
+#include <Core/Window.h>
+#include <Utils/Debug.h>
 Window::Window(): window{nullptr}, context{nullptr},  width{0}, height{0} {}
 
 Window::~Window() {

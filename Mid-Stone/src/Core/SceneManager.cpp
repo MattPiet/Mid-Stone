@@ -1,16 +1,16 @@
 #include <SDL.h>
 
-#include "Core/SceneManager.h"
-#include "Utils/Debug.h"
-#include "Core/Timer.h"
-#include "Core/Window.h"
-#include "UI//GuiWindow.h"
-#include "Scenes/Scene0g.h"
-#include "Scenes/Scene0p.h"
+#include <Core/SceneManager.h>
+#include <Utils/Debug.h>
+#include <Core/Timer.h>
+#include <Core/Window.h>
+#include <UI/GuiWindow.h>
+#include <Scenes/Scene0g.h>
+#include <Scenes/Scene0p.h>
+#include <Scenes/AnimationScene.h>>
 
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
-
 #include <imgui_impl_opengl3.h>
 
 
@@ -145,11 +145,16 @@ void SceneManager::HandleEvents() {
 				return;
 
 			case SDL_SCANCODE_F1:
+				DestroyScene();
+				BuildNewScene(Scene_number::scene0_g);
+				break;
 			case SDL_SCANCODE_F2:
+				DestroyScene();
+				BuildNewScene(Scene_number::animation_scene);
+				break;
 			case SDL_SCANCODE_F3:
 			case SDL_SCANCODE_F4:
 			case SDL_SCANCODE_F5:
-				BuildNewScene(Scene_number::scene0_g);
 				break;
 
 			default:
@@ -186,12 +191,25 @@ bool SceneManager::BuildNewScene(Scene_number scene) {
 		status = currentScene->OnCreate();
 		break;
 
+	case Scene_number::animation_scene:
+		currentScene = new AnimationScene();
+		status = currentScene->OnCreate();
+		break;
+
 	default:
 		Debug::Error("Incorrect scene number assigned in the manager", __FILE__, __LINE__);
 		currentScene = nullptr;
 		return false;
 	}
 	return status;
+}
+
+void SceneManager::DestroyScene(){
+	if (currentScene) {
+		currentScene->OnDestroy();
+		delete currentScene;
+		currentScene = nullptr;
+	}
 }
 
 

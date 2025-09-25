@@ -56,6 +56,15 @@
     <ClCompile Include="C:\GameDevM\imgui\imgui_widgets.cpp">
       <Filter>Third_party\CPP</Filter>
     </ClCompile>
+    <ClCompile Include="src\Graphics\AnimationClip.cpp">
+      <Filter>Source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\Animator.cpp">
+      <Filter>Source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scenes\AnimationScene.cpp">
+      <Filter>Source\Scenes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\GameDevM\imgui\imconfig.h">
@@ -123,6 +132,15 @@
     </ClInclude>
     <ClInclude Include="include\Core\Window.h">
       <Filter>Headers\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Graphics\AnimationClip.h">
+      <Filter>Headers\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Graphics\Animator.h">
+      <Filter>Headers\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scenes\AnimationScene.h">
+      <Filter>Headers\Scenes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

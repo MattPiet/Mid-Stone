@@ -2,16 +2,19 @@
 #include <iostream>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_image.h>
-#include "Scenes/Scene0p.h"
+#include <Scenes/Scene0p.h>
 #include <MMath.h>
-#include "Utils/Debug.h"
-#include "Graphics/Mesh.h"
-#include "Graphics/Shader.h"
-#include "Entities/Body.h"
+#include <Utils/Debug.h>
+#include <Graphics/Mesh.h>
+#include <Graphics/Shader.h>
+#include <Entities/Body.h>
 
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
+#include <SDL_mixer.h>
+
+///ImGui includes
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 
 Scene0p::Scene0p() :sphere{nullptr}, shader{nullptr}, mesh{nullptr},
 drawInWireMode{true} {

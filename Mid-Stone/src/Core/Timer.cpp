@@ -1,6 +1,6 @@
 #include <typeinfo>
 #include <iostream>
-#include "Core/Timer.h"
+#include <Core/Timer.h>
 
 Timer::Timer() : prevTicks{0}, currentTicks{0} {}
 

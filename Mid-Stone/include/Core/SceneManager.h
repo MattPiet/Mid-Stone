@@ -23,6 +23,7 @@ private:
 	enum class Scene_number : uint8_t {
 		scene0_g = 0,
 		scene0_p,
+		animation_scene,
 		scene1,
 		scene2,
 		scene3,
@@ -42,6 +43,8 @@ private:
 	bool fullScreen;
 
 	bool BuildNewScene(Scene_number scene_);
+
+	void DestroyScene();
 };
 
 #endif // SCENEMANAGER_H
