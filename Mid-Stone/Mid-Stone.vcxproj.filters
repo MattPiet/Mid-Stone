@@ -65,6 +65,12 @@
     <ClCompile Include="src\Scenes\AnimationScene.cpp">
       <Filter>Source\Scenes</Filter>
     </ClCompile>
+    <ClCompile Include="src\Graphics\SpriteMesh.cpp">
+      <Filter>Source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\SpriteRenderer.cpp">
+      <Filter>Source\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\GameDevM\imgui\imconfig.h">
@@ -142,12 +148,27 @@
     <ClInclude Include="include\Scenes\AnimationScene.h">
       <Filter>Headers\Scenes</Filter>
     </ClInclude>
+    <ClInclude Include="include\Graphics\SpriteMesh.h">
+      <Filter>Headers\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Utils\MemoryMonitor.h">
+      <Filter>Headers\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Graphics\SpriteRenderer.h">
+      <Filter>Headers\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\defaultFrag.glsl">
       <Filter>Shaders</Filter>
     </None>
     <None Include="shaders\defaultVert.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\spriteFrag.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\spriteVert.glsl">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
