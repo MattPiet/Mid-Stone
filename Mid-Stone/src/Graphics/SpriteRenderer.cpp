@@ -64,7 +64,7 @@ void SpriteRenderer::renderSprite(Shader* shader, SpriteMesh* sprite_mesh, Matri
     }
 	// now we need to scale the model matrix to the size of the image
     float aspect = (float)imageWidth / imageHeight;
-    float desiredHeight = 64.0f;                   
+    float desiredHeight = 64.0f / 10.0f;                   
     float desiredWidth = desiredHeight * aspect;  
 
     modelMatrix *= MMath::scale(desiredWidth, desiredHeight, 1.0f);

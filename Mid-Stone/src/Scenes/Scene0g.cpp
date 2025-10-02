@@ -19,8 +19,6 @@
 
 //#include <Utils/MemoryMonitor.h>
 
-unsigned int shaderProgram;
-
 Scene0g::Scene0g() : sphere{ nullptr }, shader{ nullptr }, mesh{ nullptr },
 drawInWireMode{ false }, master_volume{ 1.0f }, mixer{ nullptr }, sprite_Mesh{ nullptr }, sprite_Renderer{ nullptr }
 {
@@ -57,14 +55,14 @@ bool Scene0g::OnCreate()
     projectionMatrix = MMath::perspective(45.0f, (16.0f / 9.0f), 0.5f, 100.0f);
  
 	/// Set up the sprite projection matrix //// This is orthographic for 2D rendering
-    spriteProjectionMatrix = MMath::orthographic(0.0f, 1280.0f,
-                                                 0.0f, 720.0f,
+    spriteProjectionMatrix = MMath::orthographic(0.0f, 1280.0f / 10.0f,
+                                                 0.0f, 720.0f / 10.0f,
                                                  -1.0f, 1.0f);
 
     viewMatrix = MMath::lookAt(Vec3(0.0f, 0.0f, 5.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
     modelMatrix.loadIdentity();
 	/// Move the sprite to the center of the screen ish
-    modelMatrix = MMath::translate(800.0f,500.0f,0.0f);
+    modelMatrix = MMath::translate(60.0f,40.0f,0.0f);
 
     SDL_Init(SDL_INIT_AUDIO);
     MIX_Init();
@@ -167,10 +165,10 @@ void Scene0g::RenderGUI()
     ImGui::Checkbox("Wireframe Mode", &drawInWireMode);
 
     static float sphereScale = 1.0f;
-    if (ImGui::SliderFloat("Sphere Scale", &sphereScale, 0.1f, 5.0f))
+ /*   if (ImGui::SliderFloat("Sphere Scale", &sphereScale, 0.9f, 1.1f))
     {
-        modelMatrix = MMath::scale(sphereScale, sphereScale, sphereScale);
-    }
+        modelMatrix *= MMath::scale(0, 0, 0);
+    }*/
     if (mixer)
     {
         if (ImGui::SliderFloat("Audio Volume", &master_volume, 0.0f, 1.0f))
