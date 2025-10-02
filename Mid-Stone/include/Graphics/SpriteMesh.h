@@ -7,9 +7,9 @@
 class SpriteMesh
 {
     unsigned int VertexBufferID, VAO, IndexBufferID, TexCoordsBufferID;
-    static constexpr int vertPropertiesCount = 2; // 2 for position, 2 for tex coords
+    static constexpr int vertPropertiesCount = 2; 
     float vertices[8] = {
-        // positions  // texture coords
+        // positions  
          0.5f,  0.5f,   // top right
          0.5f, -0.5f,   // bottom right
         -0.5f, -0.5f,   // bottom left

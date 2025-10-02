@@ -41,6 +41,7 @@ bool Scene0g::OnCreate()
     mesh = new Mesh("meshes/Sphere.obj");
     mesh->OnCreate();
 
+	// Create the sprite mesh and sprite renderer //// look in the headr file for more info
     sprite_Mesh = new SpriteMesh();
     sprite_Mesh->OnCreate();
 
@@ -54,9 +55,16 @@ bool Scene0g::OnCreate()
     }
 
     projectionMatrix = MMath::perspective(45.0f, (16.0f / 9.0f), 0.5f, 100.0f);
+ 
+	/// Set up the sprite projection matrix //// This is orthographic for 2D rendering
+    spriteProjectionMatrix = MMath::orthographic(0.0f, 1280.0f,
+                                                 0.0f, 720.0f,
+                                                 -1.0f, 1.0f);
+
     viewMatrix = MMath::lookAt(Vec3(0.0f, 0.0f, 5.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
     modelMatrix.loadIdentity();
-
+	/// Move the sprite to the center of the screen ish
+    modelMatrix = MMath::translate(800.0f,500.0f,0.0f);
 
     SDL_Init(SDL_INIT_AUDIO);
     MIX_Init();
@@ -178,8 +186,8 @@ void Scene0g::RenderGUI()
     ImGui::End();
 }
 
-void Scene0g::Update(const float deltaTime)
-{
+void Scene0g::Update(const float deltaTime){
+
 }
 
 void Scene0g::Render() const
@@ -201,21 +209,13 @@ void Scene0g::Render() const
     }
 
     glUseProgram(shader->GetProgram());
-    glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, projectionMatrix);
-    glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, viewMatrix);
-    glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, modelMatrix);
-
+    glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, spriteProjectionMatrix);
 	//// Render the sprite
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, sprite_Renderer->getTextureID());
-	std::pair sprite_info = sprite_Renderer->runSpriteSheet(1, 1, 0); // rows, columns, current_sprite_index
-
-    glUniform1i(shader->GetUniformID("ourTexture"), 0);
-    glUniform2f(shader->GetUniformID("uvScale"), sprite_info.first.first, sprite_info.first.second);
-    glUniform2f(shader->GetUniformID("uvOffset"), sprite_info.second.first, sprite_info.second.second);
-
-    sprite_Mesh->RenderMesh();
-     //mesh->Render(GL_TRIANGLES);
+	// no but like actually this is all you need in the scene render function to render a sprite
+	// look at the header file for more info but basically you need a sprite mesh and a sprite renderer
+	// to animate a sprite sheet just pass in the current sprite index to the renderSprite function
+	// so we still need to figure out how to animate the sprite sheet
+	sprite_Renderer->renderSprite(shader, sprite_Mesh, modelMatrix); // current_sprite_index
     glUseProgram(0);
 
 
