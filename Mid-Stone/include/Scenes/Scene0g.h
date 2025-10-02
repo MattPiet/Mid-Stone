@@ -13,6 +13,8 @@ union SDL_Event;
 class Body;
 class Mesh;
 class Shader;
+class SpriteMesh;
+class SpriteRenderer;
 
 class Scene0g : public Scene {
 private:
@@ -25,6 +27,9 @@ private:
 	bool drawInWireMode;
 	float master_volume = 1.0f;
 	MIX_Mixer* mixer;
+
+	SpriteMesh* sprite_Mesh;
+	SpriteRenderer* sprite_Renderer;
 
 public:
 	explicit Scene0g();

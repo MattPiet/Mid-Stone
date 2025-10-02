@@ -71,7 +71,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\GameDevM\SDL\include\SDL3;C:\GameDevM\SDL\include;C:\GameDevM\OpenGL\include;C:\GameDevM\MathLibrary\include;C:\GameDevM\imgui\include;C:\GameDevM\imgui\include\GLFW;$(IncludePath)</IncludePath>
+    <IncludePath>C:\GameDevM\Stb-Master;C:\GameDevM\SDL\include\SDL3;C:\GameDevM\SDL\include;C:\GameDevM\OpenGL\include;C:\GameDevM\MathLibrary\include;C:\GameDevM\imgui\include;C:\GameDevM\imgui\include\GLFW;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>
@@ -147,6 +147,8 @@
     <ClCompile Include="src\Graphics\Animator.cpp" />
     <ClCompile Include="src\Graphics\Mesh.cpp" />
     <ClCompile Include="src\Graphics\Shader.cpp" />
+    <ClCompile Include="src\Graphics\SpriteMesh.cpp" />
+    <ClCompile Include="src\Graphics\SpriteRenderer.cpp" />
     <ClCompile Include="src\Scenes\AnimationScene.cpp" />
     <ClCompile Include="src\Scenes\Scene0g.cpp" />
     <ClCompile Include="src\Scenes\Scene0p.cpp" />
@@ -172,17 +174,22 @@
     <ClInclude Include="include\Graphics\Animator.h" />
     <ClInclude Include="include\Graphics\Mesh.h" />
     <ClInclude Include="include\Graphics\Shader.h" />
+    <ClInclude Include="include\Graphics\SpriteMesh.h" />
+    <ClInclude Include="include\Graphics\SpriteRenderer.h" />
     <ClInclude Include="include\Scenes\AnimationScene.h" />
     <ClInclude Include="include\Scenes\Scene.h" />
     <ClInclude Include="include\Scenes\Scene0g.h" />
     <ClInclude Include="include\Scenes\Scene0p.h" />
     <ClInclude Include="include\UI\GuiWindow.h" />
     <ClInclude Include="include\Utils\Debug.h" />
+    <ClInclude Include="include\Utils\MemoryMonitor.h" />
     <ClInclude Include="third_party\tiny_obj_loader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\defaultFrag.glsl" />
     <None Include="shaders\defaultVert.glsl" />
+    <None Include="shaders\spriteFrag.glsl" />
+    <None Include="shaders\spriteVert.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="README.md" />
