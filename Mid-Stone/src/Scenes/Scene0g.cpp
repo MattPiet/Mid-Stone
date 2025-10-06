@@ -20,7 +20,8 @@
 //#include <Utils/MemoryMonitor.h>
 
 Scene0g::Scene0g() : sphere{ nullptr }, shader{ nullptr }, mesh{ nullptr },
-drawInWireMode{ false }, master_volume{ 1.0f }, mixer{ nullptr }, sprite_Mesh{ nullptr }, sprite_Renderer{ nullptr }
+drawInWireMode{ false }, master_volume{ 1.0f }, mixer{ nullptr }, sprite_Mesh{ nullptr }, sprite_Renderer{ nullptr }, 
+spriteSheet_Renderer{ nullptr }
 {
     Debug::Info("Created Scene0: ", __FILE__, __LINE__);
 }
@@ -46,6 +47,9 @@ bool Scene0g::OnCreate()
     sprite_Renderer = new SpriteRenderer();
     sprite_Renderer->loadImage("sprites/fatty_clicked.png");
 
+	spriteSheet_Renderer = new SpriteRenderer();
+	spriteSheet_Renderer->loadImage("sprites/idle.png", 1, 3); 
+
     shader = new Shader("shaders/spriteVert.glsl", "shaders/spriteFrag.glsl");
     if (!shader->OnCreate())
     {
@@ -62,7 +66,10 @@ bool Scene0g::OnCreate()
     viewMatrix = MMath::lookAt(Vec3(0.0f, 0.0f, 5.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
     modelMatrix.loadIdentity();
 	/// Move the sprite to the center of the screen ish
-    modelMatrix = MMath::translate(60.0f,40.0f,0.0f);
+    modelMatrix = MMath::translate(44.0f,36.0f,0.0f);
+
+    spriteSheet_ModelMatrix.loadIdentity();
+	spriteSheet_ModelMatrix = MMath::translate(84.0f, 36.0f, 0.0f);
 
     SDL_Init(SDL_INIT_AUDIO);
     MIX_Init();
@@ -122,6 +129,9 @@ void Scene0g::OnDestroy()
 	delete sprite_Renderer;
     sprite_Renderer = nullptr;
 
+	delete spriteSheet_Renderer;
+	spriteSheet_Renderer = nullptr;
+
     //// Turn off audio
     if (mixer)
     {
@@ -165,10 +175,10 @@ void Scene0g::RenderGUI()
     ImGui::Checkbox("Wireframe Mode", &drawInWireMode);
 
     static float sphereScale = 1.0f;
- /*   if (ImGui::SliderFloat("Sphere Scale", &sphereScale, 0.9f, 1.1f))
+    if (ImGui::SliderFloat("Sphere Scale", &sphereScale, 0.9f, 1.1f))
     {
-        modelMatrix *= MMath::scale(0, 0, 0);
-    }*/
+        modelMatrix *= MMath::scale(sphereScale, sphereScale, 0);
+    }
     if (mixer)
     {
         if (ImGui::SliderFloat("Audio Volume", &master_volume, 0.0f, 1.0f))
@@ -213,7 +223,11 @@ void Scene0g::Render() const
 	// look at the header file for more info but basically you need a sprite mesh and a sprite renderer
 	// to animate a sprite sheet just pass in the current sprite index to the renderSprite function
 	// so we still need to figure out how to animate the sprite sheet
+
 	sprite_Renderer->renderSprite(shader, sprite_Mesh, modelMatrix); // current_sprite_index
+
+	spriteSheet_Renderer->renderSprite(shader, sprite_Mesh, spriteSheet_ModelMatrix, 0); // current_sprite_index
+
     glUseProgram(0);
 
 

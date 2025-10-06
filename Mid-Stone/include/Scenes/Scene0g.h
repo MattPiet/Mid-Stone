@@ -34,6 +34,11 @@ private:
 	SpriteMesh* sprite_Mesh;
 	SpriteRenderer* sprite_Renderer;
 
+	SpriteRenderer* spriteSheet_Renderer;
+
+	Matrix4 spriteSheet_ModelMatrix;
+
+
 public:
 	explicit Scene0g();
 	virtual ~Scene0g();

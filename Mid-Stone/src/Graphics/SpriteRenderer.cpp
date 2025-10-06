@@ -57,17 +57,24 @@ void SpriteRenderer::renderSprite(Shader* shader, SpriteMesh* sprite_mesh, Matri
         std::pair sprite_info = runSpriteSheet(current_sprite_index); 
         glUniform2f(shader->GetUniformID("uvScale"), sprite_info.first.first, sprite_info.first.second);
         glUniform2f(shader->GetUniformID("uvOffset"), sprite_info.second.first, sprite_info.second.second);
+
+        float frameWidth = (float)imageWidth / columns;
+        float frameHeight = (float)imageHeight / rows;
+        float aspect = frameWidth / frameHeight;
+        float desiredHeight = 64.0f / 5.0f;
+        float desiredWidth = desiredHeight * aspect;
+        modelMatrix *= MMath::scale(desiredWidth, desiredHeight, 1.0f);
     }
 	else { // if its not a spritesheet
         glUniform2f(shader->GetUniformID("uvScale"), 1.0f, 1.0f);
 		glUniform2f(shader->GetUniformID("uvOffset"), 0.0f, 0.0f);
+        float aspect = (float)imageWidth / imageHeight;
+        float desiredHeight = 64.0f / 10.0f;                   
+        float desiredWidth = desiredHeight * aspect;  
+        modelMatrix *= MMath::scale(desiredWidth, desiredHeight, 1.0f);
     }
 	// now we need to scale the model matrix to the size of the image
-    float aspect = (float)imageWidth / imageHeight;
-    float desiredHeight = 64.0f / 10.0f;                   
-    float desiredWidth = desiredHeight * aspect;  
 
-    modelMatrix *= MMath::scale(desiredWidth, desiredHeight, 1.0f);
     glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, modelMatrix);
 	// finally render the sprite mesh
     sprite_mesh->RenderMesh();
