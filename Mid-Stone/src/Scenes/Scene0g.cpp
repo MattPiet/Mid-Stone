@@ -11,6 +11,8 @@
 #include <Graphics/SpriteMesh.h>
 #include <SDL_mixer.h>
 #include <Graphics/SpriteRenderer.h>
+#include <glm/gtx/string_cast.hpp>
+
 #include <Graphics/Animator.h>
 
 ///ImGui includes
@@ -271,9 +273,35 @@ static float sphereScale = 1.0f;
     ImGui::End();
 }
 
-void Scene0g::Update(const float deltaTime){
-	animator->update(deltaTime);  
-	
+void Scene0g::Update(const float deltaTime)
+{
+    animator->update(deltaTime);  
+
+    /** Update Players **/
+    if (pressingLeft && !pressingRight)
+    {
+        players.front()->MoveAim(2.0f);
+    }
+    if (pressingRight && !pressingLeft)
+    {
+        players.front()->MoveAim(-2.0f);
+    }
+
+    /* Regular Loop for Updating Players */
+    for (auto& player : players)
+    {
+        player->Update(deltaTime);
+    }
+    /* Regular Loop for Updating Bullets */
+    for (auto& bullet : bullets)
+    {
+        bullet->Update(deltaTime);
+    }
+    /* Regular Loop for Updating Effects */
+    for (auto& effect : effects)
+    {
+        effect->Update(deltaTime);
+    }
 
     /* Removes and Deletes Players if they expire */
     players.erase(
@@ -343,6 +371,7 @@ void Scene0g::Render() const
     {
         impactRenderer->renderSprite(shader, sprite_Mesh, effect->GetModelMatrix());
     }
+
 
     spriteSheet_Renderer->renderSprite(shader, sprite_Mesh, spriteSheet_ModelMatrix, 0); // current_sprite_index
 
