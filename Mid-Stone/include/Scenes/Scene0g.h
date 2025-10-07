@@ -6,6 +6,9 @@
 
 #include <SDL_mixer.h>
 
+#include "Entities/Entity.h"
+#include "Entities/Player.h"
+
 using namespace MATH;
 
 /// Forward declarations 
@@ -16,39 +19,56 @@ class Shader;
 class SpriteMesh;
 class SpriteRenderer;
 
-class Scene0g : public Scene {
+class Scene0g : public Scene
+{
 private:
-	Body* sphere;
-	Mesh* mesh;
-	Matrix4 projectionMatrix;
-	Matrix4 viewMatrix;
-	Matrix4 modelMatrix;
-	bool drawInWireMode;
-	float master_volume = 1.0f;
-	MIX_Mixer* mixer;
+    Body* sphere;
+    Mesh* mesh;
+    Matrix4 projectionMatrix;
+    Matrix4 viewMatrix;
+    Matrix4 modelMatrix;
+    bool drawInWireMode;
+    float master_volume = 1.0f;
+    MIX_Mixer* mixer;
 
-	/// / This is everything we need for sprite rendering
-	Shader* shader;
-	Matrix4 spriteProjectionMatrix;
-	// you need 1 sprite mesh and 1 sprite renderer to render a single sprite 
-	SpriteMesh* sprite_Mesh;
-	SpriteRenderer* sprite_Renderer;
+    /// / This is everything we need for sprite rendering
+    Shader* shader;
+    Matrix4 spriteProjectionMatrix;
+    // you need 1 sprite mesh and 1 sprite renderer to render a single sprite 
+    SpriteMesh* sprite_Mesh;
+    SpriteRenderer* sprite_Renderer;
 
-	SpriteRenderer* spriteSheet_Renderer;
+    bool pressingLeft = false;
+    bool pressingRight = false;
 
-	Matrix4 spriteSheet_ModelMatrix;
+    SpriteRenderer* spriteSheet_Renderer;
+
+    Matrix4 spriteSheet_ModelMatrix;
+
+    /** Entity containers **/
+    std::vector<std::unique_ptr<Player>> players;
+    std::vector<std::unique_ptr<Entity>> bullets;
+    std::vector<std::unique_ptr<Entity>> effects;
+    
+    /** Renderers **/
+    SpriteRenderer* playerRenderer;
+    SpriteRenderer* crossHairsRenderer;
+    SpriteRenderer* bulletsRenderer;
+    SpriteRenderer* impactRenderer;
+
+    
 
 
 public:
-	explicit Scene0g();
-	virtual ~Scene0g();
+    explicit Scene0g();
+    virtual ~Scene0g();
 
-	virtual bool OnCreate() override;
-	virtual void OnDestroy() override;
-	virtual void Update(const float deltaTime) override;
-	virtual void Render() const override;
-	virtual void HandleEvents(const SDL_Event &sdlEvent) override;
-	virtual void RenderGUI();
+    virtual bool OnCreate() override;
+    virtual void OnDestroy() override;
+    virtual void Update(const float deltaTime) override;
+    virtual void Render() const override;
+    virtual void HandleEvents(const SDL_Event& sdlEvent) override;
+    virtual void RenderGUI();
 };
 
 
