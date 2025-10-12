@@ -117,13 +117,13 @@ bool Scene0g::OnCreate()
 
     /** Renderer Setup **/
     crossHairsRenderer = new SpriteRenderer();
-    crossHairsRenderer->loadImage("sprites/crosshairs.png");
+    crossHairsRenderer->loadImage("sprites/fatty_clicked.png");
     playerRenderer = new SpriteRenderer();
     playerRenderer->loadImage("sprites/idle.png", 1, 3);
     bulletsRenderer = new SpriteRenderer();
-    bulletsRenderer->loadImage("sprites/fist.png", 2, 8);
+    bulletsRenderer->loadImage("sprites/fatty_clicked.png");
     impactRenderer = new SpriteRenderer();
-    impactRenderer->loadImage("sprites/impact.png", 2, 4);
+    impactRenderer->loadImage("sprites/Attack_Top.png", 1, 3);
     players.emplace_back(std::make_unique<Player>(Vec3{15, 15, 0}, Vec3{1.5f, 1.5f, 1.5f}));
 
 

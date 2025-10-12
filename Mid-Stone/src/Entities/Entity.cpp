@@ -1,4 +1,4 @@
-﻿#include "Entities/Entity.h"
+﻿#include "../../include/Entities/Entity.h"
 
 #include <iostream>
 #include <MMath.h>

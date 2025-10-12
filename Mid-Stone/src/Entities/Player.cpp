@@ -1,4 +1,4 @@
-﻿#include "Entities/Player.h"
+﻿#include "../../include/Entities/Player.h"
 
 #include <MMath.h>
 #include <QMath.h>

@@ -143,6 +143,7 @@
     <ClCompile Include="src\Core\Timer.cpp" />
     <ClCompile Include="src\Core\Window.cpp" />
     <ClCompile Include="src\Entities\Body.cpp" />
+    <ClCompile Include="src\Entities\Collisions.cpp" />
     <ClCompile Include="src\Entities\Entity.cpp">
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -326,6 +327,7 @@
     <ClInclude Include="include\Core\Timer.h" />
     <ClInclude Include="include\Core\Window.h" />
     <ClInclude Include="include\Entities\Body.h" />
+    <ClInclude Include="include\Entities\Collisions.h" />
     <ClInclude Include="include\Entities\Entity.h" />
     <ClInclude Include="include\Entities\Player.h" />
     <ClInclude Include="include\Graphics\AnimationClip.h" />
