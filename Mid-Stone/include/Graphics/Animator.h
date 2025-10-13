@@ -3,6 +3,7 @@
 #include <string>
 #include <unordered_map>
 #include <iostream>
+#include <SDL_render.h>
 using namespace std;
 class Animator{
 private:
@@ -44,5 +45,16 @@ public:
 			throw runtime_error("Animation clip'" + name + "'not found.");
 		} 
 	}
+
+	//calls update on the current clip (currently there is no update function in AnimationClip so this does nothing)
+	void update(float deltaSeconds) {
+		if (currentClip) {
+			//currentClip->update(deltaSeconds);
+
+		}
+	}
+
+
+	void render();
 };
 
