@@ -48,3 +48,11 @@ void Entity::Update(float deltaTime)
         }
     }
 }
+void Entity::ApplyForce(MATH::Vec3 force) {
+    acceleration = force / mass;
+}
+
+void Entity::UpdatePosition(float deltaTime) {
+    velocity += acceleration * deltaTime;
+    position += velocity * deltaTime;
+}
