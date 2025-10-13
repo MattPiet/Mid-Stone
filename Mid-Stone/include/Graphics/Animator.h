@@ -20,10 +20,8 @@ public:
 	//Basic getter to retrieve the current clips name
 	string getCurrentClipName() const { return currentClipName; }
 
-
 	//Adds a new Animation clip to the animator using emplace (emplace adds new data into the map)
 	void addAnimationClip(const string& name, AnimationClip* clip) {animationClips.emplace(name, clip);}
-
 
 	//Plays an animation clip based off a name provided
 	void playAnimationClip(const string& name) {
