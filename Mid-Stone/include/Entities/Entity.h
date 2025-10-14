@@ -12,9 +12,6 @@ private:
 
     MATH::Vec3 scale;
     MATH::Vec3 position;
-    MATH::Vec3 velocity;
-    MATH::Vec3 acceleration;
-	float mass{ 1.0f };
     
 
     using ExpiredCallback = std::function<void(Entity&)>;
@@ -72,7 +69,4 @@ public:
     [[nodiscard]] MATH::Matrix4 GetModelMatrix() const;
 
     void Update(float deltaTime);
-
-    void ApplyForce(MATH::Vec3 force);
-    void UpdatePosition(float deltaTime);
 };

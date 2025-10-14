@@ -71,12 +71,6 @@
     <ClCompile Include="src\Graphics\SpriteRenderer.cpp">
       <Filter>Source\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\Entities\Entity.cpp">
-      <Filter>Source\Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Entities\Player.cpp">
-      <Filter>Source\Entities</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\GameDevM\imgui\imconfig.h">
@@ -162,12 +156,6 @@
     </ClInclude>
     <ClInclude Include="include\Graphics\SpriteRenderer.h">
       <Filter>Headers\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Entities\Entity.h">
-      <Filter>Headers\Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Entities\Player.h">
-      <Filter>Headers\Entities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -71,7 +71,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\GameDevM\Stb-Master;C:\GameDevM\SDL\include\SDL3;C:\GameDevM\SDL\include;C:\GameDevM\OpenGL\include;C:\GameDevM\MathLibrary\include;C:\GameDevM\imgui\include;C:\GameDevM\imgui\include\GLFW;$(ProjectDir)include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\GameDevM\Stb-Master;C:\GameDevM\SDL\include\SDL3;C:\GameDevM\SDL\include;C:\GameDevM\OpenGL\include;C:\GameDevM\MathLibrary\include;C:\GameDevM\imgui\include;C:\GameDevM\imgui\include\GLFW;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>
