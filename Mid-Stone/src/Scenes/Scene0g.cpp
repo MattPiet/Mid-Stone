@@ -11,6 +11,7 @@
 #include <Graphics/SpriteMesh.h>
 #include <SDL_mixer.h>
 #include <Graphics/SpriteRenderer.h>
+#include <Graphics/Animator.h>
 
 ///ImGui includes
 #include <imgui.h>
@@ -87,6 +88,13 @@ bool Scene0g::OnCreate()
     MIX_SetMasterGain(mixer, master_volume);
     MIX_PlayAudio(mixer, Music);
     MIX_DestroyAudio(Music);
+
+
+    clip2 = new AnimationClip( AnimationClip::PlayMode::LOOP, 0.1f, 2,2);
+	animator = new Animator();
+	animator->addAnimationClip("Idle", clip2);
+	animator->addAnimationClip("Default", clip1);
+	animator->playAnimationClip("Idle");
 
 
     //// Load and play sound
@@ -195,6 +203,7 @@ void Scene0g::RenderGUI()
 }
 
 void Scene0g::Update(const float deltaTime){
+    clip2->getTotalFrames();
 
 }
 
