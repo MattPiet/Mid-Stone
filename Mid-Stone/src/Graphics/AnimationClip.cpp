@@ -19,18 +19,22 @@ void AnimationClip::update(float deltaSeconds) {
         // Playback logic
         switch (playMode) {
         case PlayMode::LOOP:
-            currentFrame++;
-            if (currentFrame >= totalFrames) {
-                currentFrame = 0;
-                cout << "[AnimationClip] Looping animation." << endl;
-            }
+           
+                currentFrame++;
+                if (currentFrame >= totalFrames) {
+                    currentFrame = 0;
+                    cout << "[AnimationClip] Looping animation." << endl;
+                }
+            
             break;
         case PlayMode::ONCE:
-            currentFrame++;
-            if (currentFrame >= totalFrames) {
-                currentFrame = totalFrames - 1;
-                isFinished = true;
-                cout << "[AnimationClip] Animation finished (ONCE)." << endl;
+            if (currentFrame <= totalFrames) {
+                currentFrame++;
+                if (currentFrame >= totalFrames) {
+                    currentFrame = totalFrames - 1;
+                    isFinished = true;
+                    cout << "[AnimationClip] Animation finished (ONCE)." << endl;
+                }
             }
             break;
         case PlayMode::REVERSE:
@@ -44,7 +48,7 @@ void AnimationClip::update(float deltaSeconds) {
             if (isPlayingForward) {
                 currentFrame++;
                 if (currentFrame >= totalFrames) {
-                    currentFrame = totalFrames - 2;
+                    currentFrame = totalFrames - 1;
                     isPlayingForward = false;
                     cout << "[AnimationClip] PingPong: reversing direction (backward)." << endl;
                 }
@@ -61,3 +65,5 @@ void AnimationClip::update(float deltaSeconds) {
         }
     }
 }
+
+

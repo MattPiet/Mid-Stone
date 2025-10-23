@@ -32,7 +32,7 @@ public:
    rows{ 1 },
    columns{ 1 },
       totalFrames { 1 }, 
-      currentFrame{ 1 },
+      currentFrame{ 0 },
    secondsSinceLastUpdate{ 0.0f },
    isPlayingForward{ true },
    isFinished{ false }
@@ -45,8 +45,8 @@ public:
       frameDuration{ frameDuration_ },
       rows{ rows_ },
       columns{ columns_ },
-      totalFrames{ columns_ * rows_ }, 
-      currentFrame{ 1 },
+      totalFrames{  (columns_ * rows_) }, 
+      currentFrame{ 0 },
       secondsSinceLastUpdate{ 0.0f },
       isPlayingForward{ true },
       isFinished{ false }
@@ -81,9 +81,9 @@ public:
   isFinished = false;
   }  
 
-  // 
+  // Updates the animation clip based on the elapsed time since the last update
   void update(float deltaSeconds);
 
 
-  void render();
+  
 };

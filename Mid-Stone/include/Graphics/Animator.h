@@ -28,14 +28,17 @@ public:
 	//Plays an animation clip based off a name provided
 	void playAnimationClip(const string& name);
 
+	AnimationClip* getCurrentClip() const { return currentClip; }
+
 	//calls update on the current clip (currently there is no update function in AnimationClip so this does nothing)
 	void update(float deltaSeconds) {
 		if (currentClip) {
 			currentClip->update(deltaSeconds);
+			cout << "Current frame " << currentClip->getCurrentFrame() << endl;
 		}
 	}
 
 
-	void render();
+	
 };
 

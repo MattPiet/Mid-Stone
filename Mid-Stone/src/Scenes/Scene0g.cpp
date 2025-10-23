@@ -90,7 +90,7 @@ bool Scene0g::OnCreate()
     MIX_DestroyAudio(Music);
 
 
-    clip2 = new AnimationClip( AnimationClip::PlayMode::LOOP, 0.1f, 2,2);
+    clip2 = new AnimationClip( AnimationClip::PlayMode::PINGPONG, 1.0f, 2, 2);
 	animator = new Animator();
 	animator->addAnimationClip("Idle", clip2);
 	animator->addAnimationClip("Default", clip1);
@@ -203,7 +203,8 @@ void Scene0g::RenderGUI()
 }
 
 void Scene0g::Update(const float deltaTime){
-    clip2->getTotalFrames();
+	animator->update(deltaTime);  
+	
 
 }
 
@@ -235,7 +236,7 @@ void Scene0g::Render() const
 
 	sprite_Renderer->renderSprite(shader, sprite_Mesh, modelMatrix); // current_sprite_index
 
-	spriteSheet_Renderer->renderSprite(shader, sprite_Mesh, spriteSheet_ModelMatrix, 0); // current_sprite_index
+	spriteSheet_Renderer->renderSprite(shader, sprite_Mesh, spriteSheet_ModelMatrix, animator->getCurrentClip()->getCurrentFrame()); // current_sprite_index
 
     glUseProgram(0);
 

@@ -16,7 +16,6 @@ void Animator::playAnimationClip(const string& name) {
 		currentClipName = name;
 		currentClip = it->second;
 		currentClip->reset();
-		return;
 	}
 	//If the clip is not found set the current clip to null and the name to an empty string and print that there was no clip found
 	else {
