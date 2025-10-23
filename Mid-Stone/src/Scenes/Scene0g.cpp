@@ -12,6 +12,7 @@
 #include <SDL_mixer.h>
 #include <Graphics/SpriteRenderer.h>
 #include <glm/gtx/string_cast.hpp>
+#include <Physics/Collisions.h>
 
 #include <Graphics/Animator.h>
 
@@ -44,12 +45,15 @@ bool Scene0g::OnCreate()
     mesh = new Mesh("meshes/Sphere.obj");
     mesh->OnCreate();
 
+	fistEntity = new Entity(Vec3(44.0f, 36.0f, 0.0f), Vec3(1.0f, 1.0f, 1.0f), 'q');
+
     // Create the sprite mesh and sprite renderer //// look in the headr file for more info
     sprite_Mesh = new SpriteMesh();
     sprite_Mesh->OnCreate();
 
     sprite_Renderer = new SpriteRenderer();
     sprite_Renderer->loadImage("sprites/fist.png", 2, 8);
+	fistEntity->OnCreate(sprite_Renderer);
 
     spriteSheet_Renderer = new SpriteRenderer();
     spriteSheet_Renderer->loadImage("sprites/idle.png", 1, 3);
@@ -59,6 +63,8 @@ bool Scene0g::OnCreate()
     {
         std::cout << "Shader failed ... we have a problem\n";
     }
+
+	
 
     projectionMatrix = MMath::perspective(45.0f, (16.0f / 9.0f), 0.5f, 100.0f);
 
@@ -124,8 +130,10 @@ bool Scene0g::OnCreate()
     bulletsRenderer->loadImage("sprites/fist.png", 2, 8);
     impactRenderer = new SpriteRenderer();
     impactRenderer->loadImage("sprites/impact.png", 2, 4);
-    players.emplace_back(std::make_unique<Player>(Vec3{15, 15, 0}, Vec3{1.5f, 1.5f, 1.5f}, 'q', Vec2{30,60}));
-
+    players.emplace_back(std::make_unique<Player>(Vec3{15, 15, 0}, Vec3{1.5f, 1.5f, 1.5f}, 'q'));
+    for (auto& player : players) {
+		player->OnCreate(playerRenderer);
+    }
 
     return true;
 }
@@ -144,6 +152,10 @@ void Scene0g::OnDestroy()
     shader->OnDestroy();
     delete shader;
     shader = nullptr;
+
+	fistEntity->OnDestroy();
+	delete fistEntity;
+	fistEntity = nullptr;
 
     sprite_Mesh->OnDestroy();
     delete sprite_Mesh;
@@ -182,6 +194,19 @@ void Scene0g::OnDestroy()
         MIX_DestroyMixer(mixer);
         MIX_Quit();
     }
+
+    ///Deleting shaders
+    for (auto& player : players) {
+            player->OnDestroy();
+    }
+
+    for (auto& bullet : bullets) {
+        bullet->OnDestroy();
+	}
+
+    for (auto& effect : effects) {
+        effect->OnDestroy();
+    }
 }
 
 void Scene0g::HandleEvents(const SDL_Event& sdlEvent)
@@ -203,10 +228,12 @@ void Scene0g::HandleEvents(const SDL_Event& sdlEvent)
         case SDL_SCANCODE_SPACE:
             if (auto bullet = players.front()->Shoot())
             {
+				bullet->OnCreate(bulletsRenderer);
                 // implicit upcast unique_ptr<Bullet> -> unique_ptr<Entity> (default deleter)
                 bullet->SetExpiredCallback([this](Entity& e)
                 {
-                    auto impact = std::make_unique<Entity>(e.GetPosition(), Vec3{1.0f, 1.0f, 1.0f}, 'q', Vec2{25,50});
+                    auto impact = std::make_unique<Entity>(e.GetPosition(), Vec3{1.0f, 1.0f, 1.0f}, 'q');
+					impact->OnCreate(impactRenderer);
                     impact->SetLifeSpan(1.0f);
                     effects.emplace_back(std::move(impact));
                 });
@@ -303,21 +330,59 @@ void Scene0g::Update(const float deltaTime)
         effect->Update(deltaTime);
     }
 
+    /*Updating Collisions*/
+	for (int i = 0; i < bullets.size(); i++)
+    {
+        if (bullets[i] != bullets.back()) {
+        
+            if (Collision::CheckQuadQuadCollision(*bullets[i], *bullets[i + 1])) {
+                Collision::CollisionResponse(*bullets[i], *bullets[i + 1]);
+            }
+            
+        }
+        
+        
+	}
+
+
     /* Removes and Deletes Players if they expire */
+    for (auto& player : players)
+    {
+        if (player->IsExpired())
+        {
+            player->OnDestroy();
+        }
+    }
     players.erase(
         std::remove_if(players.begin(), players.end(),
                        [](const std::unique_ptr<Player>& e) { return e->IsExpired(); }),
         players.end()
     );
+    
 
     /* Removes and Deletes bullets if they expire */
+    for (auto& bullet : bullets)
+    {
+       if (bullet->IsExpired())
+       {
+           bullet->OnDestroy();
+	   }
+	}
     bullets.erase(
         std::remove_if(bullets.begin(), bullets.end(),
                        [](const std::unique_ptr<Entity>& e) { return e->IsExpired(); }),
         bullets.end()
     );
+    
 
     /* Removes and Deletes effects if they expire */
+    for (auto& effect : effects)
+    {
+        if (effect->IsExpired())
+        {
+            effect->OnDestroy();
+        }
+    }
     effects.erase(
         std::remove_if(effects.begin(), effects.end(),
                        [](const std::unique_ptr<Entity>& e) { return e->IsExpired(); }),
@@ -353,23 +418,32 @@ void Scene0g::Render() const
 
 	spriteSheet_Renderer->renderSprite(shader, sprite_Mesh, spriteSheet_ModelMatrix, animator->getCurrentClip()->getCurrentFrame()); // current_sprite_index
 
+    fistEntity->DrawHitBox(spriteProjectionMatrix, sprite_Mesh);
+    
+    glUseProgram(shader->GetProgram());
     /* Regular Loop for Rendering Players */
     for (auto& player : players)
     {
         playerRenderer->renderSprite(shader, sprite_Mesh, player->GetModelMatrix());
         crossHairsRenderer->renderSprite(shader, sprite_Mesh, player->GetAimModelMatrix());
+        player->DrawHitBox(spriteProjectionMatrix, sprite_Mesh);
+        glUseProgram(shader->GetProgram());
     }
 
     /* Regular Loop for Rendering Bullets */
     for (auto& bullet : bullets)
     {
         bulletsRenderer->renderSprite(shader, sprite_Mesh, bullet->GetModelMatrix());
+        bullet->DrawHitBox(spriteProjectionMatrix, sprite_Mesh);
+        glUseProgram(shader->GetProgram());
     }
 
     /* Regular Loop for Rendering Effects */
     for (auto& effect : effects)
     {
         impactRenderer->renderSprite(shader, sprite_Mesh, effect->GetModelMatrix());
+        effect->DrawHitBox(spriteProjectionMatrix, sprite_Mesh);
+        glUseProgram(shader->GetProgram());
     }
 
 

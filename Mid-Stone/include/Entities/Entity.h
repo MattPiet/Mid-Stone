@@ -4,6 +4,10 @@
 #include <Quaternion.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include <Graphics/Shader.h>
+#include <Graphics/SpriteMesh.h>
+#include <Graphics/SpriteRenderer.h>
+
 
 class Entity
 {
@@ -14,8 +18,10 @@ private:
     MATH::Vec3 position;
 
     char hitBoxType; // 'c' for circle, 'q' for quad, etc.
-    MATH::Vec2 size; // size of the hitbox (e.g., radius for circle, width/height for quad)
+    MATH::Vec3 hitbox;
+	MATH::Vec4 hitboxColor{ 0.0f, 1.0f, 0.0f, 1.0f }; // RGBA
 
+	Shader* shader;
 
     using ExpiredCallback = std::function<void(Entity&)>;
     /**
@@ -46,7 +52,10 @@ protected:
 
 public:
     Entity() = default;
-    Entity(const MATH::Vec3& position, const MATH::Vec3& scale, const char& hitBoxType, const MATH::Vec2& size);
+    Entity(const MATH::Vec3& position, const MATH::Vec3& scale, const char& hitBoxType);
+
+    void OnCreate(SpriteRenderer* renderer);
+	void OnDestroy();
 
     virtual ~Entity()
     {
@@ -59,7 +68,7 @@ public:
     void SetExpiredCallback(ExpiredCallback callback) { onExpired = std::move(callback); }
 
     char GetHitBoxType() const { return hitBoxType; }
-    MATH::Vec2 GetSize() const { return size; }
+    
 
     /**
      * Checks whether the current lifetime surpasses the expected lifespan, as long as the lifespan is > 0
@@ -75,4 +84,14 @@ public:
     [[nodiscard]] MATH::Matrix4 GetModelMatrix() const;
 
     void Update(float deltaTime);
+
+	void DrawHitBox(MATH::Matrix4 projectionMatrix, SpriteMesh* mesh);
+
+    void SetHitboxColor(const MATH::Vec4& color) {
+        hitboxColor = color;
+    }
+
+    MATH::Vec3 GetHitbox() const {
+        return hitbox;
+	}
 };

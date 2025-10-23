@@ -181,6 +181,12 @@
     <None Include="shaders\spriteVert.glsl">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="shaders\HitboxVert.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\HitboxFrag.glsl">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Shaders">

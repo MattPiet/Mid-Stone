@@ -71,7 +71,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\GameDevM\Stb-Master;C:\GameDevM\SDL\include\SDL3;C:\GameDevM\SDL\include;C:\GameDevM\OpenGL\include;C:\GameDevM\MathLibrary\include;C:\GameDevM\imgui\include;C:\GameDevM\imgui\include\GLFW;$(IncludePath)</IncludePath>
+    <IncludePath>C:\GameDevM\Stb-Master;C:\GameDevM\SDL\include\SDL3;C:\GameDevM\SDL\include;C:\GameDevM\OpenGL\include;C:\GameDevM\MathLibrary\include;C:\GameDevM\imgui\include;C:\GameDevM\imgui\include\GLFW;$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>
@@ -348,6 +348,8 @@
   <ItemGroup>
     <None Include="shaders\defaultFrag.glsl" />
     <None Include="shaders\defaultVert.glsl" />
+    <None Include="shaders\HitboxFrag.glsl" />
+    <None Include="shaders\HitboxVert.glsl" />
     <None Include="shaders\spriteFrag.glsl" />
     <None Include="shaders\spriteVert.glsl" />
   </ItemGroup>

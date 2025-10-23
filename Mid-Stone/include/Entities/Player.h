@@ -23,7 +23,7 @@ protected:
 public:
     Player() = default;
 
-    Player(const MATH::Vec3& position, const MATH::Vec3& scale, const char& hitBoxType, const MATH::Vec2& size);
+    Player(const MATH::Vec3& position, const MATH::Vec3& scale, const char& hitBoxType);
     ~Player() override
     {
         std::cout << "Player destroyed" << std::endl;
