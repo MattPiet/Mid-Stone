@@ -11,8 +11,7 @@
 #include <Graphics/SpriteMesh.h>
 #include <SDL_mixer.h>
 #include <Graphics/SpriteRenderer.h>
-#include <glm/gtx/string_cast.hpp>
-
+#include <Graphics/Animator.h>
 
 ///ImGui includes
 #include <imgui.h>
@@ -92,6 +91,13 @@ bool Scene0g::OnCreate()
     MIX_DestroyAudio(Music);
 
 
+    clip2 = new AnimationClip( AnimationClip::PlayMode::PINGPONG, 1.0f, 2, 2);
+	animator = new Animator();
+	animator->addAnimationClip("Idle", clip2);
+	animator->addAnimationClip("Default", clip1);
+	animator->playAnimationClip("Idle");
+
+
     //// Load and play sound
 
     //MIX_Audio* sound = MIX_LoadAudio(mixer, "Audio/laser.wav", true);
@@ -158,6 +164,15 @@ void Scene0g::OnDestroy()
 
     delete impactRenderer;
     impactRenderer = nullptr;
+
+	delete animator;
+	animator = nullptr;
+
+	delete clip1;
+	clip1 = nullptr;
+
+	delete clip2;
+	clip2 = nullptr;
 
     //// Turn off audio
     if (mixer)
@@ -235,7 +250,8 @@ void Scene0g::RenderGUI()
     ImGui::Text("This is the Scene0g debug window");
     ImGui::Checkbox("Wireframe Mode", &drawInWireMode);
 
-    static float sphereScale = 1.0f;
+    
+static float sphereScale = 1.0f;
     if (ImGui::SliderFloat("Sphere Scale", &sphereScale, 0.9f, 1.1f))
     {
         modelMatrix *= MMath::scale(sphereScale, sphereScale, 0);
@@ -255,33 +271,9 @@ void Scene0g::RenderGUI()
     ImGui::End();
 }
 
-void Scene0g::Update(const float deltaTime)
-{
-    /** Update Players **/
-    if (pressingLeft && !pressingRight)
-    {
-        players.front()->MoveAim(2.0f);
-    }
-    if (pressingRight && !pressingLeft)
-    {
-        players.front()->MoveAim(-2.0f);
-    }
-
-    /* Regular Loop for Updating Players */
-    for (auto& player : players)
-    {
-        player->Update(deltaTime);
-    }
-    /* Regular Loop for Updating Bullets */
-    for (auto& bullet : bullets)
-    {
-        bullet->Update(deltaTime);
-    }
-    /* Regular Loop for Updating Effects */
-    for (auto& effect : effects)
-    {
-        effect->Update(deltaTime);
-    }
+void Scene0g::Update(const float deltaTime){
+	animator->update(deltaTime);  
+	
 
     /* Removes and Deletes Players if they expire */
     players.erase(
@@ -331,7 +323,7 @@ void Scene0g::Render() const
     // to animate a sprite sheet just pass in the current sprite index to the renderSprite function
     // so we still need to figure out how to animate the sprite sheet
 
-    sprite_Renderer->renderSprite(shader, sprite_Mesh, modelMatrix); // current_sprite_index
+	spriteSheet_Renderer->renderSprite(shader, sprite_Mesh, spriteSheet_ModelMatrix, animator->getCurrentClip()->getCurrentFrame()); // current_sprite_index
 
     /* Regular Loop for Rendering Players */
     for (auto& player : players)

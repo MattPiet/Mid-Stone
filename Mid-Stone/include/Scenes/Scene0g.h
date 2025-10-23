@@ -3,7 +3,6 @@
 #include "Scene.h"
 #include "Vector.h"
 #include <Matrix.h>
-
 #include <SDL_mixer.h>
 
 #include "Entities/Entity.h"
@@ -18,6 +17,8 @@ class Mesh;
 class Shader;
 class SpriteMesh;
 class SpriteRenderer;
+class AnimationClip;
+class Animator;
 
 class Scene0g : public Scene
 {
@@ -57,6 +58,13 @@ private:
     SpriteRenderer* impactRenderer;
 
     
+
+
+	//Animation Stuff
+	AnimationClip* clip1; // default constructor
+	AnimationClip* clip2; // dynamic constructor
+
+	Animator* animator;
 
 
 public:
