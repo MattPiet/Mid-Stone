@@ -7,6 +7,8 @@
 
 #include "Entities/Entity.h"
 #include "Entities/Player.h"
+#include "Graphics/Camera.h"
+#include "Graphics/CameraController.h"
 
 using namespace MATH;
 
@@ -26,7 +28,6 @@ private:
     Body* sphere;
     Mesh* mesh;
     Matrix4 projectionMatrix;
-    Matrix4 viewMatrix;
     Matrix4 modelMatrix;
     bool drawInWireMode;
     float master_volume = 1.0f;
@@ -59,6 +60,11 @@ private:
 
     Entity* fistEntity;
 
+    /** Camera **/
+    std::unique_ptr<Camera> camera;
+    std::unique_ptr<CameraController> cameraController;
+
+    
 
 	//Animation Stuff
 	AnimationClip* clip1; // default constructor
