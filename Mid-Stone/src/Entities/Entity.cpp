@@ -4,10 +4,12 @@
 #include <MMath.h>
 #include <ostream>
 
-Entity::Entity(const Vec3& position, const Vec3& scale)
+Entity::Entity(const Vec3& position, const Vec3& scale, const char& hitBoxType, const Vec2& size)
 {
     this->position = position;
     this->scale = scale;
+	this->hitBoxType = hitBoxType;
+	this->size = size;
 }
 
 void Entity::SetLifeSpan(float lifeSpanSeconds_)

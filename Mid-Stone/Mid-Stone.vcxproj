@@ -143,7 +143,6 @@
     <ClCompile Include="src\Core\Timer.cpp" />
     <ClCompile Include="src\Core\Window.cpp" />
     <ClCompile Include="src\Entities\Body.cpp" />
-    <ClCompile Include="src\Entities\Collisions.cpp" />
     <ClCompile Include="src\Entities\Entity.cpp">
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -306,6 +305,7 @@
     <ClCompile Include="src\Graphics\Shader.cpp" />
     <ClCompile Include="src\Graphics\SpriteMesh.cpp" />
     <ClCompile Include="src\Graphics\SpriteRenderer.cpp" />
+    <ClCompile Include="src\Physics\Collisions.cpp" />
     <ClCompile Include="src\Scenes\AnimationScene.cpp" />
     <ClCompile Include="src\Scenes\Scene0g.cpp" />
     <ClCompile Include="src\Scenes\Scene0p.cpp" />
@@ -327,7 +327,6 @@
     <ClInclude Include="include\Core\Timer.h" />
     <ClInclude Include="include\Core\Window.h" />
     <ClInclude Include="include\Entities\Body.h" />
-    <ClInclude Include="include\Entities\Collisions.h" />
     <ClInclude Include="include\Entities\Entity.h" />
     <ClInclude Include="include\Entities\Player.h" />
     <ClInclude Include="include\Graphics\AnimationClip.h" />
@@ -336,6 +335,7 @@
     <ClInclude Include="include\Graphics\Shader.h" />
     <ClInclude Include="include\Graphics\SpriteMesh.h" />
     <ClInclude Include="include\Graphics\SpriteRenderer.h" />
+    <ClInclude Include="include\Physics\Collisions.h" />
     <ClInclude Include="include\Scenes\AnimationScene.h" />
     <ClInclude Include="include\Scenes\Scene.h" />
     <ClInclude Include="include\Scenes\Scene0g.h" />

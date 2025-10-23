@@ -117,14 +117,14 @@ bool Scene0g::OnCreate()
 
     /** Renderer Setup **/
     crossHairsRenderer = new SpriteRenderer();
-    crossHairsRenderer->loadImage("sprites/fatty_clicked.png");
+    crossHairsRenderer->loadImage("sprites/crosshairs.png");
     playerRenderer = new SpriteRenderer();
     playerRenderer->loadImage("sprites/idle.png", 1, 3);
     bulletsRenderer = new SpriteRenderer();
-    bulletsRenderer->loadImage("sprites/fatty_clicked.png");
+    bulletsRenderer->loadImage("sprites/fist.png", 2, 8);
     impactRenderer = new SpriteRenderer();
-    impactRenderer->loadImage("sprites/Attack_Top.png", 1, 3);
-    players.emplace_back(std::make_unique<Player>(Vec3{15, 15, 0}, Vec3{1.5f, 1.5f, 1.5f}));
+    impactRenderer->loadImage("sprites/impact.png", 2, 4);
+    players.emplace_back(std::make_unique<Player>(Vec3{15, 15, 0}, Vec3{1.5f, 1.5f, 1.5f}, 'q', Vec2{30,60}));
 
 
     return true;
@@ -206,7 +206,7 @@ void Scene0g::HandleEvents(const SDL_Event& sdlEvent)
                 // implicit upcast unique_ptr<Bullet> -> unique_ptr<Entity> (default deleter)
                 bullet->SetExpiredCallback([this](Entity& e)
                 {
-                    auto impact = std::make_unique<Entity>(e.GetPosition(), Vec3{1.0f, 1.0f, 1.0f});
+                    auto impact = std::make_unique<Entity>(e.GetPosition(), Vec3{1.0f, 1.0f, 1.0f}, 'q', Vec2{25,50});
                     impact->SetLifeSpan(1.0f);
                     effects.emplace_back(std::move(impact));
                 });

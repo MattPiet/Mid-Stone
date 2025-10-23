@@ -8,34 +8,37 @@
 class Entity
 {
 private:
-    
+
 
     MATH::Vec3 scale;
     MATH::Vec3 position;
-    
+
+    char hitBoxType; // 'c' for circle, 'q' for quad, etc.
+    MATH::Vec2 size; // size of the hitbox (e.g., radius for circle, width/height for quad)
+
 
     using ExpiredCallback = std::function<void(Entity&)>;
     /**
      * Callback for a function that will be executed once this entity expires
      */
     ExpiredCallback onExpired;
-    
+
     /**
      * Life span for the entity, if it's 0, the object is immortal, if not, it will be the time in
      * seconds that the entity will live before destructing itself.
      */
-    float lifeSpanSeconds{0.0f};
+    float lifeSpanSeconds{ 0.0f };
 
     /**
      * Counter of seconds to calculate the lifespan of this entity.
      */
-    float currentLifeTimeSeconds{0.0f};
-    bool hasFiredExpiredHooks{false};
+    float currentLifeTimeSeconds{ 0.0f };
+    bool hasFiredExpiredHooks{ false };
 
 protected:
 
     MATH::Quaternion orientation;
-    
+
     virtual void OnExpired()
     {
         std::cout << "Entity expired" << std::endl;
@@ -43,18 +46,21 @@ protected:
 
 public:
     Entity() = default;
-    Entity(const MATH::Vec3& position, const MATH::Vec3& scale);
+    Entity(const MATH::Vec3& position, const MATH::Vec3& scale, const char& hitBoxType, const MATH::Vec2& size);
 
     virtual ~Entity()
     {
         std::cout << "Entity destroyed" << std::endl;
     };
-    
+
     void SetLifeSpan(float lifeSpanSeconds);
     [[nodiscard]] float GetLifeSpan() const { return lifeSpanSeconds; }
     [[nodiscard]] float GetCurrentLifeTime() const { return currentLifeTimeSeconds; }
     void SetExpiredCallback(ExpiredCallback callback) { onExpired = std::move(callback); }
-    
+
+    char GetHitBoxType() const { return hitBoxType; }
+    MATH::Vec2 GetSize() const { return size; }
+
     /**
      * Checks whether the current lifetime surpasses the expected lifespan, as long as the lifespan is > 0
      * @return boolean indicating whether it is expired or not
