@@ -1,11 +1,10 @@
 #include "Graphics/AnimationClip.h"
 #include <iostream>
-using namespace std;
 
 void AnimationClip::update(float deltaSeconds) {
     // If there are no frames do nothing
     if (totalFrames <= 0) {
-        cout << "[AnimationClip] No frames to update." << endl;
+        std::cout << "[AnimationClip] No frames to update." << std::endl;
         return;
     }
 
@@ -23,7 +22,7 @@ void AnimationClip::update(float deltaSeconds) {
                 currentFrame++;
                 if (currentFrame >= totalFrames) {
                     currentFrame = 0;
-                    cout << "[AnimationClip] Looping animation." << endl;
+                    std::cout << "[AnimationClip] Looping animation." << std::endl;
                 }
             
             break;
@@ -33,7 +32,7 @@ void AnimationClip::update(float deltaSeconds) {
                 if (currentFrame >= totalFrames) {
                     currentFrame = totalFrames - 1;
                     isFinished = true;
-                    cout << "[AnimationClip] Animation finished (ONCE)." << endl;
+                    std::cout << "[AnimationClip] Animation finished (ONCE)." << std::endl;
                 }
             }
             break;
@@ -41,7 +40,7 @@ void AnimationClip::update(float deltaSeconds) {
             currentFrame--;
             if (currentFrame < 0) {
                 currentFrame = totalFrames - 1;
-               cout << "[AnimationClip] Playing animation in reverse." << endl;
+               std::cout << "[AnimationClip] Playing animation in reverse." << std::endl;
             }
             break;
         case PlayMode::PINGPONG:
@@ -50,7 +49,7 @@ void AnimationClip::update(float deltaSeconds) {
                 if (currentFrame >= totalFrames) {
                     currentFrame = totalFrames - 1;
                     isPlayingForward = false;
-                    cout << "[AnimationClip] PingPong: reversing direction (backward)." << endl;
+                    std::cout << "[AnimationClip] PingPong: reversing direction (backward)." << std::endl;
                 }
             }
             else {
@@ -58,7 +57,7 @@ void AnimationClip::update(float deltaSeconds) {
                 if (currentFrame < 0) {
                     currentFrame = 1;
                     isPlayingForward = true;
-                    cout << "[AnimationClip] PingPong: reversing direction (forward)." << endl;
+                    std::cout << "[AnimationClip] PingPong: reversing direction (forward)." << std::endl;
                 }
             }
             break;

@@ -1,18 +1,18 @@
 #include "Graphics/Animator.h"
 
-void Animator::addAnimationClip(const string& name, AnimationClip* clip) {
+void Animator::addAnimationClip(const std::string& name, AnimationClip* clip) {
 	animationClips.emplace(name, clip);
-	cout << "Added clip: " << name << endl;
+	std::cout << "Added clip: " << name << std::endl;
 }
 
-void Animator::playAnimationClip(const string& name) {
+void Animator::playAnimationClip(const std::string& name) {
 
 	//Automatically iterates through the map to find the clip
 	auto it = animationClips.find(name);
 
 	//If found set the current clip to the found clip
 	if (it != animationClips.end()) {
-		cout << "Playing clip: " << name << endl;
+		std::cout << "Playing clip: " << name << std::endl;
 		currentClipName = name;
 		currentClip = it->second;
 		currentClip->reset();
@@ -21,7 +21,7 @@ void Animator::playAnimationClip(const string& name) {
 	else {
 		currentClipName = "";
 		currentClip = nullptr;
-		cout << "Clip not found!" << endl;
-		throw runtime_error("Animation clip'" + name + "'not found.");
+		std::cout << "Clip not found!" << std::endl;
+		throw std::runtime_error("Animation clip'" + name + "'not found.");
 	}
 }

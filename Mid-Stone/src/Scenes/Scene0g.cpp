@@ -140,6 +140,15 @@ void Scene0g::OnDestroy()
 	delete spriteSheet_Renderer;
 	spriteSheet_Renderer = nullptr;
 
+	delete animator;
+	animator = nullptr;
+
+	delete clip1;
+	clip1 = nullptr;
+
+	delete clip2;
+	clip2 = nullptr;
+
     //// Turn off audio
     if (mixer)
     {
@@ -182,7 +191,8 @@ void Scene0g::RenderGUI()
     ImGui::Text("This is the Scene0g debug window");
     ImGui::Checkbox("Wireframe Mode", &drawInWireMode);
 
-    static float sphereScale = 1.0f;
+    
+static float sphereScale = 1.0f;
     if (ImGui::SliderFloat("Sphere Scale", &sphereScale, 0.9f, 1.1f))
     {
         modelMatrix *= MMath::scale(sphereScale, sphereScale, 0);

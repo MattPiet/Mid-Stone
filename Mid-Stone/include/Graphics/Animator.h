@@ -4,29 +4,28 @@
 #include <unordered_map>
 #include <iostream>
 #include <SDL_render.h>
-using namespace std;
 class Animator{
 private:
 	//The name of the current clip being played
-	string currentClipName;
+	std::string currentClipName;
 
 	//Pointer to the current clip being played
 	AnimationClip* currentClip;
 
 	//Holds the animation clips in an unordered map for easy access via a name that is tied to the animation clip
-	std::unordered_map<string, AnimationClip*> animationClips;
+	std::unordered_map<std::string, AnimationClip*> animationClips;
 
 	bool isPlaying = false;
 public:
 
 	//Basic getter to retrieve the current clips name
-	string getCurrentClipName() const { return currentClipName; }
+	std::string getCurrentClipName() const { return currentClipName; }
 
 	//Adds a new Animation clip to the animator using emplace (emplace adds new data into the map)
-	void addAnimationClip(const string& name, AnimationClip* clip);
+	void addAnimationClip(const std::string& name, AnimationClip* clip);
 
 	//Plays an animation clip based off a name provided
-	void playAnimationClip(const string& name);
+	void playAnimationClip(const std::string& name);
 
 	AnimationClip* getCurrentClip() const { return currentClip; }
 
@@ -34,7 +33,7 @@ public:
 	void update(float deltaSeconds) {
 		if (currentClip) {
 			currentClip->update(deltaSeconds);
-			cout << "Current frame " << currentClip->getCurrentFrame() << endl;
+			std::cout << "Current frame " << currentClip->getCurrentFrame() << std::endl;
 		}
 	}
 
