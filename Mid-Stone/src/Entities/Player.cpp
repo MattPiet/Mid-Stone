@@ -31,8 +31,7 @@ std::unique_ptr<Entity> Player::Shoot() const
     const Vec4 worldPoint = TRL * Vec4(0,0,0,1);
     const Vec3 worldMuzzlePosition(worldPoint.x, worldPoint.y, worldPoint.z);
     
-    auto bullet = std::make_unique<Entity>(worldMuzzlePosition, Vec3{1.0f, 1.0f, 1.0f}, 'q');
-   
+    auto bullet = std::make_unique<Entity>(worldMuzzlePosition, Vec3{1.5f, 1.5f, 1.0f}, 'q');
     bullet->SetLifeSpan(2.0f);
     return bullet;
 }

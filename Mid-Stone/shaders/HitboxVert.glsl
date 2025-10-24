@@ -11,5 +11,5 @@ layout(location = 3) uniform vec3 scale;
 
 void main() {
     vec3 offsetVert = vertex * scale;
-    gl_Position = projectionMatrix * modelMatrix * vec4(offsetVert, 1.0);
+    gl_Position = projectionMatrix * modelMatrix * vec4(vertex, 1.0);
 }

@@ -94,4 +94,8 @@ public:
     MATH::Vec3 GetHitbox() const {
         return hitbox;
 	}
+
+    void AdjustHitboxSize(const MATH::Vec3& adjustment) {
+        hitbox = hitbox + adjustment;
+	}
 };

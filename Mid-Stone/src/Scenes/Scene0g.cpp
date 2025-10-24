@@ -130,7 +130,7 @@ bool Scene0g::OnCreate()
     bulletsRenderer->loadImage("sprites/fist.png", 2, 8);
     impactRenderer = new SpriteRenderer();
     impactRenderer->loadImage("sprites/impact.png", 2, 4);
-    players.emplace_back(std::make_unique<Player>(Vec3{15, 15, 0}, Vec3{1.5f, 1.5f, 1.5f}, 'q'));
+    players.emplace_back(std::make_unique<Player>(Vec3{15, 15, 0}, Vec3{1.75f, 1.75f, 1.75f}, 'q'));
     for (auto& player : players) {
 		player->OnCreate(playerRenderer);
     }
@@ -229,6 +229,7 @@ void Scene0g::HandleEvents(const SDL_Event& sdlEvent)
             if (auto bullet = players.front()->Shoot())
             {
 				bullet->OnCreate(bulletsRenderer);
+                bullet->AdjustHitboxSize(Vec3{ -10.f, -10.f, 0.0f });
                 // implicit upcast unique_ptr<Bullet> -> unique_ptr<Entity> (default deleter)
                 bullet->SetExpiredCallback([this](Entity& e)
                 {
@@ -330,19 +331,6 @@ void Scene0g::Update(const float deltaTime)
         effect->Update(deltaTime);
     }
 
-    /*Updating Collisions*/
-	for (int i = 0; i < bullets.size(); i++)
-    {
-        if (bullets[i] != bullets.back()) {
-        
-            if (Collision::CheckQuadQuadCollision(*bullets[i], *bullets[i + 1])) {
-                Collision::CollisionResponse(*bullets[i], *bullets[i + 1]);
-            }
-            
-        }
-        
-        
-	}
 
 
     /* Removes and Deletes Players if they expire */
@@ -368,6 +356,15 @@ void Scene0g::Update(const float deltaTime)
            bullet->OnDestroy();
 	   }
 	}
+
+    for (int i = 0; i < bullets.size(); i++)
+    {
+        if (bullets[i] != bullets.back()) {
+
+            Collision::CollisionResponse(*bullets[i], *bullets[i + 1]);
+        }
+
+    }
     bullets.erase(
         std::remove_if(bullets.begin(), bullets.end(),
                        [](const std::unique_ptr<Entity>& e) { return e->IsExpired(); }),
@@ -388,6 +385,9 @@ void Scene0g::Update(const float deltaTime)
                        [](const std::unique_ptr<Entity>& e) { return e->IsExpired(); }),
         effects.end()
     );
+    
+  
+	
 }
 
 void Scene0g::Render() const

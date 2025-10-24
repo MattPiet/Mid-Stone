@@ -22,20 +22,20 @@ void Entity::OnCreate(SpriteRenderer* renderer){
     if (renderer->GetRows() > 0 && renderer->GetColumns() > 0) { // if its a spritesheet
         float frameWidth = (float)renderer->GetImageWidth() / renderer->GetColumns();
         float frameHeight = (float)renderer->GetImageHeight() / renderer->GetRows();
-        float aspect = frameWidth / frameHeight;
+        float aspect = (frameWidth) / (frameHeight);
         float desiredHeight = 64.0f / 5.0f;
         float desiredWidth = desiredHeight * aspect;
-        hitbox = MATH::Vec3(desiredWidth, desiredHeight, 1.0f);
+        hitbox = MATH::Vec3(desiredWidth * scale.x, desiredHeight * scale.y, 1.0f);
     }
     else { // if its not a spritesheet
         float aspect = (float)renderer->GetImageWidth() / renderer->GetImageHeight();
         float desiredHeight = 64.0f / 10.0f;
         float desiredWidth = desiredHeight * aspect;
-        hitbox = MATH::Vec3(desiredWidth, desiredHeight, 1.0f);
+        hitbox = MATH::Vec3(desiredWidth * scale.x, desiredHeight * scale.y, 1.0f);
     }
-    hitbox = hitbox * 0.5f; // slightly bigger hitbox for better visibility
-	hitbox.x *= scale.x;
-    hitbox.y *= scale.y;
+    //hitbox = hitbox * 0.5f; 
+	/*hitbox.x *= scale.x;
+    hitbox.y *= scale.y;*/
 }
 
 void Entity::OnDestroy(){
@@ -88,7 +88,10 @@ void Entity::DrawHitBox(MATH::Matrix4 projectionMatrix, SpriteMesh* mesh)
     if (shader) {
         glUseProgram(shader->GetProgram());
         glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, projectionMatrix);
-        glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, this->GetModelMatrix());
+        Matrix4 model = MMath::translate(position) *
+                        MMath::toMatrix4(orientation) *
+			            MMath::scale(MATH::Vec3(hitbox.x, hitbox.y, 1.0f));
+        glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, model);
         glUniform3fv(shader->GetUniformID("scale"), 1, hitbox);
 		glUniform4fv(shader->GetUniformID("hitboxColor"), 1, hitboxColor);
         mesh->RenderMesh();
