@@ -39,47 +39,11 @@ Scene0g::~Scene0g()
 bool Scene0g::OnCreate()
 {
     Debug::Info("Loading assets Scene0: ", __FILE__, __LINE__);
-    sphere = new Body();
-    sphere->OnCreate();
 
-    mesh = new Mesh("meshes/Sphere.obj");
-    mesh->OnCreate();
 
-	fistEntity = new Entity(Vec3(44.0f, 36.0f, 0.0f), Vec3(1.0f, 1.0f, 1.0f), Hit_box_type::quad);
-
-    // Create the sprite mesh and sprite renderer //// look in the headr file for more info
-    sprite_Mesh = new SpriteMesh();
-    sprite_Mesh->OnCreate();
-
-    sprite_Renderer = new SpriteRenderer();
-    sprite_Renderer->loadImage("sprites/fist.png", 2, 8);
-	fistEntity->OnCreate(sprite_Renderer);
-
-    spriteSheet_Renderer = new SpriteRenderer();
-    spriteSheet_Renderer->loadImage("sprites/Attack_Top.png", 1, 3);
-
-    shader = new Shader("shaders/spriteVert.glsl", "shaders/spriteFrag.glsl");
-    if (!shader->OnCreate())
-    {
-        std::cout << "Shader failed ... we have a problem\n";
-    }
-
-	
-
-    projectionMatrix = MMath::perspective(45.0f, (16.0f / 9.0f), 0.5f, 100.0f);
-
-    /// Set up the sprite projection matrix //// This is orthographic for 2D rendering
-    spriteProjectionMatrix = MMath::orthographic(0.0f, 1280.0f / 10.0f,
-                                                 0.0f, 720.0f / 10.0f,
-                                                 -1.0f, 1.0f);
-
-    viewMatrix = MMath::lookAt(Vec3(0.0f, 0.0f, 5.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
     modelMatrix.loadIdentity();
-    /// Move the sprite to the center of the screen ish
     modelMatrix = MMath::translate(44.0f, 36.0f, 0.0f);
 
-    spriteSheet_ModelMatrix.loadIdentity();
-    spriteSheet_ModelMatrix = MMath::translate(84.0f, 36.0f, 0.0f);
 
     SDL_Init(SDL_INIT_AUDIO);
     MIX_Init();
@@ -120,6 +84,10 @@ bool Scene0g::OnCreate()
     MIX_Quit();
     }*/
 
+    players.emplace_back(std::make_unique<Player>(Vec3{15, 15, 0}, Vec3{1.75f, 1.75f, 1.75f}, Hit_box_type::quad));
+    for (auto& player : players) {
+        player->OnCreate(playerRenderer);
+    }
 
     /** Renderer Setup **/
     crossHairsRenderer = new SpriteRenderer();
@@ -130,10 +98,24 @@ bool Scene0g::OnCreate()
     bulletsRenderer->loadImage("sprites/fist.png", 2, 8);
     impactRenderer = new SpriteRenderer();
     impactRenderer->loadImage("sprites/impact.png", 2, 4);
-    players.emplace_back(std::make_unique<Player>(Vec3{15, 15, 0}, Vec3{1.75f, 1.75f, 1.75f}, Hit_box_type::quad));
-    for (auto& player : players) {
-		player->OnCreate(playerRenderer);
+    players.emplace_back(std::make_unique<Player>(Vec3{-50, -20, 0}, Vec3{2.0f, 2.0f, 2.0f}));
+
+    /** Sprite Setup **/
+    sprite_Mesh = new SpriteMesh();
+    sprite_Mesh->OnCreate();
+    spriteSheet_ModelMatrix.loadIdentity();
+    spriteSheet_ModelMatrix = MMath::translate(84.0f, 36.0f, 0.0f);
+
+    shader = new Shader("shaders/spriteVert.glsl", "shaders/spriteFrag.glsl");
+    if (!shader->OnCreate())
+    {
+        std::cout << "Shader failed ... we have a problem\n";
     }
+
+    /** Camera **/
+    camera = std::make_unique<Camera>();
+    cameraController = std::make_unique<CameraController>(camera.get());
+    
 
     return true;
 }
@@ -141,24 +123,37 @@ bool Scene0g::OnCreate()
 void Scene0g::OnDestroy()
 {
     Debug::Info("Deleting assets Scene0: ", __FILE__, __LINE__);
-    sphere->OnDestroy();
-    delete sphere;
-    sphere = nullptr;
+    if (sphere != nullptr)
+    {
+        sphere->OnDestroy();
+        delete sphere;
+        sphere = nullptr;
+    }
 
-    mesh->OnDestroy();
-    delete mesh;
-    mesh = nullptr;
+    if (mesh != nullptr)
+    {
+        mesh->OnDestroy();
+        delete mesh;
+        mesh = nullptr;
+    }
 
-    shader->OnDestroy();
-    delete shader;
-    shader = nullptr;
+    if (shader != nullptr)
+    {
+        shader->OnDestroy();
+        delete shader;
+        shader = nullptr;
+    }
 
 	delete fistEntity;
 	fistEntity = nullptr;
+    
+    if (sprite_Mesh != nullptr)
+    {
+        sprite_Mesh->OnDestroy();
+        delete sprite_Mesh;
+        sprite_Mesh = nullptr;
+    }
 
-    sprite_Mesh->OnDestroy();
-    delete sprite_Mesh;
-    sprite_Mesh = nullptr;
 
     delete sprite_Renderer;
     sprite_Renderer = nullptr;
@@ -186,6 +181,9 @@ void Scene0g::OnDestroy()
 
 	delete clip2;
 	clip2 = nullptr;
+
+    cameraController.reset();
+    camera.reset();
 
     //// Turn off audio
     if (mixer)
@@ -246,12 +244,38 @@ void Scene0g::HandleEvents(const SDL_Event& sdlEvent)
         break;
 
     case SDL_EVENT_MOUSE_MOTION:
+        cameraController->OnMouseMoved({static_cast<float>(sdlEvent.motion.x), static_cast<float>(sdlEvent.motion.y)});
+        break;
+
+    case SDL_EVENT_MOUSE_WHEEL:
+        {
+            const float steps = (sdlEvent.wheel.y > 0) ? +1.0f : -1.0f;
+            float x, y;
+            SDL_GetMouseState(&x, &y);
+            cameraController->OnMouseWheel(steps, {x, y});
+        }
         break;
 
     case SDL_EVENT_MOUSE_BUTTON_DOWN:
+        switch (sdlEvent.button.button)
+        {
+        case SDL_BUTTON_MIDDLE:
+            cameraController->OnMouseButtonPressed(2, {
+                                                       static_cast<float>(sdlEvent.button.x),
+                                                       static_cast<float>(sdlEvent.button.y)
+                                                   });
+            break;
+        }
         break;
 
     case SDL_EVENT_MOUSE_BUTTON_UP:
+        switch (sdlEvent.button.button)
+        {
+        case SDL_BUTTON_MIDDLE:
+            cameraController->OnMouseButtonReleased(2);
+            break;
+        }
+        break;
         break;
 
     default:
@@ -374,18 +398,16 @@ void Scene0g::Render() const
     }
 
     glUseProgram(shader->GetProgram());
-    glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, spriteProjectionMatrix);
+    glUniformMatrix4fv(static_cast<GLint>(shader->GetUniformID("projectionMatrix")), 1, GL_FALSE,
+                       camera->GetProjectionMatrix());
+    glUniformMatrix4fv(static_cast<GLint>(shader->GetUniformID("viewMatrix")), 1, GL_FALSE, camera->GetViewMatrix());
+
     //// Render the sprite
     // no but like actually this is all you need in the scene render function to render a sprite
     // look at the header file for more info but basically you need a sprite mesh and a sprite renderer
     // to animate a sprite sheet just pass in the current sprite index to the renderSprite function
     // so we still need to figure out how to animate the sprite sheet
 
-	spriteSheet_Renderer->renderSprite(shader, sprite_Mesh, spriteSheet_ModelMatrix, animator->getCurrentClip()->getCurrentFrame()); // current_sprite_index
-
-    fistEntity->DrawHitBox(spriteProjectionMatrix, sprite_Mesh);
-    
-    glUseProgram(shader->GetProgram());
     /* Regular Loop for Rendering Players */
     for (auto& player : players)
     {
@@ -412,8 +434,6 @@ void Scene0g::Render() const
         glUseProgram(shader->GetProgram());
     }
 
-
-    spriteSheet_Renderer->renderSprite(shader, sprite_Mesh, spriteSheet_ModelMatrix, 0); // current_sprite_index
 
     glUseProgram(0);
 }
