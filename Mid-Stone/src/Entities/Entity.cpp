@@ -1,13 +1,54 @@
 ﻿#include "Entities/Entity.h"
+#include <Utils/MemoryMonitor.h>
 
 #include <iostream>
 #include <MMath.h>
 #include <ostream>
 
-Entity::Entity(const Vec3& position, const Vec3& scale)
+
+Entity::Entity(const MATH::Vec3& position, const MATH::Vec3& scale)
 {
     this->position = position;
     this->scale = scale;
+    this->hitBoxType = Hit_box_type::quad;
+}
+
+Entity::Entity(const Vec3& position, const Vec3& scale, const Hit_box_type& hitBoxType)
+{
+    this->position = position;
+    this->scale = scale;
+	this->hitBoxType = hitBoxType;
+}
+
+void Entity::OnCreate(SpriteRenderer* renderer){
+    shader = new Shader("shaders/HitboxVert.glsl", "shaders/HitboxFrag.glsl");
+    if (!shader->OnCreate())
+    {
+    std::cout << "Hitbox Shader failed ... we have a problem\n";
+    }
+    if (renderer->GetRows() > 0 && renderer->GetColumns() > 0) { // if its a spritesheet
+        float frameWidth = (float)renderer->GetImageWidth() / renderer->GetColumns();
+        float frameHeight = (float)renderer->GetImageHeight() / renderer->GetRows();
+        float aspect = (frameWidth) / (frameHeight);
+        float desiredHeight = 64.0f / 5.0f; // Aspect Ratio Pixels
+        float desiredWidth = desiredHeight * aspect;
+        hitbox = MATH::Vec3(desiredWidth * scale.x, desiredHeight * scale.y, 1.0f);
+    }
+    else { // if its not a spritesheet
+        float aspect = (float)renderer->GetImageWidth() / renderer->GetImageHeight();
+        float desiredHeight = 64.0f / 10.0f;
+        float desiredWidth = desiredHeight * aspect;
+        hitbox = MATH::Vec3(desiredWidth * scale.x, desiredHeight * scale.y, 1.0f);
+    }
+    //hitbox = hitbox * 0.5f; 
+	/*hitbox.x *= scale.x;
+    hitbox.y *= scale.y;*/
+}
+
+void Entity::OnDestroy(){
+    std::cout << "Im Destroying My shader\n";
+    shader->OnDestroy();
+    delete shader;
 }
 
 void Entity::SetLifeSpan(float lifeSpanSeconds_)
@@ -48,11 +89,21 @@ void Entity::Update(float deltaTime)
         }
     }
 }
-void Entity::ApplyForce(MATH::Vec3 force) {
-    acceleration = force / mass;
-}
 
-void Entity::UpdatePosition(float deltaTime) {
-    velocity += acceleration * deltaTime;
-    position += velocity * deltaTime;
+void Entity::DrawHitBox(MATH::Matrix4 projectionMatrix, SpriteMesh* mesh)
+{
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    if (shader) {
+        glUseProgram(shader->GetProgram());
+        glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, projectionMatrix);
+        Matrix4 model = MMath::translate(position) *
+                        MMath::toMatrix4(orientation) *
+			            MMath::scale(MATH::Vec3(hitbox.x, hitbox.y, 1.0f));
+        glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, model);
+        glUniform3fv(shader->GetUniformID("scale"), 1, hitbox);
+		glUniform4fv(shader->GetUniformID("hitboxColor"), 1, hitboxColor);
+        mesh->RenderMesh();
+    }
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glUseProgram(0);
 }

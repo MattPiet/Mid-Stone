@@ -2,6 +2,7 @@
 #include <Utils/Debug.h>
 #include <fstream>
 #include <string.h>
+//#include <Utils/MemoryMonitor.h>
 
 Shader::Shader(const char* vertFilename_, const char* fragFilename_,
 	const char* tessCtrlFilename_, const char* tessEvalFilename_,

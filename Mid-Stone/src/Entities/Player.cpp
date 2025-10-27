@@ -7,6 +7,10 @@ Player::Player(const MATH::Vec3& position, const MATH::Vec3& scale) : Entity(pos
 {
 }
 
+Player::Player(const MATH::Vec3& position, const MATH::Vec3& scale, const Hit_box_type& hitBoxType) : Entity(position, scale, hitBoxType)
+{
+}
+
 void Player::MoveAim(float angleInDegrees)
 {
     MATH::Quaternion rotation = MATH::QMath::angleAxisRotation(angleInDegrees, MATH::Vec3(0.0f, 0.0f, 1.0f));
@@ -31,7 +35,7 @@ std::unique_ptr<Entity> Player::Shoot() const
     const Vec4 worldPoint = TRL * Vec4(0,0,0,1);
     const Vec3 worldMuzzlePosition(worldPoint.x, worldPoint.y, worldPoint.z);
     
-    auto bullet = std::make_unique<Entity>(worldMuzzlePosition, Vec3{1.0f, 1.0f, 1.0f});
+    auto bullet = std::make_unique<Entity>(worldMuzzlePosition, Vec3{1.5f, 1.5f, 1.0f}, Hit_box_type::quad);
     bullet->SetLifeSpan(2.0f);
     return bullet;
 }

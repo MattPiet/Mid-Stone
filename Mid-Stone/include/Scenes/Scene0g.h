@@ -57,7 +57,7 @@ private:
     SpriteRenderer* bulletsRenderer;
     SpriteRenderer* impactRenderer;
 
-    
+    Entity* fistEntity;
 
 
 	//Animation Stuff

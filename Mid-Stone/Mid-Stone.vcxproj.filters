@@ -71,11 +71,10 @@
     <ClCompile Include="src\Graphics\SpriteRenderer.cpp">
       <Filter>Source\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\Entities\Entity.cpp">
-      <Filter>Source\Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Entities\Player.cpp">
-      <Filter>Source\Entities</Filter>
+    <ClCompile Include="src\Entities\Entity.cpp" />
+    <ClCompile Include="src\Entities\Player.cpp" />
+    <ClCompile Include="src\Physics\Collisions.cpp">
+      <Filter>Source\Physics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -163,11 +162,10 @@
     <ClInclude Include="include\Graphics\SpriteRenderer.h">
       <Filter>Headers\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\Entities\Entity.h">
-      <Filter>Headers\Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Entities\Player.h">
-      <Filter>Headers\Entities</Filter>
+    <ClInclude Include="include\Entities\Entity.h" />
+    <ClInclude Include="include\Entities\Player.h" />
+    <ClInclude Include="include\Physics\Collisions.h">
+      <Filter>Headers\Physics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -181,6 +179,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="shaders\spriteVert.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\HitboxVert.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\HitboxFrag.glsl">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
@@ -238,6 +242,12 @@
     </Filter>
     <Filter Include="Headers\Utils">
       <UniqueIdentifier>{fa980139-a12c-4225-b973-677bf498585e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Physics">
+      <UniqueIdentifier>{a6254eb6-b7b9-4b27-9436-253931435e89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Physics">
+      <UniqueIdentifier>{f3457ddb-9168-4462-bb9c-98a35f6de8ed}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

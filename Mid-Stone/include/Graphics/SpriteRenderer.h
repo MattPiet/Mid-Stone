@@ -26,5 +26,11 @@ public:
 	void renderSprite(Shader* shader, SpriteMesh* sprite_mesh, Matrix4 modelMatrix, int current_sprite_index = 0) const; 
 
 	SpriteRenderer() : imageWidth{ 0 }, imageHeight{ 0 }, comppp{ 0 }, textureID{ 0 }, rows{ 0 }, columns{ 0 } {}
+
+	int GetImageWidth() const { return imageWidth; }
+	int GetImageHeight() const { return imageHeight; }
+	int GetRows() const { return rows; }
+	int GetColumns() const { return columns; }
+
 };
 #endif 

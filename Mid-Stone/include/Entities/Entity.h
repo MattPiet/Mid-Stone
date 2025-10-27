@@ -4,41 +4,51 @@
 #include <Quaternion.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include <Graphics/Shader.h>
+#include <Graphics/SpriteMesh.h>
+#include <Graphics/SpriteRenderer.h>
+
+enum class Hit_box_type : uint8_t {
+    quad = 0,
+    circle,
+};
 
 class Entity
 {
 private:
-    
+
 
     MATH::Vec3 scale;
     MATH::Vec3 position;
-    MATH::Vec3 velocity;
-    MATH::Vec3 acceleration;
-	float mass{ 1.0f };
-    
+
+    Hit_box_type hitBoxType; // 'c' for circle, Hit_box_type::quad for quad, etc.
+    MATH::Vec3 hitbox;
+	MATH::Vec4 hitboxColor{ 0.0f, 1.0f, 0.0f, 1.0f }; // RGBA
+
+	Shader* shader;
 
     using ExpiredCallback = std::function<void(Entity&)>;
     /**
      * Callback for a function that will be executed once this entity expires
      */
     ExpiredCallback onExpired;
-    
+
     /**
      * Life span for the entity, if it's 0, the object is immortal, if not, it will be the time in
      * seconds that the entity will live before destructing itself.
      */
-    float lifeSpanSeconds{0.0f};
+    float lifeSpanSeconds{ 0.0f };
 
     /**
      * Counter of seconds to calculate the lifespan of this entity.
      */
-    float currentLifeTimeSeconds{0.0f};
-    bool hasFiredExpiredHooks{false};
+    float currentLifeTimeSeconds{ 0.0f };
+    bool hasFiredExpiredHooks{ false };
 
 protected:
 
     MATH::Quaternion orientation;
-    
+
     virtual void OnExpired()
     {
         std::cout << "Entity expired" << std::endl;
@@ -47,17 +57,25 @@ protected:
 public:
     Entity() = default;
     Entity(const MATH::Vec3& position, const MATH::Vec3& scale);
+    Entity(const MATH::Vec3& position, const MATH::Vec3& scale, const Hit_box_type& hitBoxType);
+
+    void OnCreate(SpriteRenderer* renderer);
+	void OnDestroy();
 
     virtual ~Entity()
     {
+        this->OnDestroy();
         std::cout << "Entity destroyed" << std::endl;
     };
-    
+
     void SetLifeSpan(float lifeSpanSeconds);
     [[nodiscard]] float GetLifeSpan() const { return lifeSpanSeconds; }
     [[nodiscard]] float GetCurrentLifeTime() const { return currentLifeTimeSeconds; }
     void SetExpiredCallback(ExpiredCallback callback) { onExpired = std::move(callback); }
+
+    Hit_box_type GetHitBoxType() const { return hitBoxType; }
     
+
     /**
      * Checks whether the current lifetime surpasses the expected lifespan, as long as the lifespan is > 0
      * @return boolean indicating whether it is expired or not
@@ -73,6 +91,17 @@ public:
 
     void Update(float deltaTime);
 
-    void ApplyForce(MATH::Vec3 force);
-    void UpdatePosition(float deltaTime);
+	void DrawHitBox(MATH::Matrix4 projectionMatrix, SpriteMesh* mesh);
+
+    void SetHitboxColor(const MATH::Vec4& color) {
+        hitboxColor = color;
+    }
+
+    MATH::Vec3 GetHitbox() const {
+        return hitbox;
+	}
+
+    void AdjustHitboxSize(const MATH::Vec3& adjustment) {
+        hitbox = hitbox + adjustment;
+	}
 };
