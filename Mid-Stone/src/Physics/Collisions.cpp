@@ -1,6 +1,8 @@
 #include "Physics/Collisions.h"
 
 bool Collision::CheckCircleCircleCollision(const Entity& entity_1, const Entity& entity_2){
+	// TODO This is wrong, rework later.
+	
 	//Check for overlap on all axes
 		//Distance between the centers of the circles
 	float distance = MATH::VMath::distance(entity_1.GetPosition(), entity_2.GetPosition()); //Assuming they are in the same plane

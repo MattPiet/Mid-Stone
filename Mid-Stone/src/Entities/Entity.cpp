@@ -6,7 +6,14 @@
 #include <ostream>
 
 
-Entity::Entity(const Vec3& position, const Vec3& scale, const char& hitBoxType)
+Entity::Entity(const MATH::Vec3& position, const MATH::Vec3& scale)
+{
+    this->position = position;
+    this->scale = scale;
+    this->hitBoxType = Hit_box_type::quad;
+}
+
+Entity::Entity(const Vec3& position, const Vec3& scale, const Hit_box_type& hitBoxType)
 {
     this->position = position;
     this->scale = scale;
@@ -14,7 +21,7 @@ Entity::Entity(const Vec3& position, const Vec3& scale, const char& hitBoxType)
 }
 
 void Entity::OnCreate(SpriteRenderer* renderer){
-    shader = new Shader("shaders/hitboxVert.glsl", "shaders/hitboxFrag.glsl");
+    shader = new Shader("shaders/HitboxVert.glsl", "shaders/HitboxFrag.glsl");
     if (!shader->OnCreate())
     {
     std::cout << "Hitbox Shader failed ... we have a problem\n";
@@ -23,7 +30,7 @@ void Entity::OnCreate(SpriteRenderer* renderer){
         float frameWidth = (float)renderer->GetImageWidth() / renderer->GetColumns();
         float frameHeight = (float)renderer->GetImageHeight() / renderer->GetRows();
         float aspect = (frameWidth) / (frameHeight);
-        float desiredHeight = 64.0f / 5.0f;
+        float desiredHeight = 64.0f / 5.0f; // Aspect Ratio Pixels
         float desiredWidth = desiredHeight * aspect;
         hitbox = MATH::Vec3(desiredWidth * scale.x, desiredHeight * scale.y, 1.0f);
     }
@@ -39,6 +46,7 @@ void Entity::OnCreate(SpriteRenderer* renderer){
 }
 
 void Entity::OnDestroy(){
+    std::cout << "Im Destroying My shader\n";
     shader->OnDestroy();
     delete shader;
 }

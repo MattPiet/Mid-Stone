@@ -61,7 +61,7 @@ void SpriteRenderer::renderSprite(Shader* shader, SpriteMesh* sprite_mesh, Matri
         float frameWidth = (float)imageWidth / columns;
         float frameHeight = (float)imageHeight / rows;
         float aspect = frameWidth / frameHeight;
-        float desiredHeight = 64.0f / 5.0f;
+        float desiredHeight = 64.0f / 5.0f; // Aspect Ratio Pixels
         float desiredWidth = desiredHeight * aspect;
         modelMatrix *= MMath::scale(desiredWidth, desiredHeight, 1.0f);
     }

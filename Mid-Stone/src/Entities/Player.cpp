@@ -1,9 +1,13 @@
-﻿#include "../../include/Entities/Player.h"
+﻿#include "Entities/Player.h"
 
 #include <MMath.h>
 #include <QMath.h>
 
-Player::Player(const MATH::Vec3& position, const MATH::Vec3& scale, const char& hitBoxType) : Entity(position, scale, hitBoxType)
+Player::Player(const MATH::Vec3& position, const MATH::Vec3& scale) : Entity(position, scale)
+{
+}
+
+Player::Player(const MATH::Vec3& position, const MATH::Vec3& scale, const Hit_box_type& hitBoxType) : Entity(position, scale, hitBoxType)
 {
 }
 
@@ -31,7 +35,7 @@ std::unique_ptr<Entity> Player::Shoot() const
     const Vec4 worldPoint = TRL * Vec4(0,0,0,1);
     const Vec3 worldMuzzlePosition(worldPoint.x, worldPoint.y, worldPoint.z);
     
-    auto bullet = std::make_unique<Entity>(worldMuzzlePosition, Vec3{1.5f, 1.5f, 1.0f}, 'q');
+    auto bullet = std::make_unique<Entity>(worldMuzzlePosition, Vec3{1.5f, 1.5f, 1.0f}, Hit_box_type::quad);
     bullet->SetLifeSpan(2.0f);
     return bullet;
 }

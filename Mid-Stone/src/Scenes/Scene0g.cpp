@@ -45,7 +45,7 @@ bool Scene0g::OnCreate()
     mesh = new Mesh("meshes/Sphere.obj");
     mesh->OnCreate();
 
-	fistEntity = new Entity(Vec3(44.0f, 36.0f, 0.0f), Vec3(1.0f, 1.0f, 1.0f), 'q');
+	fistEntity = new Entity(Vec3(44.0f, 36.0f, 0.0f), Vec3(1.0f, 1.0f, 1.0f), Hit_box_type::quad);
 
     // Create the sprite mesh and sprite renderer //// look in the headr file for more info
     sprite_Mesh = new SpriteMesh();
@@ -56,7 +56,7 @@ bool Scene0g::OnCreate()
 	fistEntity->OnCreate(sprite_Renderer);
 
     spriteSheet_Renderer = new SpriteRenderer();
-    spriteSheet_Renderer->loadImage("sprites/idle.png", 1, 3);
+    spriteSheet_Renderer->loadImage("sprites/Attack_Top.png", 1, 3);
 
     shader = new Shader("shaders/spriteVert.glsl", "shaders/spriteFrag.glsl");
     if (!shader->OnCreate())
@@ -125,12 +125,12 @@ bool Scene0g::OnCreate()
     crossHairsRenderer = new SpriteRenderer();
     crossHairsRenderer->loadImage("sprites/crosshairs.png");
     playerRenderer = new SpriteRenderer();
-    playerRenderer->loadImage("sprites/idle.png", 1, 3);
+    playerRenderer->loadImage("sprites/Attack_Top.png", 1, 3);
     bulletsRenderer = new SpriteRenderer();
     bulletsRenderer->loadImage("sprites/fist.png", 2, 8);
     impactRenderer = new SpriteRenderer();
     impactRenderer->loadImage("sprites/impact.png", 2, 4);
-    players.emplace_back(std::make_unique<Player>(Vec3{15, 15, 0}, Vec3{1.75f, 1.75f, 1.75f}, 'q'));
+    players.emplace_back(std::make_unique<Player>(Vec3{15, 15, 0}, Vec3{1.75f, 1.75f, 1.75f}, Hit_box_type::quad));
     for (auto& player : players) {
 		player->OnCreate(playerRenderer);
     }
@@ -153,7 +153,6 @@ void Scene0g::OnDestroy()
     delete shader;
     shader = nullptr;
 
-	fistEntity->OnDestroy();
 	delete fistEntity;
 	fistEntity = nullptr;
 
@@ -194,19 +193,6 @@ void Scene0g::OnDestroy()
         MIX_DestroyMixer(mixer);
         MIX_Quit();
     }
-
-    ///Deleting shaders
-    for (auto& player : players) {
-            player->OnDestroy();
-    }
-
-    for (auto& bullet : bullets) {
-        bullet->OnDestroy();
-	}
-
-    for (auto& effect : effects) {
-        effect->OnDestroy();
-    }
 }
 
 void Scene0g::HandleEvents(const SDL_Event& sdlEvent)
@@ -233,7 +219,7 @@ void Scene0g::HandleEvents(const SDL_Event& sdlEvent)
                 // implicit upcast unique_ptr<Bullet> -> unique_ptr<Entity> (default deleter)
                 bullet->SetExpiredCallback([this](Entity& e)
                 {
-                    auto impact = std::make_unique<Entity>(e.GetPosition(), Vec3{1.0f, 1.0f, 1.0f}, 'q');
+                    auto impact = std::make_unique<Entity>(e.GetPosition(), Vec3{1.0f, 1.0f, 1.0f}, Hit_box_type::quad);
 					impact->OnCreate(impactRenderer);
                     impact->SetLifeSpan(1.0f);
                     effects.emplace_back(std::move(impact));
@@ -334,13 +320,6 @@ void Scene0g::Update(const float deltaTime)
 
 
     /* Removes and Deletes Players if they expire */
-    for (auto& player : players)
-    {
-        if (player->IsExpired())
-        {
-            player->OnDestroy();
-        }
-    }
     players.erase(
         std::remove_if(players.begin(), players.end(),
                        [](const std::unique_ptr<Player>& e) { return e->IsExpired(); }),
@@ -349,14 +328,7 @@ void Scene0g::Update(const float deltaTime)
     
 
     /* Removes and Deletes bullets if they expire */
-    for (auto& bullet : bullets)
-    {
-       if (bullet->IsExpired())
-       {
-           bullet->OnDestroy();
-	   }
-	}
-
+    // TODO Delete after demo.
     for (int i = 0; i < bullets.size(); i++)
     {
         if (bullets[i] != bullets.back()) {
@@ -373,13 +345,6 @@ void Scene0g::Update(const float deltaTime)
     
 
     /* Removes and Deletes effects if they expire */
-    for (auto& effect : effects)
-    {
-        if (effect->IsExpired())
-        {
-            effect->OnDestroy();
-        }
-    }
     effects.erase(
         std::remove_if(effects.begin(), effects.end(),
                        [](const std::unique_ptr<Entity>& e) { return e->IsExpired(); }),
@@ -424,8 +389,9 @@ void Scene0g::Render() const
     /* Regular Loop for Rendering Players */
     for (auto& player : players)
     {
-        playerRenderer->renderSprite(shader, sprite_Mesh, player->GetModelMatrix());
+        playerRenderer->renderSprite(shader, sprite_Mesh, player->GetModelMatrix(),1);
         crossHairsRenderer->renderSprite(shader, sprite_Mesh, player->GetAimModelMatrix());
+        
         player->DrawHitBox(spriteProjectionMatrix, sprite_Mesh);
         glUseProgram(shader->GetProgram());
     }

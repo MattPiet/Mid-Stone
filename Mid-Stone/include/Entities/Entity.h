@@ -8,6 +8,10 @@
 #include <Graphics/SpriteMesh.h>
 #include <Graphics/SpriteRenderer.h>
 
+enum class Hit_box_type : uint8_t {
+    quad = 0,
+    circle,
+};
 
 class Entity
 {
@@ -17,7 +21,7 @@ private:
     MATH::Vec3 scale;
     MATH::Vec3 position;
 
-    char hitBoxType; // 'c' for circle, 'q' for quad, etc.
+    Hit_box_type hitBoxType; // 'c' for circle, Hit_box_type::quad for quad, etc.
     MATH::Vec3 hitbox;
 	MATH::Vec4 hitboxColor{ 0.0f, 1.0f, 0.0f, 1.0f }; // RGBA
 
@@ -52,13 +56,15 @@ protected:
 
 public:
     Entity() = default;
-    Entity(const MATH::Vec3& position, const MATH::Vec3& scale, const char& hitBoxType);
+    Entity(const MATH::Vec3& position, const MATH::Vec3& scale);
+    Entity(const MATH::Vec3& position, const MATH::Vec3& scale, const Hit_box_type& hitBoxType);
 
     void OnCreate(SpriteRenderer* renderer);
 	void OnDestroy();
 
     virtual ~Entity()
     {
+        this->OnDestroy();
         std::cout << "Entity destroyed" << std::endl;
     };
 
@@ -67,7 +73,7 @@ public:
     [[nodiscard]] float GetCurrentLifeTime() const { return currentLifeTimeSeconds; }
     void SetExpiredCallback(ExpiredCallback callback) { onExpired = std::move(callback); }
 
-    char GetHitBoxType() const { return hitBoxType; }
+    Hit_box_type GetHitBoxType() const { return hitBoxType; }
     
 
     /**
