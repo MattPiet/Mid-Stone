@@ -84,11 +84,7 @@ bool Scene0g::OnCreate()
     MIX_Quit();
     }*/
 
-    players.emplace_back(std::make_unique<Player>(Vec3{15, 15, 0}, Vec3{1.75f, 1.75f, 1.75f}, Hit_box_type::quad));
-    for (auto& player : players) {
-        player->OnCreate(playerRenderer);
-    }
-
+    
     /** Renderer Setup **/
     crossHairsRenderer = new SpriteRenderer();
     crossHairsRenderer->loadImage("sprites/crosshairs.png");
@@ -100,6 +96,12 @@ bool Scene0g::OnCreate()
     impactRenderer->loadImage("sprites/impact.png", 2, 4);
     players.emplace_back(std::make_unique<Player>(Vec3{-50, -20, 0}, Vec3{2.0f, 2.0f, 2.0f}));
 
+    for (auto& player : players) {
+        player->OnCreate(playerRenderer);
+    }
+
+
+    
     /** Sprite Setup **/
     sprite_Mesh = new SpriteMesh();
     sprite_Mesh->OnCreate();
@@ -413,16 +415,15 @@ void Scene0g::Render() const
     {
         playerRenderer->renderSprite(shader, sprite_Mesh, player->GetModelMatrix(),1);
         crossHairsRenderer->renderSprite(shader, sprite_Mesh, player->GetAimModelMatrix());
-        
-        player->DrawHitBox(spriteProjectionMatrix, sprite_Mesh);
+        player->DrawHitBox(camera->GetProjectionMatrix(), camera->GetViewMatrix(), sprite_Mesh);
         glUseProgram(shader->GetProgram());
     }
 
     /* Regular Loop for Rendering Bullets */
-    for (auto& bullet : bullets)
+    for (auto& bullet: bullets)
     {
         bulletsRenderer->renderSprite(shader, sprite_Mesh, bullet->GetModelMatrix());
-        bullet->DrawHitBox(spriteProjectionMatrix, sprite_Mesh);
+        bullet->DrawHitBox(camera->GetProjectionMatrix(), camera->GetViewMatrix(), sprite_Mesh);
         glUseProgram(shader->GetProgram());
     }
 
@@ -430,7 +431,7 @@ void Scene0g::Render() const
     for (auto& effect : effects)
     {
         impactRenderer->renderSprite(shader, sprite_Mesh, effect->GetModelMatrix());
-        effect->DrawHitBox(spriteProjectionMatrix, sprite_Mesh);
+        effect->DrawHitBox(camera->GetProjectionMatrix(), camera->GetViewMatrix(), sprite_Mesh);
         glUseProgram(shader->GetProgram());
     }
 

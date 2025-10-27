@@ -90,7 +90,7 @@ void Entity::Update(float deltaTime)
     }
 }
 
-void Entity::DrawHitBox(MATH::Matrix4 projectionMatrix, SpriteMesh* mesh)
+void Entity::DrawHitBox(MATH::Matrix4 projectionMatrix, MATH::Matrix4 viewMatrix, SpriteMesh* mesh)
 {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     if (shader) {
@@ -100,6 +100,7 @@ void Entity::DrawHitBox(MATH::Matrix4 projectionMatrix, SpriteMesh* mesh)
                         MMath::toMatrix4(orientation) *
 			            MMath::scale(MATH::Vec3(hitbox.x, hitbox.y, 1.0f));
         glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, model);
+        glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, viewMatrix);
         glUniform3fv(shader->GetUniformID("scale"), 1, hitbox);
 		glUniform4fv(shader->GetUniformID("hitboxColor"), 1, hitboxColor);
         mesh->RenderMesh();

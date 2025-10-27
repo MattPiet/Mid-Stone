@@ -91,7 +91,7 @@ public:
 
     void Update(float deltaTime);
 
-	void DrawHitBox(MATH::Matrix4 projectionMatrix, SpriteMesh* mesh);
+	void DrawHitBox(MATH::Matrix4 projectionMatrix, MATH::Matrix4 viewMatrix, SpriteMesh* mesh);
 
     void SetHitboxColor(const MATH::Vec4& color) {
         hitboxColor = color;

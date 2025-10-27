@@ -23,9 +23,6 @@
     <ClCompile Include="src\Scenes\Scene0p.cpp">
       <Filter>Source\Scenes</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scenes\Scene0g.cpp">
-      <Filter>Source\Scenes</Filter>
-    </ClCompile>
     <ClCompile Include="src\UI\GuiWindow.cpp">
       <Filter>Source\UI</Filter>
     </ClCompile>
@@ -71,10 +68,23 @@
     <ClCompile Include="src\Graphics\SpriteRenderer.cpp">
       <Filter>Source\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\Entities\Entity.cpp" />
-    <ClCompile Include="src\Entities\Player.cpp" />
     <ClCompile Include="src\Physics\Collisions.cpp">
       <Filter>Source\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scenes\Scene0g.cpp">
+      <Filter>Source\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Entities\Entity.cpp">
+      <Filter>Source\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Entities\Player.cpp">
+      <Filter>Source\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\Camera.cpp">
+      <Filter>Source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\CameraController.cpp">
+      <Filter>Source\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -162,10 +172,20 @@
     <ClInclude Include="include\Graphics\SpriteRenderer.h">
       <Filter>Headers\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\Entities\Entity.h" />
-    <ClInclude Include="include\Entities\Player.h" />
     <ClInclude Include="include\Physics\Collisions.h">
       <Filter>Headers\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Entities\Entity.h">
+      <Filter>Headers\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Entities\Player.h">
+      <Filter>Headers\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Graphics\Camera.h">
+      <Filter>Headers\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Graphics\CameraController.h">
+      <Filter>Headers\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -181,10 +201,10 @@
     <None Include="shaders\spriteVert.glsl">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shaders\HitboxVert.glsl">
+    <None Include="shaders\HitboxFrag.glsl">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shaders\HitboxFrag.glsl">
+    <None Include="shaders\HitboxVert.glsl">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
