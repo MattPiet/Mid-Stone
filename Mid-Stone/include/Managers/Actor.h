@@ -15,7 +15,7 @@ class Actor
 {
 public:
 	virtual ~Actor() {}
-	virtual bool OnCreate() = 0;
+	//virtual bool OnCreate() = 0;
 	virtual void OnDestroy() = 0;
 	virtual void Update(const float deltaTime_) = 0;
 	virtual void Render(Matrix4 viewMatrix, Matrix4 projectionMatrix) const = 0;

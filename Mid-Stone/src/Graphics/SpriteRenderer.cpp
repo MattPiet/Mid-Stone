@@ -51,16 +51,16 @@ std::pair<std::pair<float, float>, std::pair<float, float>> SpriteRenderer::runS
 void SpriteRenderer::renderSprite(Shader* shader, SpriteMesh* sprite_mesh, Matrix4 modelMatrix) const{
 	// Ok so this is all trippy but basically we bind the texture and set the uniform for the texture
     glBindTexture(GL_TEXTURE_2D, textureID);
-	glUniform1i(shader->GetUniformID("ourTexture"), 0); // set the texture uniform to texture unit 0
+    std::pair desiredWidth_Height = buildSprite();
+    modelMatrix *= MMath::scale(desiredWidth_Height.first, desiredWidth_Height.second, 1.0f);
     glUniform2f(shader->GetUniformID("uvScale"), 1.0f, 1.0f);
 	glUniform2f(shader->GetUniformID("uvOffset"), 0.0f, 0.0f);
 	// now we need to scale the model matrix to the size of the image
-    std::pair desiredWidth_Height = buildSprite();
-    modelMatrix *= MMath::scale(desiredWidth_Height.first, desiredWidth_Height.second, 1.0f);
     glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, modelMatrix);
 	// finally render the sprite mesh
     sprite_mesh->RenderMesh();
     glBindTexture(GL_TEXTURE_2D, 0); 
+    glUseProgram(0);
 }
 std::pair<float, float> SpriteRenderer::buildSprite() const {
     float aspect = (float)imageWidth / imageHeight;

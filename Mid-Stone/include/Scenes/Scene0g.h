@@ -9,6 +9,7 @@
 #include "Entities/Player.h"
 #include "Graphics/Camera.h"
 #include "Graphics/CameraController.h"
+#include <Managers/2DActor.h>
 
 using namespace MATH;
 
@@ -21,6 +22,7 @@ class SpriteMesh;
 class SpriteRenderer;
 class AnimationClip;
 class Animator;
+class ActorTwoD;
 
 class Scene0g : public Scene
 {
@@ -72,6 +74,9 @@ private:
 
 	Animator* animator;
 
+
+	ActorTwoD* test_actor;
+	ActorTwoD* Test_actor_SpriteSheet;
 
 public:
     explicit Scene0g();

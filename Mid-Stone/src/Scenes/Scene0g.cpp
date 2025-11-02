@@ -63,7 +63,7 @@ bool Scene0g::OnCreate()
     MIX_DestroyAudio(Music);
 
 
-    clip2 = new AnimationClip( AnimationClip::PlayMode::PINGPONG, 1.0f, 2, 2);
+    clip2 = new AnimationClip( AnimationClip::PlayMode::PINGPONG, 0.4f, 2, 2);
 	animator = new Animator();
 	animator->addAnimationClip("Idle", clip2);
 	animator->addAnimationClip("Default", clip1);
@@ -118,6 +118,26 @@ bool Scene0g::OnCreate()
     camera = std::make_unique<Camera>();
     cameraController = std::make_unique<CameraController>(camera.get());
     
+    test_actor = new ActorTwoD();
+    if (!test_actor->OnCreate("sprites/fatty_clicked.png"))
+    {
+        std::cout << "Failed to create test actor\n";
+        return false;
+	}
+	test_actor->getEntity()->SetPosition(Vec3(-25.0f, -20.0f, 0.0f));
+    test_actor->draw_Hitbox = true;
+
+	Test_actor_SpriteSheet = new ActorTwoD();
+    if (!Test_actor_SpriteSheet->OnCreate("sprites/Idle.png", 1, 3)){
+        std::cout << "Failed to create test actor spritesheet\n";
+		return false;
+	}
+	Test_actor_SpriteSheet->getEntity()->SetPosition(Vec3(-10.0f, -20.0f, 0.0f));
+    Test_actor_SpriteSheet->draw_Hitbox = true;
+
+	Test_actor_SpriteSheet->getAnimator()->addAnimationClip("Idle", clip2);
+	Test_actor_SpriteSheet->getAnimator()->playAnimationClip("Idle");
+	Test_actor_SpriteSheet->ReBuildAll("sprites/Idle.png", 1, 3);
 
     return true;
 }
@@ -183,6 +203,11 @@ void Scene0g::OnDestroy()
 
 	delete clip2;
 	clip2 = nullptr;
+
+	delete test_actor;
+	test_actor = nullptr;
+    delete Test_actor_SpriteSheet;
+	Test_actor_SpriteSheet = nullptr;
 
     cameraController.reset();
     camera.reset();
@@ -316,6 +341,9 @@ static float sphereScale = 1.0f;
 void Scene0g::Update(const float deltaTime)
 {
     animator->update(deltaTime);  
+	Test_actor_SpriteSheet->Update(deltaTime);
+
+
 
     /** Update Players **/
     if (pressingLeft && !pressingRight)
@@ -435,6 +463,11 @@ void Scene0g::Render() const
         glUseProgram(shader->GetProgram());
     }
 
+	test_actor->Render(camera->GetViewMatrix(), camera->GetProjectionMatrix());
+    glUseProgram(shader->GetProgram());
+
+	Test_actor_SpriteSheet->Render(camera->GetViewMatrix(), camera->GetProjectionMatrix());
+    glUseProgram(shader->GetProgram());
 
     glUseProgram(0);
 }

@@ -33,7 +33,7 @@ public:
 	void update(float deltaSeconds) {
 		if (currentClip) {
 			currentClip->update(deltaSeconds);
-			std::cout << "Current frame " << currentClip->getCurrentFrame() << std::endl;
+			//std::cout << "Current frame " << currentClip->getCurrentFrame() << std::endl;
 		}
 	}
 

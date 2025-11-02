@@ -55,7 +55,7 @@ protected:
     }
 
 public:
-    Entity() = default;
+    Entity() { position = Vec3(0.0f, 0.0f, 0.0f), scale = Vec3(1.0f, 1.0f, 1.0f); }
     Entity(const MATH::Vec3& position, const MATH::Vec3& scale);
     Entity(const MATH::Vec3& position, const MATH::Vec3& scale, const Hit_box_type& hitBoxType);
 
@@ -106,4 +106,8 @@ public:
     void AdjustHitboxSize(const MATH::Vec3& adjustment) {
         hitbox = hitbox + adjustment;
 	}
+
+    void SetPosition(const MATH::Vec3& position_) {
+        position = position_;
+    }
 };

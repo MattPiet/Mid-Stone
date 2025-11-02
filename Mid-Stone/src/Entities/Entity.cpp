@@ -98,7 +98,6 @@ void Entity::DrawHitBox(MATH::Matrix4 projectionMatrix, MATH::Matrix4 viewMatrix
 			            MMath::scale(MATH::Vec3(hitbox.x, hitbox.y, 1.0f));
         glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, model);
         glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, viewMatrix);
-        glUniform3fv(shader->GetUniformID("scale"), 1, hitbox);
 		glUniform4fv(shader->GetUniformID("hitboxColor"), 1, hitboxColor);
         mesh->RenderMesh();
     }

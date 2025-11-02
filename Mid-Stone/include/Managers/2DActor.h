@@ -20,11 +20,22 @@ private:
 	Animator* animator;
 
 public:
-	explicit ActorTwoD();
+	bool draw_Hitbox = false;
+	ActorTwoD();
 	virtual ~ActorTwoD();
-	virtual bool OnCreate() override;
+	bool OnCreate(const char* FileName, int rows = NULL, int columns = NULL);
 	virtual void OnDestroy() override;
 	virtual void Update(const float deltaTime_) override;
 	virtual void Render(Matrix4 viewMatrix, Matrix4 projectionMatrix) const override;
+
+	void AddClip(const std::string& name, const AnimationClip* clip) const ;
+	
+	void ReBuildAll(const char* FileName, int rows = NULL, int columns = NULL);
+
+	Entity* getEntity() const { return entity; }
+	SpriteMesh* getMesh() const { return sprite_Mesh; }
+	SpriteRenderer* getRenderer() { return sprite_Renderer; }
+	Animator* getAnimator() const { return animator; }
+
 
 };
