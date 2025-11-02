@@ -14,6 +14,7 @@ class SpriteRenderer
 	int comppp; // this is the number of color channels in the image
 	unsigned int textureID; // the OpenGL texture ID used to bind the texture
 	int rows, columns; // number of rows and columns in the spritesheet, if 0 then not a spritesheet
+	std::pair<std::pair<float, float>, std::pair<float, float>> spriteSheet_info; // the info for the spritesheet UV scale and offset created in runSpriteSheet
 public:
 
 	void loadImage(const char* path, int rows_ = NULL, int columns_ = NULL, bool flip = true); // load an image from file and create an OpenGL texture
@@ -23,7 +24,11 @@ public:
 	std::pair<std::pair<float, float>, std::pair<float, float>> runSpriteSheet(int current_sprite_index) const; // get the UV scale and offset for the current sprite index in the spritesheet
 
 	// render the sprite with the given shader and model matrix, if current_sprite_index is 0 then render the whole image
-	void renderSprite(Shader* shader, SpriteMesh* sprite_mesh, Matrix4 modelMatrix, int current_sprite_index = 0) const; 
+	void renderSprite(Shader* shader, SpriteMesh* sprite_mesh, Matrix4 modelMatrix) const; 
+	std::pair<float,float> buildSprite() const;
+	void renderSpriteSheet(Shader* shader, SpriteMesh* sprite_mesh, Matrix4 modelMatrix, int current_sprite_index) const;
+	std::pair<float, float> buildSpriteSheet(int current_sprite_index) const;
+
 
 	SpriteRenderer() : imageWidth{ 0 }, imageHeight{ 0 }, comppp{ 0 }, textureID{ 0 }, rows{ 0 }, columns{ 0 } {}
 

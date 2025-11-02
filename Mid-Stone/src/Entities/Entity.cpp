@@ -20,31 +20,28 @@ Entity::Entity(const Vec3& position, const Vec3& scale, const Hit_box_type& hitB
 	this->hitBoxType = hitBoxType;
 }
 
-void Entity::OnCreate(SpriteRenderer* renderer){
+void Entity::OnCreate(SpriteRenderer* renderer) {
     shader = new Shader("shaders/HitboxVert.glsl", "shaders/HitboxFrag.glsl");
     if (!shader->OnCreate())
     {
-    std::cout << "Hitbox Shader failed ... we have a problem\n";
+        std::cout << "Hitbox Shader failed ... we have a problem\n";
     }
-    if (renderer->GetRows() > 0 && renderer->GetColumns() > 0) { // if its a spritesheet
-        float frameWidth = (float)renderer->GetImageWidth() / renderer->GetColumns();
-        float frameHeight = (float)renderer->GetImageHeight() / renderer->GetRows();
-        float aspect = (frameWidth) / (frameHeight);
-        float desiredHeight = 64.0f / 5.0f; // Aspect Ratio Pixels
-        float desiredWidth = desiredHeight * aspect;
-        hitbox = MATH::Vec3(desiredWidth * scale.x, desiredHeight * scale.y, 1.0f);
+    if (renderer->GetColumns() == NULL){
+        CreateHitBox(renderer);
     }
-    else { // if its not a spritesheet
-        float aspect = (float)renderer->GetImageWidth() / renderer->GetImageHeight();
-        float desiredHeight = 64.0f / 10.0f;
-        float desiredWidth = desiredHeight * aspect;
-        hitbox = MATH::Vec3(desiredWidth * scale.x, desiredHeight * scale.y, 1.0f);
+    else{
+		CreateHitBox(renderer, 0);
     }
-    //hitbox = hitbox * 0.5f; 
-	/*hitbox.x *= scale.x;
-    hitbox.y *= scale.y;*/
 }
 
+void Entity::CreateHitBox(SpriteRenderer* renderer){
+        std::pair desiredWidth_Height = renderer->buildSprite();
+        hitbox = MATH::Vec3(desiredWidth_Height.first * scale.x, desiredWidth_Height.second * scale.y, 1.0f);
+}
+void Entity::CreateHitBox(SpriteRenderer* renderer, int CurrentIndex) {
+        std::pair desiredWidth_Height = renderer->buildSpriteSheet(CurrentIndex);
+        hitbox = MATH::Vec3(desiredWidth_Height.first * scale.x, desiredWidth_Height.second * scale.y, 1.0f);
+}
 void Entity::OnDestroy(){
     std::cout << "Im Destroying My shader\n";
     shader->OnDestroy();

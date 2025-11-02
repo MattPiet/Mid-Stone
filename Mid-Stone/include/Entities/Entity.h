@@ -60,6 +60,8 @@ public:
     Entity(const MATH::Vec3& position, const MATH::Vec3& scale, const Hit_box_type& hitBoxType);
 
     void OnCreate(SpriteRenderer* renderer);
+    void CreateHitBox(SpriteRenderer* renderer);
+	void CreateHitBox(SpriteRenderer* renderer, int CurrentIndex);
 	void OnDestroy();
 
     virtual ~Entity()

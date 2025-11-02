@@ -357,11 +357,11 @@ void Scene0g::Update(const float deltaTime)
     // TODO Delete after demo.
     for (int i = 0; i < bullets.size(); i++)
     {
-        if (bullets[i] != bullets.back()) {
+        if (bullets[i] != bullets[0]) {
 
-            Collision::CollisionResponse(*bullets[i], *bullets[i + 1]);
+            Collision::CollisionResponse(*bullets[i], *bullets[i - 1]);
         }
-
+    
     }
     bullets.erase(
         std::remove_if(bullets.begin(), bullets.end(),
@@ -413,7 +413,7 @@ void Scene0g::Render() const
     /* Regular Loop for Rendering Players */
     for (auto& player : players)
     {
-        playerRenderer->renderSprite(shader, sprite_Mesh, player->GetModelMatrix(),1);
+        playerRenderer->renderSpriteSheet(shader, sprite_Mesh, player->GetModelMatrix(),1);
         crossHairsRenderer->renderSprite(shader, sprite_Mesh, player->GetAimModelMatrix());
         player->DrawHitBox(camera->GetProjectionMatrix(), camera->GetViewMatrix(), sprite_Mesh);
         glUseProgram(shader->GetProgram());
@@ -422,7 +422,7 @@ void Scene0g::Render() const
     /* Regular Loop for Rendering Bullets */
     for (auto& bullet: bullets)
     {
-        bulletsRenderer->renderSprite(shader, sprite_Mesh, bullet->GetModelMatrix());
+        bulletsRenderer->renderSpriteSheet(shader, sprite_Mesh, bullet->GetModelMatrix(),1);
         bullet->DrawHitBox(camera->GetProjectionMatrix(), camera->GetViewMatrix(), sprite_Mesh);
         glUseProgram(shader->GetProgram());
     }
@@ -430,7 +430,7 @@ void Scene0g::Render() const
     /* Regular Loop for Rendering Effects */
     for (auto& effect : effects)
     {
-        impactRenderer->renderSprite(shader, sprite_Mesh, effect->GetModelMatrix());
+        impactRenderer->renderSpriteSheet(shader, sprite_Mesh, effect->GetModelMatrix(),1);
         effect->DrawHitBox(camera->GetProjectionMatrix(), camera->GetViewMatrix(), sprite_Mesh);
         glUseProgram(shader->GetProgram());
     }

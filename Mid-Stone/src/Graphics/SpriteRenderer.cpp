@@ -46,38 +46,48 @@ std::pair<std::pair<float, float>, std::pair<float, float>> SpriteRenderer::runS
     float uOffset = static_cast<float>(currentSpriteCol) * cellWidth;
     float vOffset = static_cast<float>(currentSpriteRow) * cellHeight;
 	// return the UV scale and offset as a pair of pairs
-        return std::make_pair(std::make_pair(cellWidth, cellHeight), std::make_pair(uOffset, vOffset));
+    return std::make_pair(std::make_pair(cellWidth, cellHeight), std::make_pair(uOffset, vOffset));
 }
-void SpriteRenderer::renderSprite(Shader* shader, SpriteMesh* sprite_mesh, Matrix4 modelMatrix, int current_sprite_index) const{
+void SpriteRenderer::renderSprite(Shader* shader, SpriteMesh* sprite_mesh, Matrix4 modelMatrix) const{
 	// Ok so this is all trippy but basically we bind the texture and set the uniform for the texture
-
     glBindTexture(GL_TEXTURE_2D, textureID);
 	glUniform1i(shader->GetUniformID("ourTexture"), 0); // set the texture uniform to texture unit 0
-	if (rows > 0 && columns > 0) { // if its a spritesheet
-        std::pair sprite_info = runSpriteSheet(current_sprite_index); 
-        glUniform2f(shader->GetUniformID("uvScale"), sprite_info.first.first, sprite_info.first.second);
-        glUniform2f(shader->GetUniformID("uvOffset"), sprite_info.second.first, sprite_info.second.second);
-
-        float frameWidth = (float)imageWidth / columns;
-        float frameHeight = (float)imageHeight / rows;
-        float aspect = frameWidth / frameHeight;
-        float desiredHeight = 64.0f / 5.0f; // Aspect Ratio Pixels
-        float desiredWidth = desiredHeight * aspect;
-        modelMatrix *= MMath::scale(desiredWidth, desiredHeight, 1.0f);
-    }
-	else { // if its not a spritesheet
-        glUniform2f(shader->GetUniformID("uvScale"), 1.0f, 1.0f);
-		glUniform2f(shader->GetUniformID("uvOffset"), 0.0f, 0.0f);
-        float aspect = (float)imageWidth / imageHeight;
-        float desiredHeight = 64.0f / 10.0f;                   
-        float desiredWidth = desiredHeight * aspect;  
-        modelMatrix *= MMath::scale(desiredWidth, desiredHeight, 1.0f);
-    }
+    glUniform2f(shader->GetUniformID("uvScale"), 1.0f, 1.0f);
+	glUniform2f(shader->GetUniformID("uvOffset"), 0.0f, 0.0f);
 	// now we need to scale the model matrix to the size of the image
-
+    std::pair desiredWidth_Height = buildSprite();
+    modelMatrix *= MMath::scale(desiredWidth_Height.first, desiredWidth_Height.second, 1.0f);
     glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, modelMatrix);
 	// finally render the sprite mesh
     sprite_mesh->RenderMesh();
     glBindTexture(GL_TEXTURE_2D, 0); 
 }
+std::pair<float, float> SpriteRenderer::buildSprite() const {
+    float aspect = (float)imageWidth / imageHeight;
+    float desiredHeight = 64.0f / 10.0f;
+    float desiredWidth = desiredHeight * aspect;
+    return std::make_pair(desiredWidth, desiredHeight);
+}
+void SpriteRenderer::renderSpriteSheet(Shader* shader, SpriteMesh* sprite_mesh, Matrix4 modelMatrix, int current_sprite_index) const {
+        glBindTexture(GL_TEXTURE_2D, textureID);
+		std::pair desiredWidth_Height = buildSpriteSheet(current_sprite_index);
+		modelMatrix *= MMath::scale(desiredWidth_Height.first, desiredWidth_Height.second, 1.0f);
+        glUniform2f(shader->GetUniformID("uvScale"), spriteSheet_info.first.first, spriteSheet_info.first.second);
+        glUniform2f(shader->GetUniformID("uvOffset"), spriteSheet_info.second.first, spriteSheet_info.second.second);
+        glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, modelMatrix);
+        sprite_mesh->RenderMesh();
+        glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+std::pair<float, float> SpriteRenderer::buildSpriteSheet(int current_sprite_index) const {
+    const_cast<std::pair<std::pair<float, float>, std::pair<float, float>>&>(spriteSheet_info) = runSpriteSheet(current_sprite_index);
+    float frameWidth = (float)imageWidth / columns;
+    float frameHeight = (float)imageHeight / rows;
+    float aspect = frameWidth / frameHeight;
+    float desiredHeight = 64.0f / 5.0f; // Aspect Ratio Pixels
+    float desiredWidth = desiredHeight * aspect;
+
+    return std::make_pair(desiredWidth, desiredHeight);
+}
+
 #endif
