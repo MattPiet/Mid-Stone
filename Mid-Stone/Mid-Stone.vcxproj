@@ -157,7 +157,6 @@
     <ClCompile Include="src\Physics\Collisions.cpp" />
     <ClCompile Include="src\Scenes\AnimationScene.cpp" />
     <ClCompile Include="src\Scenes\Scene0g.cpp" />
-    <ClCompile Include="src\Scenes\Scene0p.cpp" />
     <ClCompile Include="src\UI\GuiWindow.cpp" />
     <ClCompile Include="src\Utils\Debug.cpp" />
   </ItemGroup>
@@ -192,7 +191,6 @@
     <ClInclude Include="include\Scenes\AnimationScene.h" />
     <ClInclude Include="include\Scenes\Scene.h" />
     <ClInclude Include="include\Scenes\Scene0g.h" />
-    <ClInclude Include="include\Scenes\Scene0p.h" />
     <ClInclude Include="include\UI\GuiWindow.h" />
     <ClInclude Include="include\Utils\Debug.h" />
     <ClInclude Include="include\Utils\MemoryMonitor.h" />

@@ -23,7 +23,7 @@
 
 #include <Utils/MemoryMonitor.h>
 
-Scene0g::Scene0g() : sphere{nullptr}, shader{nullptr}, mesh{nullptr},
+Scene0g::Scene0g() : shader{nullptr}, mesh{nullptr},
                      drawInWireMode{false}, master_volume{1.0f}, mixer{nullptr}, sprite_Mesh{nullptr},
                      sprite_Renderer{nullptr},
                      spriteSheet_Renderer{nullptr}
@@ -125,13 +125,6 @@ bool Scene0g::OnCreate()
 void Scene0g::OnDestroy()
 {
     Debug::Info("Deleting assets Scene0: ", __FILE__, __LINE__);
-    if (sphere != nullptr)
-    {
-        sphere->OnDestroy();
-        delete sphere;
-        sphere = nullptr;
-    }
-
     if (mesh != nullptr)
     {
         mesh->OnDestroy();

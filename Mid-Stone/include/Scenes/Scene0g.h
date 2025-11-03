@@ -27,7 +27,6 @@ class ActorTwoD;
 class Scene0g : public Scene
 {
 private:
-    Body* sphere;
     Mesh* mesh;
     Matrix4 projectionMatrix;
     bool drawInWireMode;
