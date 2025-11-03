@@ -153,6 +153,7 @@
     <ClCompile Include="src\Graphics\Shader.cpp" />
     <ClCompile Include="src\Graphics\SpriteMesh.cpp" />
     <ClCompile Include="src\Graphics\SpriteRenderer.cpp" />
+    <ClCompile Include="src\Managers\2DActor.cpp" />
     <ClCompile Include="src\Physics\Collisions.cpp" />
     <ClCompile Include="src\Scenes\AnimationScene.cpp" />
     <ClCompile Include="src\Scenes\Scene0g.cpp" />
@@ -185,6 +186,8 @@
     <ClInclude Include="include\Graphics\Shader.h" />
     <ClInclude Include="include\Graphics\SpriteMesh.h" />
     <ClInclude Include="include\Graphics\SpriteRenderer.h" />
+    <ClInclude Include="include\Managers\2DActor.h" />
+    <ClInclude Include="include\Managers\Actor.h" />
     <ClInclude Include="include\Physics\Collisions.h" />
     <ClInclude Include="include\Scenes\AnimationScene.h" />
     <ClInclude Include="include\Scenes\Scene.h" />

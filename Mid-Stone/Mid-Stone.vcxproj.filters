@@ -86,6 +86,9 @@
     <ClCompile Include="src\Graphics\CameraController.cpp">
       <Filter>Source\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="src\Managers\2DActor.cpp">
+      <Filter>Source\Managers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\GameDevM\imgui\imconfig.h">
@@ -187,6 +190,12 @@
     <ClInclude Include="include\Graphics\CameraController.h">
       <Filter>Headers\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\Managers\2DActor.h">
+      <Filter>Headers\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Managers\Actor.h">
+      <Filter>Headers\Managers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\defaultFrag.glsl">
@@ -268,6 +277,12 @@
     </Filter>
     <Filter Include="Source\Physics">
       <UniqueIdentifier>{f3457ddb-9168-4462-bb9c-98a35f6de8ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Managers">
+      <UniqueIdentifier>{59d71de1-69f9-4178-92d7-e56c887aac98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Managers">
+      <UniqueIdentifier>{5715b05e-70cc-4406-a15a-c2bf7c63a24a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
