@@ -1,5 +1,6 @@
 #include <QMath.h>
 #include <Managers/PlayerController.h>
+#include <Utils/MemoryMonitor.h>
 
 PlayerController::PlayerController()
 {
@@ -7,6 +8,13 @@ PlayerController::PlayerController()
 
 PlayerController::~PlayerController()
 {
+    crosshairsShader->OnDestroy();
+    delete crosshairsShader;
+	crosshairsShader = nullptr;
+    crosshairsMesh->OnDestroy();
+    delete crosshairsMesh;
+	crosshairsMesh = nullptr;
+	delete crosshairsRenderer;
 }
 
 bool PlayerController::OnCreate(const char* crossHairsFilename)

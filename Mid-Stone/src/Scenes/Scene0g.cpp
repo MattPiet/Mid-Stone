@@ -151,6 +151,11 @@ void Scene0g::OnDestroy()
     cameraController.reset();
     camera.reset();
 
+    for (auto& player : players)
+    {
+		player.reset();
+    }
+
     //// Turn off audio
     if (mixer)
     {
