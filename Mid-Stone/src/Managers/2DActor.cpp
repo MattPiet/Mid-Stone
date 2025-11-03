@@ -1,7 +1,7 @@
 ﻿#include "Managers/2DActor.h"
 #include <Utils/MemoryMonitor.h>
 
-ActorTwoD::ActorTwoD(){
+Actor2D::Actor2D(){
 	 entity = nullptr;
 	 SpriteShader = nullptr;
 	 HitboxShader = nullptr;
@@ -10,11 +10,11 @@ ActorTwoD::ActorTwoD(){
 	 animator = nullptr;
 }
 
-ActorTwoD::~ActorTwoD(){
+Actor2D::~Actor2D(){
 	OnDestroy();
 }
 
-bool ActorTwoD::OnCreate(const char* FileName, int rows, int columns)
+bool Actor2D::OnCreate(const char* FileName, int rows, int columns)
 {
 	SpriteShader = new Shader("shaders/spriteVert.glsl", "shaders/spriteFrag.glsl");
 	if (!SpriteShader->OnCreate())
@@ -46,7 +46,7 @@ bool ActorTwoD::OnCreate(const char* FileName, int rows, int columns)
 	return true;
 }
 
-void ActorTwoD::OnDestroy(){
+void Actor2D::OnDestroy(){
 	 delete entity;
 	 entity = nullptr;
 	 SpriteShader->OnDestroy();
@@ -64,11 +64,11 @@ void ActorTwoD::OnDestroy(){
 	 animator = nullptr;
 }
 
-void ActorTwoD::Update(const float deltaTime_){
+void Actor2D::Update(const float deltaTime_){
 	animator->update(deltaTime_);
 }
 
-void ActorTwoD::Render(Matrix4 viewMatrix, Matrix4 projectionMatrix) const{
+void Actor2D::Render(Matrix4 viewMatrix, Matrix4 projectionMatrix) const{
 	if (draw_Hitbox) {
 		entity->DrawHitBox(projectionMatrix, viewMatrix, sprite_Mesh);
 	}
@@ -87,11 +87,11 @@ void ActorTwoD::Render(Matrix4 viewMatrix, Matrix4 projectionMatrix) const{
 
 }
 
-void ActorTwoD::AddClip(const std::string& name, const AnimationClip* clip) const{
+void Actor2D::AddClip(const std::string& name, const AnimationClip* clip) const{
 	animator->addAnimationClip(name, const_cast<AnimationClip*>(clip));
 }
 
-void ActorTwoD::ReBuildAll(const char* FileName, int rows, int columns){
+void Actor2D::ReBuildAll(const char* FileName, int rows, int columns){
 	if (rows != NULL && columns != NULL) {
 		sprite_Renderer->loadImage(FileName, rows, columns);
 		entity->CreateHitBox(sprite_Renderer, animator->getCurrentClip()->getCurrentFrame());

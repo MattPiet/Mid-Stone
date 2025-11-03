@@ -22,59 +22,50 @@ class SpriteMesh;
 class SpriteRenderer;
 class AnimationClip;
 class Animator;
-class ActorTwoD;
+class Actor2D;
 
 class Scene0g : public Scene
 {
 private:
-    Mesh* mesh;
-    Matrix4 projectionMatrix;
-    bool drawInWireMode;
-    float master_volume = 1.0f;
+    /** Scene Components **/
     MIX_Mixer* mixer;
 
-    /// / This is everything we need for sprite rendering
-    Shader* shader;
-    Matrix4 spriteProjectionMatrix;
-    // you need 1 sprite mesh and 1 sprite renderer to render a single sprite 
-    SpriteMesh* sprite_Mesh;
-    SpriteRenderer* sprite_Renderer;
+    /** Scene Features **/
+    bool drawInWireMode;
+    float master_volume = 1.0f;
 
+    /** Input System **/
     bool pressingLeft = false;
     bool pressingRight = false;
 
-    SpriteRenderer* spriteSheet_Renderer;
+    /** Camera **/
+    std::unique_ptr<Camera> camera;
+    std::unique_ptr<CameraController> cameraController;
 
-    Matrix4 spriteSheet_ModelMatrix;
+    /** Player Controller **/
+    // TODO: PlayerController: MainPlayer
+    Actor2D* mainPlayerActor;
+
+    /** Actor Containers **/
+    std::vector<std::unique_ptr<Actor2D>> visualEffects;
+
 
     /** Entity containers **/
+    std::vector<std::unique_ptr<Actor2D>> actors;
     std::vector<std::unique_ptr<Player>> players;
     std::vector<std::unique_ptr<Entity>> bullets;
     std::vector<std::unique_ptr<Entity>> effects;
-    
+
     /** Renderers **/
     SpriteRenderer* playerRenderer;
     SpriteRenderer* crossHairsRenderer;
     SpriteRenderer* bulletsRenderer;
     SpriteRenderer* impactRenderer;
 
-    Entity* fistEntity;
 
-    /** Camera **/
-    std::unique_ptr<Camera> camera;
-    std::unique_ptr<CameraController> cameraController;
-
-    
-
-	//Animation Stuff
-	AnimationClip* clip1; // default constructor
-	AnimationClip* clip2; // dynamic constructor
-
-	Animator* animator;
-
-
-	ActorTwoD* test_actor;
-	ActorTwoD* Test_actor_SpriteSheet;
+    Shader* shader;
+    SpriteMesh* sprite_Mesh;
+    SpriteRenderer* sprite_Renderer;
 
 public:
     explicit Scene0g();
