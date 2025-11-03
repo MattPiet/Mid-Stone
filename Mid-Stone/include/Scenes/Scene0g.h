@@ -11,6 +11,8 @@
 #include "Graphics/CameraController.h"
 #include <Managers/2DActor.h>
 
+#include "Managers/PlayerController.h"
+
 using namespace MATH;
 
 /// Forward declarations 
@@ -43,8 +45,8 @@ private:
     std::unique_ptr<CameraController> cameraController;
 
     /** Player Controller **/
-    // TODO: PlayerController: MainPlayer
-    Actor2D* mainPlayerActor;
+    std::unique_ptr<PlayerController> mainPlayerController;
+    std::unique_ptr<Actor2D> mainPlayerActor;
 
     /** Actor Containers **/
     std::vector<std::unique_ptr<Actor2D>> visualEffects;
@@ -58,7 +60,6 @@ private:
 
     /** Renderers **/
     SpriteRenderer* playerRenderer;
-    SpriteRenderer* crossHairsRenderer;
     SpriteRenderer* bulletsRenderer;
     SpriteRenderer* impactRenderer;
 

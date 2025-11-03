@@ -60,8 +60,7 @@ bool Scene0g::OnCreate()
     cameraController = std::make_unique<CameraController>(camera.get());
 
     /** Set up Player **/
-    
-    mainPlayerActor = new Actor2D();
+    mainPlayerActor = std::make_unique<Actor2D>();
     if (!mainPlayerActor->OnCreate("sprites/Idle.png", 1, 3))
     {
         std::cout << "Failed to create test actor spritesheet\n";
@@ -78,13 +77,13 @@ bool Scene0g::OnCreate()
     mainPlayerActor->getAnimator()->playAnimationClip("Idle");
     mainPlayerActor->draw_Hitbox = true;
 
-    
-    /** ---------- **/
+    /** Set up Main Player Controller **/
+    mainPlayerController = std::make_unique<PlayerController>();
 
+    mainPlayerController->OnCreate("sprites/crosshairs.png");
+    mainPlayerController->SetPossessedActor(mainPlayerActor.get());
 
     /** Renderer Setup **/
-    crossHairsRenderer = new SpriteRenderer();
-    crossHairsRenderer->loadImage("sprites/crosshairs.png");
     playerRenderer = new SpriteRenderer();
     playerRenderer->loadImage("sprites/Attack_Top.png", 1, 3);
     bulletsRenderer = new SpriteRenderer();
@@ -117,12 +116,8 @@ void Scene0g::OnDestroy()
 {
     Debug::Info("Deleting assets Scene0: ", __FILE__, __LINE__);
     /** Delete Main Player **/
-    if (mainPlayerActor != nullptr)
-    {   
-        delete mainPlayerActor;
-        mainPlayerActor = nullptr;
-    }
-
+    mainPlayerActor.reset();
+    mainPlayerController.reset();
 
     if (shader != nullptr)
     {
@@ -138,8 +133,6 @@ void Scene0g::OnDestroy()
         sprite_Mesh = nullptr;
     }
 
-   
-
 
     delete sprite_Renderer;
     sprite_Renderer = nullptr;
@@ -149,9 +142,7 @@ void Scene0g::OnDestroy()
 
     delete bulletsRenderer;
     bulletsRenderer = nullptr;
-
-    delete crossHairsRenderer;
-    crossHairsRenderer = nullptr;
+    
 
     delete impactRenderer;
     impactRenderer = nullptr;
@@ -285,15 +276,14 @@ void Scene0g::Update(const float deltaTime)
     /** Update Main Player **/
     mainPlayerActor->Update(deltaTime);
 
-
     /** Update Players **/
     if (pressingLeft && !pressingRight)
     {
-        players.front()->MoveAim(2.0f);
+        mainPlayerController->MoveAim(2.0f);
     }
     if (pressingRight && !pressingLeft)
     {
-        players.front()->MoveAim(-2.0f);
+        mainPlayerController->MoveAim(-2.0f);
     }
 
     /* Regular Loop for Updating Players */
@@ -370,20 +360,18 @@ void Scene0g::Render() const
 
     /** Render Main Player **/
     mainPlayerActor->Render(camera->GetViewMatrix(), camera->GetProjectionMatrix());
+    /** Render Main Controller **/
+    mainPlayerController->RenderCrossHairs(camera->GetViewMatrix(), camera->GetProjectionMatrix());
+
+    
+
     glUseProgram(shader->GetProgram());
-
-
-    //// Render the sprite
-    // no but like actually this is all you need in the scene render function to render a sprite
-    // look at the header file for more info but basically you need a sprite mesh and a sprite renderer
-    // to animate a sprite sheet just pass in the current sprite index to the renderSprite function
-    // so we still need to figure out how to animate the sprite sheet
+    
 
     /* Regular Loop for Rendering Players */
     for (auto& player : players)
     {
         playerRenderer->renderSpriteSheet(shader, sprite_Mesh, player->GetModelMatrix(), 1);
-        crossHairsRenderer->renderSprite(shader, sprite_Mesh, player->GetAimModelMatrix());
         player->DrawHitBox(camera->GetProjectionMatrix(), camera->GetViewMatrix(), sprite_Mesh);
         glUseProgram(shader->GetProgram());
     }
