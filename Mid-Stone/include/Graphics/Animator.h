@@ -18,6 +18,13 @@ private:
 	bool isPlaying = false;
 public:
 
+	~Animator() {
+		//Destructor to clean up the animation clips
+		for (auto& pair : animationClips) {
+			delete pair.second;
+		}
+		animationClips.clear();
+	}
 	//Basic getter to retrieve the current clips name
 	std::string getCurrentClipName() const { return currentClipName; }
 

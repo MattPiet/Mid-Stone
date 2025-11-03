@@ -6,7 +6,6 @@
 #include <Core/Window.h>
 #include <UI/GuiWindow.h>
 #include <Scenes/Scene0g.h>
-#include <Scenes/Scene0p.h>
 #include <Scenes/AnimationScene.h>>
 
 #include <imgui.h>
@@ -185,12 +184,7 @@ bool SceneManager::BuildNewScene(Scene_number scene) {
 		currentScene = new Scene0g();
 		status = currentScene->OnCreate();
 		break;
-
-	case Scene_number::scene0_p:
-		currentScene = new Scene0p();
-		status = currentScene->OnCreate();
-		break;
-
+	
 	case Scene_number::animation_scene:
 		currentScene = new AnimationScene();
 		status = currentScene->OnCreate();

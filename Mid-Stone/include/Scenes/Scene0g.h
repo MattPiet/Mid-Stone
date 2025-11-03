@@ -11,6 +11,8 @@
 #include "Graphics/CameraController.h"
 #include <Managers/2DActor.h>
 
+#include "Managers/PlayerController.h"
+
 using namespace MATH;
 
 /// Forward declarations 
@@ -22,61 +24,49 @@ class SpriteMesh;
 class SpriteRenderer;
 class AnimationClip;
 class Animator;
-class ActorTwoD;
+class Actor2D;
 
 class Scene0g : public Scene
 {
 private:
-    Body* sphere;
-    Mesh* mesh;
-    Matrix4 projectionMatrix;
-    Matrix4 modelMatrix;
-    bool drawInWireMode;
-    float master_volume = 1.0f;
+    /** Scene Components **/
     MIX_Mixer* mixer;
 
-    /// / This is everything we need for sprite rendering
-    Shader* shader;
-    Matrix4 spriteProjectionMatrix;
-    // you need 1 sprite mesh and 1 sprite renderer to render a single sprite 
-    SpriteMesh* sprite_Mesh;
-    SpriteRenderer* sprite_Renderer;
+    /** Scene Features **/
+    bool drawInWireMode;
+    float master_volume = 1.0f;
 
+    /** Input System **/
     bool pressingLeft = false;
     bool pressingRight = false;
-
-    SpriteRenderer* spriteSheet_Renderer;
-
-    Matrix4 spriteSheet_ModelMatrix;
-
-    /** Entity containers **/
-    std::vector<std::unique_ptr<Player>> players;
-    std::vector<std::unique_ptr<Entity>> bullets;
-    std::vector<std::unique_ptr<Entity>> effects;
-    
-    /** Renderers **/
-    SpriteRenderer* playerRenderer;
-    SpriteRenderer* crossHairsRenderer;
-    SpriteRenderer* bulletsRenderer;
-    SpriteRenderer* impactRenderer;
-
-    Entity* fistEntity;
 
     /** Camera **/
     std::unique_ptr<Camera> camera;
     std::unique_ptr<CameraController> cameraController;
 
-    
+    /** Player Controller **/
+    std::unique_ptr<PlayerController> mainPlayerController;
+    std::unique_ptr<Actor2D> mainPlayerActor;
 
-	//Animation Stuff
-	AnimationClip* clip1; // default constructor
-	AnimationClip* clip2; // dynamic constructor
-
-	Animator* animator;
+    /** Actor Containers **/
+    std::vector<std::unique_ptr<Actor2D>> visualEffects;
 
 
-	ActorTwoD* test_actor;
-	ActorTwoD* Test_actor_SpriteSheet;
+    /** Entity containers **/
+    std::vector<std::unique_ptr<Actor2D>> actors;
+    std::vector<std::unique_ptr<Player>> players;
+    std::vector<std::unique_ptr<Entity>> bullets;
+    std::vector<std::unique_ptr<Entity>> effects;
+
+    /** Renderers **/
+    SpriteRenderer* playerRenderer;
+    SpriteRenderer* bulletsRenderer;
+    SpriteRenderer* impactRenderer;
+
+
+    Shader* shader;
+    SpriteMesh* sprite_Mesh;
+    SpriteRenderer* sprite_Renderer;
 
 public:
     explicit Scene0g();

@@ -23,10 +23,9 @@
 
 #include <Utils/MemoryMonitor.h>
 
-Scene0g::Scene0g() : sphere{nullptr}, shader{nullptr}, mesh{nullptr},
+Scene0g::Scene0g() : shader{nullptr},
                      drawInWireMode{false}, master_volume{1.0f}, mixer{nullptr}, sprite_Mesh{nullptr},
-                     sprite_Renderer{nullptr},
-                     spriteSheet_Renderer{nullptr}
+                     sprite_Renderer{nullptr}
 {
     Debug::Info("Created Scene0: ", __FILE__, __LINE__);
 }
@@ -40,54 +39,51 @@ bool Scene0g::OnCreate()
 {
     Debug::Info("Loading assets Scene0: ", __FILE__, __LINE__);
 
-
-    modelMatrix.loadIdentity();
-    modelMatrix = MMath::translate(44.0f, 36.0f, 0.0f);
-
-
+    /** Initiate Libraries **/
     SDL_Init(SDL_INIT_AUDIO);
     MIX_Init();
-
     mixer = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, nullptr);
-
     if (!mixer)
     {
         std::cout << "Failed to create mixer: %s\n", SDL_GetError();
-        return 0;
+        return false;
     }
 
-    //// Load and play music
+    /** Load and play music **/
     MIX_Audio* Music = MIX_LoadAudio(mixer, "Audio/CrabRaave.wav", true);
     MIX_SetMasterGain(mixer, master_volume);
     MIX_PlayAudio(mixer, Music);
     MIX_DestroyAudio(Music);
 
+    /** Camera **/
+    camera = std::make_unique<Camera>();
+    cameraController = std::make_unique<CameraController>(camera.get());
 
-    clip2 = new AnimationClip( AnimationClip::PlayMode::PINGPONG, 0.4f, 2, 2);
-	animator = new Animator();
-	animator->addAnimationClip("Idle", clip2);
-	animator->addAnimationClip("Default", clip1);
-	animator->playAnimationClip("Idle");
+    /** Set up Player **/
+    mainPlayerActor = std::make_unique<Actor2D>();
+    if (!mainPlayerActor->OnCreate("sprites/Idle.png", 1, 3))
+    {
+        std::cout << "Failed to create test actor spritesheet\n";
+        return false;
+    }
+    // TODO Why do i set rows and columns twice my n word
+    auto mainPlayerClipIdle = new AnimationClip(
+        AnimationClip::PlayMode::PINGPONG,
+        0.1f,
+        1, 3
+    );
+    // TODO, The clip not being directly related to the spritesheet is weird no?
+    mainPlayerActor->getAnimator()->addAnimationClip("Idle", mainPlayerClipIdle);
+    mainPlayerActor->getAnimator()->playAnimationClip("Idle");
+    mainPlayerActor->draw_Hitbox = true;
 
+    /** Set up Main Player Controller **/
+    mainPlayerController = std::make_unique<PlayerController>();
 
-    //// Load and play sound
+    mainPlayerController->OnCreate("sprites/crosshairs.png");
+    mainPlayerController->SetPossessedActor(mainPlayerActor.get());
 
-    //MIX_Audio* sound = MIX_LoadAudio(mixer, "Audio/laser.wav", true);
-    /*if (!sound) {
-        std::cout << "Failed to load audio: %s\n", SDL_GetError();
-        MIX_DestroyMixer(mixer);
-        return 0;
-    MIX_PlayAudio(mixer, sound); // Play sound once
-    SDL_Delay(400); // wait for sound to play ///// this is lowkey terrible but its for testing
-    MIX_DestroyAudio(sound);
-    MIX_DestroyMixer(mixer);
-    MIX_Quit();
-    }*/
-
-    
     /** Renderer Setup **/
-    crossHairsRenderer = new SpriteRenderer();
-    crossHairsRenderer->loadImage("sprites/crosshairs.png");
     playerRenderer = new SpriteRenderer();
     playerRenderer->loadImage("sprites/Attack_Top.png", 1, 3);
     bulletsRenderer = new SpriteRenderer();
@@ -96,17 +92,15 @@ bool Scene0g::OnCreate()
     impactRenderer->loadImage("sprites/impact.png", 2, 4);
     players.emplace_back(std::make_unique<Player>(Vec3{-50, -20, 0}, Vec3{2.0f, 2.0f, 2.0f}));
 
-    for (auto& player : players) {
+    for (auto& player : players)
+    {
         player->OnCreate(playerRenderer);
     }
 
 
-    
     /** Sprite Setup **/
     sprite_Mesh = new SpriteMesh();
     sprite_Mesh->OnCreate();
-    spriteSheet_ModelMatrix.loadIdentity();
-    spriteSheet_ModelMatrix = MMath::translate(84.0f, 36.0f, 0.0f);
 
     shader = new Shader("shaders/spriteVert.glsl", "shaders/spriteFrag.glsl");
     if (!shader->OnCreate())
@@ -114,30 +108,6 @@ bool Scene0g::OnCreate()
         std::cout << "Shader failed ... we have a problem\n";
     }
 
-    /** Camera **/
-    camera = std::make_unique<Camera>();
-    cameraController = std::make_unique<CameraController>(camera.get());
-    
-    test_actor = new ActorTwoD();
-    if (!test_actor->OnCreate("sprites/fatty_clicked.png"))
-    {
-        std::cout << "Failed to create test actor\n";
-        return false;
-	}
-	test_actor->getEntity()->SetPosition(Vec3(-25.0f, -20.0f, 0.0f));
-    test_actor->draw_Hitbox = true;
-
-	Test_actor_SpriteSheet = new ActorTwoD();
-    if (!Test_actor_SpriteSheet->OnCreate("sprites/Idle.png", 1, 3)){
-        std::cout << "Failed to create test actor spritesheet\n";
-		return false;
-	}
-	Test_actor_SpriteSheet->getEntity()->SetPosition(Vec3(-10.0f, -20.0f, 0.0f));
-    Test_actor_SpriteSheet->draw_Hitbox = true;
-
-	Test_actor_SpriteSheet->getAnimator()->addAnimationClip("Idle", clip2);
-	Test_actor_SpriteSheet->getAnimator()->playAnimationClip("Idle");
-	Test_actor_SpriteSheet->ReBuildAll("sprites/Idle.png", 1, 3);
 
     return true;
 }
@@ -145,19 +115,9 @@ bool Scene0g::OnCreate()
 void Scene0g::OnDestroy()
 {
     Debug::Info("Deleting assets Scene0: ", __FILE__, __LINE__);
-    if (sphere != nullptr)
-    {
-        sphere->OnDestroy();
-        delete sphere;
-        sphere = nullptr;
-    }
-
-    if (mesh != nullptr)
-    {
-        mesh->OnDestroy();
-        delete mesh;
-        mesh = nullptr;
-    }
+    /** Delete Main Player **/
+    mainPlayerActor.reset();
+    mainPlayerController.reset();
 
     if (shader != nullptr)
     {
@@ -166,9 +126,6 @@ void Scene0g::OnDestroy()
         shader = nullptr;
     }
 
-	delete fistEntity;
-	fistEntity = nullptr;
-    
     if (sprite_Mesh != nullptr)
     {
         sprite_Mesh->OnDestroy();
@@ -180,37 +137,24 @@ void Scene0g::OnDestroy()
     delete sprite_Renderer;
     sprite_Renderer = nullptr;
 
-    delete spriteSheet_Renderer;
-    spriteSheet_Renderer = nullptr;
-
     delete playerRenderer;
     playerRenderer = nullptr;
 
     delete bulletsRenderer;
     bulletsRenderer = nullptr;
-
-    delete crossHairsRenderer;
-    crossHairsRenderer = nullptr;
+    
 
     delete impactRenderer;
     impactRenderer = nullptr;
 
-	delete animator;
-	animator = nullptr;
-
-	delete clip1;
-	clip1 = nullptr;
-
-	delete clip2;
-	clip2 = nullptr;
-
-	delete test_actor;
-	test_actor = nullptr;
-    delete Test_actor_SpriteSheet;
-	Test_actor_SpriteSheet = nullptr;
 
     cameraController.reset();
     camera.reset();
+
+    for (auto& player : players)
+    {
+		player.reset();
+    }
 
     //// Turn off audio
     if (mixer)
@@ -239,13 +183,13 @@ void Scene0g::HandleEvents(const SDL_Event& sdlEvent)
         case SDL_SCANCODE_SPACE:
             if (auto bullet = players.front()->Shoot())
             {
-				bullet->OnCreate(bulletsRenderer);
-                bullet->AdjustHitboxSize(Vec3{ -10.f, -10.f, 0.0f });
+                bullet->OnCreate(bulletsRenderer);
+                bullet->AdjustHitboxSize(Vec3{-10.f, -10.f, 0.0f});
                 // implicit upcast unique_ptr<Bullet> -> unique_ptr<Entity> (default deleter)
                 bullet->SetExpiredCallback([this](Entity& e)
                 {
                     auto impact = std::make_unique<Entity>(e.GetPosition(), Vec3{1.0f, 1.0f, 1.0f}, Hit_box_type::quad);
-					impact->OnCreate(impactRenderer);
+                    impact->OnCreate(impactRenderer);
                     impact->SetLifeSpan(1.0f);
                     effects.emplace_back(std::move(impact));
                 });
@@ -317,12 +261,6 @@ void Scene0g::RenderGUI()
     ImGui::Text("This is the Scene0g debug window");
     ImGui::Checkbox("Wireframe Mode", &drawInWireMode);
 
-    
-static float sphereScale = 1.0f;
-    if (ImGui::SliderFloat("Sphere Scale", &sphereScale, 0.9f, 1.1f))
-    {
-        modelMatrix *= MMath::scale(sphereScale, sphereScale, 0);
-    }
     if (mixer)
     {
         if (ImGui::SliderFloat("Audio Volume", &master_volume, 0.0f, 1.0f))
@@ -340,19 +278,17 @@ static float sphereScale = 1.0f;
 
 void Scene0g::Update(const float deltaTime)
 {
-    animator->update(deltaTime);  
-	Test_actor_SpriteSheet->Update(deltaTime);
-
-
+    /** Update Main Player **/
+    mainPlayerActor->Update(deltaTime);
 
     /** Update Players **/
     if (pressingLeft && !pressingRight)
     {
-        players.front()->MoveAim(2.0f);
+        mainPlayerController->MoveAim(2.0f);
     }
     if (pressingRight && !pressingLeft)
     {
-        players.front()->MoveAim(-2.0f);
+        mainPlayerController->MoveAim(-2.0f);
     }
 
     /* Regular Loop for Updating Players */
@@ -372,31 +308,29 @@ void Scene0g::Update(const float deltaTime)
     }
 
 
-
     /* Removes and Deletes Players if they expire */
     players.erase(
         std::remove_if(players.begin(), players.end(),
                        [](const std::unique_ptr<Player>& e) { return e->IsExpired(); }),
         players.end()
     );
-    
+
 
     /* Removes and Deletes bullets if they expire */
     // TODO Delete after demo.
     for (int i = 0; i < bullets.size(); i++)
     {
-        if (bullets[i] != bullets[0]) {
-
+        if (bullets[i] != bullets[0])
+        {
             Collision::CollisionResponse(*bullets[i], *bullets[i - 1]);
         }
-    
     }
     bullets.erase(
         std::remove_if(bullets.begin(), bullets.end(),
                        [](const std::unique_ptr<Entity>& e) { return e->IsExpired(); }),
         bullets.end()
     );
-    
+
 
     /* Removes and Deletes effects if they expire */
     effects.erase(
@@ -404,9 +338,6 @@ void Scene0g::Update(const float deltaTime)
                        [](const std::unique_ptr<Entity>& e) { return e->IsExpired(); }),
         effects.end()
     );
-    
-  
-	
 }
 
 void Scene0g::Render() const
@@ -432,25 +363,28 @@ void Scene0g::Render() const
                        camera->GetProjectionMatrix());
     glUniformMatrix4fv(static_cast<GLint>(shader->GetUniformID("viewMatrix")), 1, GL_FALSE, camera->GetViewMatrix());
 
-    //// Render the sprite
-    // no but like actually this is all you need in the scene render function to render a sprite
-    // look at the header file for more info but basically you need a sprite mesh and a sprite renderer
-    // to animate a sprite sheet just pass in the current sprite index to the renderSprite function
-    // so we still need to figure out how to animate the sprite sheet
+    /** Render Main Player **/
+    mainPlayerActor->Render(camera->GetViewMatrix(), camera->GetProjectionMatrix());
+    /** Render Main Controller **/
+    mainPlayerController->RenderCrossHairs(camera->GetViewMatrix(), camera->GetProjectionMatrix());
+
+    
+
+    glUseProgram(shader->GetProgram());
+    
 
     /* Regular Loop for Rendering Players */
     for (auto& player : players)
     {
-        playerRenderer->renderSpriteSheet(shader, sprite_Mesh, player->GetModelMatrix(),1);
-        crossHairsRenderer->renderSprite(shader, sprite_Mesh, player->GetAimModelMatrix());
+        playerRenderer->renderSpriteSheet(shader, sprite_Mesh, player->GetModelMatrix(), 1);
         player->DrawHitBox(camera->GetProjectionMatrix(), camera->GetViewMatrix(), sprite_Mesh);
         glUseProgram(shader->GetProgram());
     }
 
     /* Regular Loop for Rendering Bullets */
-    for (auto& bullet: bullets)
+    for (auto& bullet : bullets)
     {
-        bulletsRenderer->renderSpriteSheet(shader, sprite_Mesh, bullet->GetModelMatrix(),1);
+        bulletsRenderer->renderSpriteSheet(shader, sprite_Mesh, bullet->GetModelMatrix(), 1);
         bullet->DrawHitBox(camera->GetProjectionMatrix(), camera->GetViewMatrix(), sprite_Mesh);
         glUseProgram(shader->GetProgram());
     }
@@ -458,16 +392,11 @@ void Scene0g::Render() const
     /* Regular Loop for Rendering Effects */
     for (auto& effect : effects)
     {
-        impactRenderer->renderSpriteSheet(shader, sprite_Mesh, effect->GetModelMatrix(),1);
+        impactRenderer->renderSpriteSheet(shader, sprite_Mesh, effect->GetModelMatrix(), 1);
         effect->DrawHitBox(camera->GetProjectionMatrix(), camera->GetViewMatrix(), sprite_Mesh);
         glUseProgram(shader->GetProgram());
     }
 
-	test_actor->Render(camera->GetViewMatrix(), camera->GetProjectionMatrix());
-    glUseProgram(shader->GetProgram());
-
-	Test_actor_SpriteSheet->Render(camera->GetViewMatrix(), camera->GetProjectionMatrix());
-    glUseProgram(shader->GetProgram());
 
     glUseProgram(0);
 }

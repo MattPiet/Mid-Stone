@@ -89,6 +89,9 @@
     <ClCompile Include="src\Managers\2DActor.cpp">
       <Filter>Source\Managers</Filter>
     </ClCompile>
+    <ClCompile Include="src\Managers\PlayerController.cpp">
+      <Filter>Source\Managers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\GameDevM\imgui\imconfig.h">
@@ -191,6 +194,9 @@
       <Filter>Headers\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\Managers\2DActor.h">
+      <Filter>Headers\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Managers\PlayerController.h">
       <Filter>Headers\Managers</Filter>
     </ClInclude>
     <ClInclude Include="include\Managers\Actor.h">

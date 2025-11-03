@@ -8,7 +8,7 @@ class SpriteRenderer;
 class AnimationClip;
 class Animator;
 
-class ActorTwoD : public Actor
+class Actor2D : public Actor
 {
 private:
 
@@ -21,8 +21,8 @@ private:
 
 public:
 	bool draw_Hitbox = false;
-	ActorTwoD();
-	virtual ~ActorTwoD();
+	Actor2D();
+	virtual ~Actor2D();
 	bool OnCreate(const char* FileName, int rows = NULL, int columns = NULL);
 	virtual void OnDestroy() override;
 	virtual void Update(const float deltaTime_) override;
