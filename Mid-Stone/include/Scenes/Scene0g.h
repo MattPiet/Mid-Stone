@@ -30,7 +30,6 @@ private:
     Body* sphere;
     Mesh* mesh;
     Matrix4 projectionMatrix;
-    Matrix4 modelMatrix;
     bool drawInWireMode;
     float master_volume = 1.0f;
     MIX_Mixer* mixer;

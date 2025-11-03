@@ -40,51 +40,30 @@ bool Scene0g::OnCreate()
 {
     Debug::Info("Loading assets Scene0: ", __FILE__, __LINE__);
 
-
-    modelMatrix.loadIdentity();
-    modelMatrix = MMath::translate(44.0f, 36.0f, 0.0f);
-
-
+    /** Initiate Libraries **/
     SDL_Init(SDL_INIT_AUDIO);
     MIX_Init();
-
     mixer = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, nullptr);
-
     if (!mixer)
     {
         std::cout << "Failed to create mixer: %s\n", SDL_GetError();
-        return 0;
+        return false;
     }
 
-    //// Load and play music
+    /** Load and play music **/
     MIX_Audio* Music = MIX_LoadAudio(mixer, "Audio/CrabRaave.wav", true);
     MIX_SetMasterGain(mixer, master_volume);
     MIX_PlayAudio(mixer, Music);
     MIX_DestroyAudio(Music);
 
 
-    clip2 = new AnimationClip( AnimationClip::PlayMode::PINGPONG, 0.4f, 2, 2);
-	animator = new Animator();
-	animator->addAnimationClip("Idle", clip2);
-	animator->addAnimationClip("Default", clip1);
-	animator->playAnimationClip("Idle");
+    clip2 = new AnimationClip(AnimationClip::PlayMode::PINGPONG, 0.4f, 2, 2);
+    animator = new Animator();
+    animator->addAnimationClip("Idle", clip2);
+    animator->addAnimationClip("Default", clip1);
+    animator->playAnimationClip("Idle");
 
 
-    //// Load and play sound
-
-    //MIX_Audio* sound = MIX_LoadAudio(mixer, "Audio/laser.wav", true);
-    /*if (!sound) {
-        std::cout << "Failed to load audio: %s\n", SDL_GetError();
-        MIX_DestroyMixer(mixer);
-        return 0;
-    MIX_PlayAudio(mixer, sound); // Play sound once
-    SDL_Delay(400); // wait for sound to play ///// this is lowkey terrible but its for testing
-    MIX_DestroyAudio(sound);
-    MIX_DestroyMixer(mixer);
-    MIX_Quit();
-    }*/
-
-    
     /** Renderer Setup **/
     crossHairsRenderer = new SpriteRenderer();
     crossHairsRenderer->loadImage("sprites/crosshairs.png");
@@ -96,12 +75,12 @@ bool Scene0g::OnCreate()
     impactRenderer->loadImage("sprites/impact.png", 2, 4);
     players.emplace_back(std::make_unique<Player>(Vec3{-50, -20, 0}, Vec3{2.0f, 2.0f, 2.0f}));
 
-    for (auto& player : players) {
+    for (auto& player : players)
+    {
         player->OnCreate(playerRenderer);
     }
 
 
-    
     /** Sprite Setup **/
     sprite_Mesh = new SpriteMesh();
     sprite_Mesh->OnCreate();
@@ -117,27 +96,28 @@ bool Scene0g::OnCreate()
     /** Camera **/
     camera = std::make_unique<Camera>();
     cameraController = std::make_unique<CameraController>(camera.get());
-    
+
     test_actor = new ActorTwoD();
     if (!test_actor->OnCreate("sprites/fatty_clicked.png"))
     {
         std::cout << "Failed to create test actor\n";
         return false;
-	}
-	test_actor->getEntity()->SetPosition(Vec3(-25.0f, -20.0f, 0.0f));
+    }
+    test_actor->getEntity()->SetPosition(Vec3(-25.0f, -20.0f, 0.0f));
     test_actor->draw_Hitbox = true;
 
-	Test_actor_SpriteSheet = new ActorTwoD();
-    if (!Test_actor_SpriteSheet->OnCreate("sprites/Idle.png", 1, 3)){
+    Test_actor_SpriteSheet = new ActorTwoD();
+    if (!Test_actor_SpriteSheet->OnCreate("sprites/Idle.png", 1, 3))
+    {
         std::cout << "Failed to create test actor spritesheet\n";
-		return false;
-	}
-	Test_actor_SpriteSheet->getEntity()->SetPosition(Vec3(-10.0f, -20.0f, 0.0f));
+        return false;
+    }
+    Test_actor_SpriteSheet->getEntity()->SetPosition(Vec3(-10.0f, -20.0f, 0.0f));
     Test_actor_SpriteSheet->draw_Hitbox = true;
 
-	Test_actor_SpriteSheet->getAnimator()->addAnimationClip("Idle", clip2);
-	Test_actor_SpriteSheet->getAnimator()->playAnimationClip("Idle");
-	Test_actor_SpriteSheet->ReBuildAll("sprites/Idle.png", 1, 3);
+    Test_actor_SpriteSheet->getAnimator()->addAnimationClip("Idle", clip2);
+    Test_actor_SpriteSheet->getAnimator()->playAnimationClip("Idle");
+    Test_actor_SpriteSheet->ReBuildAll("sprites/Idle.png", 1, 3);
 
     return true;
 }
@@ -166,9 +146,9 @@ void Scene0g::OnDestroy()
         shader = nullptr;
     }
 
-	delete fistEntity;
-	fistEntity = nullptr;
-    
+    delete fistEntity;
+    fistEntity = nullptr;
+
     if (sprite_Mesh != nullptr)
     {
         sprite_Mesh->OnDestroy();
@@ -195,19 +175,19 @@ void Scene0g::OnDestroy()
     delete impactRenderer;
     impactRenderer = nullptr;
 
-	delete animator;
-	animator = nullptr;
+    delete animator;
+    animator = nullptr;
 
-	delete clip1;
-	clip1 = nullptr;
+    delete clip1;
+    clip1 = nullptr;
 
-	delete clip2;
-	clip2 = nullptr;
+    delete clip2;
+    clip2 = nullptr;
 
-	delete test_actor;
-	test_actor = nullptr;
+    delete test_actor;
+    test_actor = nullptr;
     delete Test_actor_SpriteSheet;
-	Test_actor_SpriteSheet = nullptr;
+    Test_actor_SpriteSheet = nullptr;
 
     cameraController.reset();
     camera.reset();
@@ -239,13 +219,13 @@ void Scene0g::HandleEvents(const SDL_Event& sdlEvent)
         case SDL_SCANCODE_SPACE:
             if (auto bullet = players.front()->Shoot())
             {
-				bullet->OnCreate(bulletsRenderer);
-                bullet->AdjustHitboxSize(Vec3{ -10.f, -10.f, 0.0f });
+                bullet->OnCreate(bulletsRenderer);
+                bullet->AdjustHitboxSize(Vec3{-10.f, -10.f, 0.0f});
                 // implicit upcast unique_ptr<Bullet> -> unique_ptr<Entity> (default deleter)
                 bullet->SetExpiredCallback([this](Entity& e)
                 {
                     auto impact = std::make_unique<Entity>(e.GetPosition(), Vec3{1.0f, 1.0f, 1.0f}, Hit_box_type::quad);
-					impact->OnCreate(impactRenderer);
+                    impact->OnCreate(impactRenderer);
                     impact->SetLifeSpan(1.0f);
                     effects.emplace_back(std::move(impact));
                 });
@@ -316,13 +296,7 @@ void Scene0g::RenderGUI()
 
     ImGui::Text("This is the Scene0g debug window");
     ImGui::Checkbox("Wireframe Mode", &drawInWireMode);
-
     
-static float sphereScale = 1.0f;
-    if (ImGui::SliderFloat("Sphere Scale", &sphereScale, 0.9f, 1.1f))
-    {
-        modelMatrix *= MMath::scale(sphereScale, sphereScale, 0);
-    }
     if (mixer)
     {
         if (ImGui::SliderFloat("Audio Volume", &master_volume, 0.0f, 1.0f))
@@ -340,9 +314,8 @@ static float sphereScale = 1.0f;
 
 void Scene0g::Update(const float deltaTime)
 {
-    animator->update(deltaTime);  
-	Test_actor_SpriteSheet->Update(deltaTime);
-
+    animator->update(deltaTime);
+    Test_actor_SpriteSheet->Update(deltaTime);
 
 
     /** Update Players **/
@@ -372,31 +345,29 @@ void Scene0g::Update(const float deltaTime)
     }
 
 
-
     /* Removes and Deletes Players if they expire */
     players.erase(
         std::remove_if(players.begin(), players.end(),
                        [](const std::unique_ptr<Player>& e) { return e->IsExpired(); }),
         players.end()
     );
-    
+
 
     /* Removes and Deletes bullets if they expire */
     // TODO Delete after demo.
     for (int i = 0; i < bullets.size(); i++)
     {
-        if (bullets[i] != bullets[0]) {
-
+        if (bullets[i] != bullets[0])
+        {
             Collision::CollisionResponse(*bullets[i], *bullets[i - 1]);
         }
-    
     }
     bullets.erase(
         std::remove_if(bullets.begin(), bullets.end(),
                        [](const std::unique_ptr<Entity>& e) { return e->IsExpired(); }),
         bullets.end()
     );
-    
+
 
     /* Removes and Deletes effects if they expire */
     effects.erase(
@@ -404,9 +375,6 @@ void Scene0g::Update(const float deltaTime)
                        [](const std::unique_ptr<Entity>& e) { return e->IsExpired(); }),
         effects.end()
     );
-    
-  
-	
 }
 
 void Scene0g::Render() const
@@ -441,16 +409,16 @@ void Scene0g::Render() const
     /* Regular Loop for Rendering Players */
     for (auto& player : players)
     {
-        playerRenderer->renderSpriteSheet(shader, sprite_Mesh, player->GetModelMatrix(),1);
+        playerRenderer->renderSpriteSheet(shader, sprite_Mesh, player->GetModelMatrix(), 1);
         crossHairsRenderer->renderSprite(shader, sprite_Mesh, player->GetAimModelMatrix());
         player->DrawHitBox(camera->GetProjectionMatrix(), camera->GetViewMatrix(), sprite_Mesh);
         glUseProgram(shader->GetProgram());
     }
 
     /* Regular Loop for Rendering Bullets */
-    for (auto& bullet: bullets)
+    for (auto& bullet : bullets)
     {
-        bulletsRenderer->renderSpriteSheet(shader, sprite_Mesh, bullet->GetModelMatrix(),1);
+        bulletsRenderer->renderSpriteSheet(shader, sprite_Mesh, bullet->GetModelMatrix(), 1);
         bullet->DrawHitBox(camera->GetProjectionMatrix(), camera->GetViewMatrix(), sprite_Mesh);
         glUseProgram(shader->GetProgram());
     }
@@ -458,15 +426,15 @@ void Scene0g::Render() const
     /* Regular Loop for Rendering Effects */
     for (auto& effect : effects)
     {
-        impactRenderer->renderSpriteSheet(shader, sprite_Mesh, effect->GetModelMatrix(),1);
+        impactRenderer->renderSpriteSheet(shader, sprite_Mesh, effect->GetModelMatrix(), 1);
         effect->DrawHitBox(camera->GetProjectionMatrix(), camera->GetViewMatrix(), sprite_Mesh);
         glUseProgram(shader->GetProgram());
     }
 
-	test_actor->Render(camera->GetViewMatrix(), camera->GetProjectionMatrix());
+    test_actor->Render(camera->GetViewMatrix(), camera->GetProjectionMatrix());
     glUseProgram(shader->GetProgram());
 
-	Test_actor_SpriteSheet->Render(camera->GetViewMatrix(), camera->GetProjectionMatrix());
+    Test_actor_SpriteSheet->Render(camera->GetViewMatrix(), camera->GetProjectionMatrix());
     glUseProgram(shader->GetProgram());
 
     glUseProgram(0);
