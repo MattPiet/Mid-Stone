@@ -349,6 +349,11 @@ void Scene0g::Render() const
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	// we can use this to draw stuff striaght to the screen using ImGui
+    ImDrawList* drawList = ImGui::GetBackgroundDrawList();
+    drawList->AddText(ImVec2(20, 20), IM_COL32(255, 255, 255, 255), "Hello from ImGui!");
+    drawList->AddText(ImVec2(20, 40), IM_COL32(255, 255, 0, 255), "Players active: 1");
+
     if (drawInWireMode)
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
