@@ -88,6 +88,7 @@ public:
 
     [[nodiscard]] MATH::Vec3 GetPosition() const { return position; }
     [[nodiscard]] MATH::Vec3 GetScale() const { return scale; }
+    [[nodiscard]] MATH::Quaternion GetOrientation() const { return orientation; }
 
     [[nodiscard]] MATH::Matrix4 GetModelMatrix() const;
 
@@ -110,4 +111,8 @@ public:
     void SetPosition(const MATH::Vec3& position_) {
         position = position_;
     }
+
+    void SetOrientation(const MATH::Quaternion& orientation_) {
+		orientation = orientation_;
+	}
 };
