@@ -74,6 +74,13 @@ void Collision::CollisionResponse(Entity& entityA, Entity& entityB) {
 
         // Reflect their velocities along the collision normal (basic elastic response)
         MATH::Vec3 collisionNormal = directionAB;
+        //  Check if they’re moving apart
+
+        MATH::Vec3 relativeVelocity = velocityB - velocityA;
+        float separatingVelocity = VMath::dot(relativeVelocity, collisionNormal);
+        if (separatingVelocity > 0.0f)
+            return; // No need for bounce if separating
+
 
         float vAAlongNormal = VMath::dot(velocityA, collisionNormal);
         float vBAlongNormal = VMath::dot(velocityB, collisionNormal);

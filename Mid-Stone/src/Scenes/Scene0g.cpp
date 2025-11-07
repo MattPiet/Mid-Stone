@@ -352,9 +352,9 @@ void Scene0g::Update(const float deltaTime)
     // TODO Delete after demo.
     for (int i = 0; i < bullets.size(); i++)
     {
-        if (bullets[i] != bullets[0])
+        for (int j = i + 1; j < bullets.size(); j++)
         {
-            Collision::CollisionResponse(*bullets[i], *bullets[i - 1]);
+            Collision::CollisionResponse(*bullets[i], *bullets[j]);
         }
 		bullets[i]->UpdatePhysics(deltaTime);
     }
