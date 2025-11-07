@@ -36,6 +36,4 @@ public:
 	SpriteMesh* getMesh() const { return sprite_Mesh; }
 	SpriteRenderer* getRenderer() { return sprite_Renderer; }
 	Animator* getAnimator() const { return animator; }
-
-
 };

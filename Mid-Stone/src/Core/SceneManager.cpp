@@ -18,7 +18,7 @@ SceneManager::SceneManager() :
 	window{ nullptr },
 	imguiWin{ nullptr },
 	timer{ nullptr },
-	fps(60),
+	fps(144),
 	isRunning{ false },
 	fullScreen{ false }
 {
@@ -104,7 +104,9 @@ void SceneManager::Run() {
 		// --- Global debug GUI ---
 		if (imguiWin) {
 			ImGui::Begin("Debug Info");
-			ImGui::Text("FPS: %u", fps);
+
+			ImGuiIO& io = ImGui::GetIO();
+			ImGui::Text("FPS: %1.f", io.Framerate);
 			ImGui::Text("DeltaTime: %.3f", timer->GetDeltaTime());
 			if (ImGui::Button("Quit")) {
 				isRunning = false;
