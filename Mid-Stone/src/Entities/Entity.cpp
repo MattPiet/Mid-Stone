@@ -34,10 +34,12 @@ void Entity::OnCreate(SpriteRenderer* renderer) {
     }
 }
 
+//Creating hitbox based off single Sprite
 void Entity::CreateHitBox(SpriteRenderer* renderer){
         std::pair desiredWidth_Height = renderer->buildSprite();
         hitbox = MATH::Vec3(desiredWidth_Height.first * scale.x, desiredWidth_Height.second * scale.y, 1.0f);
 }
+//Creating hitbox based off SpriteSheet
 void Entity::CreateHitBox(SpriteRenderer* renderer, int CurrentIndex) {
         std::pair desiredWidth_Height = renderer->buildSpriteSheet(CurrentIndex);
         hitbox = MATH::Vec3(desiredWidth_Height.first * scale.x, desiredWidth_Height.second * scale.y, 1.0f);
