@@ -43,6 +43,8 @@ private:
     /** Input System **/
     bool pressingLeft = false;
     bool pressingRight = false;
+	bool pressingRotateLeft = false;
+    bool pressingRotateRight = false;
 
     /** Camera **/
     std::unique_ptr<Camera> camera;

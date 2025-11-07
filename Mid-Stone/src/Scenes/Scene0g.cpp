@@ -190,6 +190,12 @@ void Scene0g::HandleEvents(const SDL_Event& sdlEvent)
         case SDL_SCANCODE_D:
             pressingRight = true;
             break;
+        case SDL_SCANCODE_J:
+			pressingRotateLeft = true;
+			break;
+        case SDL_SCANCODE_K:
+            pressingRotateRight = true;
+            break;
         case SDL_SCANCODE_SPACE:
             if (auto bullet = players.front()->Shoot())
             {
@@ -220,6 +226,12 @@ void Scene0g::HandleEvents(const SDL_Event& sdlEvent)
             break;
         case SDL_SCANCODE_D:
             pressingRight = false;
+            break;
+		case SDL_SCANCODE_J:
+			pressingRotateLeft = false;
+            break;
+		case SDL_SCANCODE_K:
+            pressingRotateRight = false;
             break;
         }
         break;
@@ -299,6 +311,14 @@ void Scene0g::Update(const float deltaTime)
     if (pressingRight && !pressingLeft)
     {
         mainPlayerController->MoveAim(-2.0f);
+    }
+    if (pressingRotateLeft && !pressingRotateRight)
+    {
+        mainPlayerActor->getEntity()->SetOrientation(mainPlayerActor->getEntity()->GetOrientation() * MATH::QMath::angleAxisRotation(-1.0f, MATH::Vec3(0.0f, 0.0f, 1.0f)));
+	}
+    if (pressingRotateRight && !pressingRotateLeft)
+    {
+        mainPlayerActor->getEntity()->SetOrientation(mainPlayerActor->getEntity()->GetOrientation() * MATH::QMath::angleAxisRotation(1.0f, MATH::Vec3(0.0f, 0.0f, 1.0f)));
     }
 
     /* Regular Loop for Updating Players */
