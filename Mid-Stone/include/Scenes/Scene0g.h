@@ -13,6 +13,10 @@
 
 #include "Managers/PlayerController.h"
 
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+
 using namespace MATH;
 
 /// Forward declarations 
@@ -67,6 +71,9 @@ private:
     Shader* shader;
     SpriteMesh* sprite_Mesh;
     SpriteRenderer* sprite_Renderer;
+
+
+    ImFont* MainFont;
 
 public:
     explicit Scene0g();

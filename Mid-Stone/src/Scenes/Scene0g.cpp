@@ -23,6 +23,7 @@
 
 #include <Utils/MemoryMonitor.h>
 
+
 Scene0g::Scene0g() : shader{nullptr},
                      drawInWireMode{false}, master_volume{1.0f}, mixer{nullptr}, sprite_Mesh{nullptr},
                      sprite_Renderer{nullptr}
@@ -108,6 +109,13 @@ bool Scene0g::OnCreate()
         std::cout << "Shader failed ... we have a problem\n";
     }
 
+    ImGuiIO& io = ImGui::GetIO();
+    io.Fonts->AddFontDefault();
+
+
+    // we can use this to draw stuff striaght to the screen using ImGui
+    
+    MainFont = io.Fonts->AddFontFromFileTTF("Fonts/times.ttf", 18.5f);
 
     return true;
 }
@@ -349,8 +357,9 @@ void Scene0g::Render() const
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	// we can use this to draw stuff striaght to the screen using ImGui
     ImDrawList* drawList = ImGui::GetBackgroundDrawList();
+	drawList->AddRectFilled(ImVec2(10, 10), ImVec2(400, 100), IM_COL32(0, 0, 0, 150));
+	drawList->AddText(MainFont, 22.0f, ImVec2(20,60), IM_COL32(0, 255, 0, 255), "Hello Im a different font then the rest!");
     drawList->AddText(ImVec2(20, 20), IM_COL32(255, 255, 255, 255), "Hello from ImGui!");
     drawList->AddText(ImVec2(20, 40), IM_COL32(255, 255, 0, 255), "Players active: 1");
 
