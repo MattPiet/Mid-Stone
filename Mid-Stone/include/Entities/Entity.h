@@ -20,6 +20,9 @@ private:
 
     MATH::Vec3 scale;
     MATH::Vec3 position;
+	MATH::Vec3 velocity;
+	MATH::Vec3 acceleration;
+    float mass = 1.0f;
 
     Hit_box_type hitBoxType; // 'c' for circle, Hit_box_type::quad for quad, etc.
     MATH::Vec3 hitbox;
@@ -55,7 +58,7 @@ protected:
     }
 
 public:
-    Entity() { position = Vec3(0.0f, 0.0f, 0.0f), scale = Vec3(1.0f, 1.0f, 1.0f); }
+    Entity() { position = Vec3(0.0f, 0.0f, 0.0f), scale = Vec3(1.0f, 1.0f, 1.0f), velocity = Vec3(0.0f, 0.0f, 0.0f), acceleration = Vec3(0.0f, 0.0f, 0.0f), mass = 1.0f; }
     Entity(const MATH::Vec3& position, const MATH::Vec3& scale);
     Entity(const MATH::Vec3& position, const MATH::Vec3& scale, const Hit_box_type& hitBoxType);
 
@@ -92,6 +95,8 @@ public:
     [[nodiscard]] MATH::Matrix4 GetModelMatrix() const;
 
     void Update(float deltaTime);
+	void UpdatePhysics(float deltaTime);
+    void ApplyForce(Vec3 force);
 
 	void DrawHitBox(MATH::Matrix4 projectionMatrix, MATH::Matrix4 viewMatrix, SpriteMesh* mesh);
 
@@ -114,4 +119,9 @@ public:
     Quaternion GetOrientation() const {
         return orientation;
 	}
+    void AdjustOrientation(const MATH::Quaternion& adjustment) {
+        orientation = adjustment * orientation;
+    }
+	MATH::Vec3 GetVelocity() const { return velocity; }
+	void SetVelocity(const MATH::Vec3& velocity_) { velocity = velocity_; }
 };

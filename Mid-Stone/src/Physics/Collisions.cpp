@@ -30,19 +30,66 @@ bool Collision::CheckQuadQuadCollision(const Entity& entity_1, const Entity& ent
 	return overlapx && overlapy;
 }
 
-void Collision::CollisionResponse(Entity& a, Entity& b) {
-	//if(CheckQuadQuadCollision(a,b) && !a.IsExpired() && !b.IsExpired()){
-	//	a.SetHitboxColor(MATH::Vec4(1.0f, 0.0f, 0.0f, 1.0f)); // Red
-	//	b.SetHitboxColor(MATH::Vec4(1.0f, 0.0f, 0.0f, 1.0f)); // Red
-	//}
-    if(CheckOBBOBBCollision(a,b) && !a.IsExpired() && !b.IsExpired()){
-        a.SetHitboxColor(MATH::Vec4(1.0f, 0.0f, 0.0f, 1.0f)); // Red
-        b.SetHitboxColor(MATH::Vec4(1.0f, 0.0f, 0.0f, 1.0f)); // Red
-	}
-	else{
-		a.SetHitboxColor(MATH::Vec4(0.0f, 1.0f, 0.0f, 1.0f)); // Green
-		b.SetHitboxColor(MATH::Vec4(0.0f, 1.0f, 0.0f, 1.0f)); // Green
-	}
+void Collision::CollisionResponse(Entity& entityA, Entity& entityB) {
+    // Ignore expired entities
+    if (entityA.IsExpired() || entityB.IsExpired()) return;
+
+    // First, check for collision
+    if (!CheckOBBOBBCollision(entityA, entityB)) {
+        entityA.SetHitboxColor(MATH::Vec4(0.0f, 1.0f, 0.0f, 1.0f)); // Green = no collision
+        entityB.SetHitboxColor(MATH::Vec4(0.0f, 1.0f, 0.0f, 1.0f));
+        return;
+    }
+
+    // Visual feedback: collided
+    entityA.SetHitboxColor(MATH::Vec4(1.0f, 0.0f, 0.0f, 1.0f)); // Red = collision
+    entityB.SetHitboxColor(MATH::Vec4(1.0f, 0.0f, 0.0f, 1.0f));
+
+    // --- Basic separation response ---
+    // Move entities slightly apart along the shortest vector between them
+
+    MATH::Vec3 positionA = entityA.GetPosition();
+    MATH::Vec3 positionB = entityB.GetPosition();
+    MATH::Vec3 directionAB = positionB - positionA;
+
+    float distance = VMath::distance(positionB , positionA);
+    if (distance < 0.0001f) return; // Prevent divide-by-zero if they're exactly overlapping
+
+    directionAB /= distance; // Normalize
+
+    // You can pick a small separation distance to "push" them apart
+    float separationDistance = 0.01f;
+
+    // Move both entities away from each other
+    positionA -= directionAB * (separationDistance * 0.5f);
+    positionB += directionAB * (separationDistance * 0.5f);
+
+    entityA.SetPosition(positionA);
+    entityB.SetPosition(positionB);
+
+    // --- Optional bounce or velocity response ---
+    if (VMath::mag(entityA.GetVelocity()) > VERY_SMALL && VMath::mag(entityB.GetVelocity()) > VERY_SMALL) {
+        MATH::Vec3 velocityA = entityA.GetVelocity();
+        MATH::Vec3 velocityB = entityB.GetVelocity();
+
+        // Reflect their velocities along the collision normal (basic elastic response)
+        MATH::Vec3 collisionNormal = directionAB;
+
+        float vAAlongNormal = VMath::dot(velocityA, collisionNormal);
+        float vBAlongNormal = VMath::dot(velocityB, collisionNormal);
+
+        // Simple velocity swap (for similar masses)
+        float temp = vAAlongNormal;
+        vAAlongNormal = vBAlongNormal;
+        vBAlongNormal = temp;
+
+        // Update new velocities
+        velocityA += (vAAlongNormal - VMath::dot(velocityA, collisionNormal)) * collisionNormal;
+        velocityB += (vBAlongNormal - VMath::dot(velocityB, collisionNormal)) * collisionNormal;
+
+        entityA.SetVelocity(velocityA);
+        entityB.SetVelocity(velocityB);
+    }
 }
 bool Collision::CheckOBBOBBCollision(const Entity& boxA, const Entity& boxB) {
     // Centers
