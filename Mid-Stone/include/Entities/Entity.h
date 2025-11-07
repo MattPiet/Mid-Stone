@@ -110,4 +110,8 @@ public:
     void SetPosition(const MATH::Vec3& position_) {
         position = position_;
     }
+
+    Quaternion GetOrientation() const {
+        return orientation;
+	}
 };
