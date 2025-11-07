@@ -109,13 +109,15 @@ bool Scene0g::OnCreate()
         std::cout << "Shader failed ... we have a problem\n";
     }
 
-    ImGuiIO& io = ImGui::GetIO();
-    io.Fonts->AddFontDefault();
+	ImGuiIO& io = ImGui::GetIO(); // access the ImGuiIO structure
+	io.Fonts->AddFontDefault(); // add default font
 
-
+  
     // we can use this to draw stuff striaght to the screen using ImGui
     
-    MainFont = io.Fonts->AddFontFromFileTTF("Fonts/times.ttf", 18.5f);
+	MainFont = io.Fonts->AddFontFromFileTTF("Fonts/times.ttf", 18.5f); // load a custom font
+
+
 
     return true;
 }
@@ -357,11 +359,22 @@ void Scene0g::Render() const
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    ImDrawList* drawList = ImGui::GetBackgroundDrawList();
-	drawList->AddRectFilled(ImVec2(10, 10), ImVec2(400, 100), IM_COL32(0, 0, 0, 150));
-	drawList->AddText(MainFont, 22.0f, ImVec2(20,60), IM_COL32(0, 255, 0, 255), "Hello Im a different font then the rest!");
-    drawList->AddText(ImVec2(20, 20), IM_COL32(255, 255, 255, 255), "Hello from ImGui!");
-    drawList->AddText(ImVec2(20, 40), IM_COL32(255, 255, 0, 255), "Players active: 1");
+	
+    ImGui::SetNextWindowPos(ImVec2(0, 100)); // (x, y) in screen coordinates
+    ImGui::SetNextWindowBgAlpha(0.0f); // Fully transparent background (0 = invisible, 1 = opaque)
+	ImGui::Begin("##HiddenLabel", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_AlwaysAutoResize); // this basically sets the window to be invisible
+	if (ImGui::Button("Draw HitBox")) { // making a button to toggle hitbox drawing
+		mainPlayerActor->draw_Hitbox = !mainPlayerActor->draw_Hitbox;
+	}
+	ImGui::End();// we end the invisible window here
+	ImGui::SetNextWindowBgAlpha(150.0f); // reset back to opaque for other windows
+	
+
+	ImDrawList* drawList = ImGui::GetBackgroundDrawList(); // Get the background draw list to draw behind all ImGui windows
+	drawList->AddRectFilled(ImVec2(10, 10), ImVec2(400, 100), IM_COL32(0, 0, 0, 150)); // Draw a semi-transparent rectangle as background for text
+	drawList->AddText(MainFont, 22.0f, ImVec2(20, 60), IM_COL32(0, 255, 0, 255), "Hello Im a different font then the rest!"); // Draw text with custom font and size
+	drawList->AddText(ImVec2(20, 20), IM_COL32(255, 255, 255, 255), "Hello from ImGui!"); // Draw text at position (20, 20)
+	drawList->AddText(ImVec2(20, 40), IM_COL32(255, 255, 0, 255), "Players active: 1"); // Draw text at position (20, 40)
 
     if (drawInWireMode)
     {
