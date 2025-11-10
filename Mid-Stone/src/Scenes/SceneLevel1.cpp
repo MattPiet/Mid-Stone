@@ -1,6 +1,8 @@
 #include <glew.h>
 
 #include "Scenes/SceneLevel1.h"
+
+#include "Graphics/CameraController.h"
 #include "Utils/Debug.h"
 
 
@@ -21,10 +23,78 @@ void SceneLevel1::Update(const float deltaTime)
 
 void SceneLevel1::HandleEvents(const SDL_Event& sdlEvent)
 {
+    switch (sdlEvent.type)
+    {
+    case SDL_EVENT_MOUSE_MOTION:
+        cameraController->OnMouseMoved({static_cast<float>(sdlEvent.motion.x), static_cast<float>(sdlEvent.motion.y)});
+        break;
+    case SDL_EVENT_MOUSE_WHEEL:
+        {
+            const float steps = (sdlEvent.wheel.y > 0) ? +1.0f : -1.0f;
+            float x, y;
+            SDL_GetMouseState(&x, &y);
+            cameraController->OnMouseWheel(steps, {x, y});
+        }
+        break;
+    case SDL_EVENT_MOUSE_BUTTON_DOWN:
+        switch (sdlEvent.button.button)
+        {
+        case SDL_BUTTON_MIDDLE:
+            cameraController->OnMouseButtonPressed(2, {
+                                                       static_cast<float>(sdlEvent.button.x),
+                                                       static_cast<float>(sdlEvent.button.y)
+                                                   });
+            break;
+        default: ;
+        }
+        break;
+    case SDL_EVENT_MOUSE_BUTTON_UP:
+        switch (sdlEvent.button.button)
+        {
+        case SDL_BUTTON_MIDDLE:
+            cameraController->OnMouseButtonReleased(2);
+            break;
+        default: ;
+        }
+        break;
+    default:
+        break;
+    }
 }
 
 bool SceneLevel1::OnCreate()
 {
+    Debug::Info("On Create Scene Level 1: ", __FILE__, __LINE__);
+    /** Main Player **/
+    /** Main Actor **/
+    mainPlayerActor = std::make_unique<Actor2D>();
+    if (!mainPlayerActor->OnCreate("sprites/Idle.png", 1, 3))
+    {
+        std::cout << "Failed to create test actor spritesheet\n";
+        return false;
+    }
+    // TODO Why do i set rows and columns twice my n word
+    const auto mainPlayerClipIdle = new AnimationClip(
+        AnimationClip::PlayMode::PINGPONG,
+        0.1f,
+        1, 3
+    );
+    // TODO, The clip not being directly related to the spritesheet is weird no?
+    mainPlayerActor->getAnimator()->addAnimationClip("Idle", mainPlayerClipIdle);
+    mainPlayerActor->getAnimator()->playAnimationClip("Idle");
+    mainPlayerActor->draw_Hitbox = true;
+
+    /** Main Player Controller **/
+
+    mainPlayerController = std::make_unique<PlayerController>();
+    mainPlayerController->OnCreate("sprites/crosshairs.png");
+    mainPlayerController->SetPossessedActor(mainPlayerActor.get());
+
+    /** Camera **/
+    camera = std::make_unique<Camera>();
+    cameraController = std::make_unique<CameraController>(camera.get());
+
+
     return true;
 }
 
@@ -34,6 +104,15 @@ void SceneLevel1::RenderGUI()
 
 void SceneLevel1::OnDestroy()
 {
+    Debug::Info("OnDestroy Scene Level 1: ", __FILE__, __LINE__);
+
+    /** Delete Main Player **/
+    mainPlayerActor.reset();
+    mainPlayerController.reset();
+
+    /** Camera **/
+    cameraController.reset();
+    camera.reset();
 }
 
 void SceneLevel1::Render() const
@@ -44,6 +123,11 @@ void SceneLevel1::Render() const
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    /** Render Main Player **/
+    mainPlayerActor->Render(camera->GetViewMatrix(), camera->GetProjectionMatrix());
+    /** Render Main Controller **/
+    mainPlayerController->RenderCrossHairs(camera->GetViewMatrix(), camera->GetProjectionMatrix());
 
     glUseProgram(0);
 }

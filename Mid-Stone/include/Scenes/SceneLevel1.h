@@ -1,9 +1,20 @@
 #pragma once
+#include <memory>
+
 #include "Scene.h"
+#include "Graphics/CameraController.h"
+#include "Managers/PlayerController.h"
 
 class SceneLevel1 : public Scene
 {
 private:
+    /** Main Player **/
+    std::unique_ptr<PlayerController> mainPlayerController;
+    std::unique_ptr<Actor2D> mainPlayerActor;
+
+    /** Camera **/
+    std::unique_ptr<Camera> camera;
+    std::unique_ptr<CameraController> cameraController;
 public:
     explicit SceneLevel1();
     virtual ~SceneLevel1();

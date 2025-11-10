@@ -88,7 +88,7 @@ bool SceneManager::Initialize(std::string name_, int width_, int height_)
     }
 
     /********************************   Default first scene   ***********************/
-    BuildNewScene(Scene_number::scene0_g);
+    BuildNewScene(Scene_number::scene_level_1);
     /********************************************************************************/
     return true;
 }
