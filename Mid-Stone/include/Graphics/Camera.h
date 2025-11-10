@@ -24,8 +24,8 @@ public:
     float maximumZoom = 3.0f;
     Vec2 cameraPosition;
 
-    float viewportWidth = 1280.0f;
-    float viewportHeight = 720.0f;
+    float viewportWidth = 1920;
+    float viewportHeight = 1080;
 
     bool clampToWorld = true;
     /**
