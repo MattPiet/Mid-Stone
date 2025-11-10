@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <queue>
 
 #include "Scene.h"
 #include "Graphics/CameraController.h"
@@ -22,18 +23,24 @@ private:
 
     /** Actor Managers **/
     std::vector<std::unique_ptr<Actor2D>> actors;
+
+    /** Entity Spawn Queue **/
+    std::queue<std::unique_ptr<Actor2D>> spawnQueue;
     
     
 public:
     explicit SceneLevel1();
     virtual ~SceneLevel1();
 
-    /** Scene Class Methods **/
+    /** Scene Lifecycle Methods **/
     void Render() const override;
     void Update(const float deltaTime) override;
     void HandleEvents(const SDL_Event& sdlEvent) override;
     bool OnCreate() override;
     void RenderGUI() override;
     void OnDestroy() override;
+
+    /** Gameplay Functions **/
+    void PlayerShoot();
     
 };

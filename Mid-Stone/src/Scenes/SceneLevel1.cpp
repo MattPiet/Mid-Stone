@@ -2,6 +2,8 @@
 
 #include "Scenes/SceneLevel1.h"
 
+#include <queue>
+
 #include "Graphics/CameraController.h"
 #include "Utils/Debug.h"
 
@@ -29,6 +31,24 @@ void SceneLevel1::OnDestroy()
     camera.reset();
 }
 
+void SceneLevel1::PlayerShoot()
+{
+    const Vec3 currentCrossHairsPosition = mainPlayerController->GetCrossHairsPosition();
+    auto bullet = std::make_unique<Actor2D>();
+    bullet->OnCreate("sprites/fist.png");
+    bullet->getEntity()->SetPosition(currentCrossHairsPosition);
+    bullet->ConfigureLifeSpan(1.0f);
+    bullet->RegisterExpiredCallback([this](Actor2D& actor)
+    {
+        auto impact = std::make_unique<Actor2D>();
+        impact->OnCreate("sprites/impact.png");
+        impact->getEntity()->SetPosition(actor.getEntity()->GetPosition());
+        impact->ConfigureLifeSpan(1.0f);
+        spawnQueue.emplace(std::move(impact));
+    });
+    spawnQueue.emplace(std::move(bullet));
+}
+
 
 void SceneLevel1::Update(const float deltaTime)
 {
@@ -42,18 +62,25 @@ void SceneLevel1::Update(const float deltaTime)
         mainPlayerController->MoveAim(-2.0f);
     }
 
-    /** Update Actors **/
-    for (const auto& actor : actors)
-    {
-        actor->Update(deltaTime);
-    }
-
     /* Actor Cleanup */
     actors.erase(
         std::remove_if(actors.begin(), actors.end(),
                        [](const std::unique_ptr<Actor2D>& e) { return e->HasExpired(); }),
         actors.end()
     );
+
+    /** Update Actors **/
+    for (const auto& actor : actors)
+    {
+        actor->Update(deltaTime);
+    }
+
+    /** Spawn Queue **/
+    while (!spawnQueue.empty()) 
+    {
+        actors.emplace_back(std::move(spawnQueue.front()));
+        spawnQueue.pop();
+    }
 }
 
 void SceneLevel1::HandleEvents(const SDL_Event& sdlEvent)
@@ -83,12 +110,7 @@ void SceneLevel1::HandleEvents(const SDL_Event& sdlEvent)
             break;
         case SDL_SCANCODE_SPACE:
             {
-                const Vec3 currentCrossHairsPosition = mainPlayerController->GetCrossHairsPosition();
-                auto bullet = std::make_unique<Actor2D>();
-                bullet->OnCreate("sprites/fist.png");
-                bullet->getEntity()->SetPosition(currentCrossHairsPosition);
-                bullet->ConfigureLifeSpan(1.0f);
-                actors.emplace_back(std::move(bullet));
+                PlayerShoot();
                 break;
             }
 
