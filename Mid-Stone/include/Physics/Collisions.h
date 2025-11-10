@@ -11,4 +11,6 @@ public:
 	static bool CheckQuadQuadCollision(const Entity& entity_1, const Entity& entity_2);
 
 	static void CollisionResponse(Entity& a, Entity& b);
+
+	static bool CheckOBBOBBCollision(const Entity& A, const Entity& B);
 };

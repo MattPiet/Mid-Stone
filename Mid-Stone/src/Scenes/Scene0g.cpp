@@ -193,6 +193,9 @@ void Scene0g::HandleEvents(const SDL_Event& sdlEvent)
         case SDL_SCANCODE_SPACE:
             if (auto bullet = players.front()->Shoot())
             {
+                bullet->SetPosition(Vec3(30.0f, 20.0f, 0));
+                bullet->AdjustOrientation(QMath::angleAxisRotation(45.0f, MATH::Vec3(0.0f, 0.0f, 1.0f)));
+				bullet->SetVelocity(Vec3(-50.0f, 0.0f, 0.0f));
                 bullet->OnCreate(bulletsRenderer);
                 bullet->AdjustHitboxSize(Vec3{-10.f, -10.f, 0.0f});
                 // implicit upcast unique_ptr<Bullet> -> unique_ptr<Entity> (default deleter)
@@ -203,6 +206,25 @@ void Scene0g::HandleEvents(const SDL_Event& sdlEvent)
                     impact->SetLifeSpan(1.0f);
                     effects.emplace_back(std::move(impact));
                 });
+                bullets.emplace_back(std::move(bullet));
+            }
+            break;
+        case SDL_SCANCODE_P:
+            if (auto bullet = players.front()->Shoot())
+            {
+                bullet->SetPosition(Vec3(-30.0f, 15.0f, 0));
+				bullet->AdjustOrientation(QMath::angleAxisRotation(45.0f, MATH::Vec3(0.0f, 0.0f, 1.0f)));
+				bullet->SetVelocity(Vec3(50.0f, 0.0f, 0.0f));
+                bullet->OnCreate(bulletsRenderer);
+                bullet->AdjustHitboxSize(Vec3{ -10.f, -10.f, 0.0f });
+                // implicit upcast unique_ptr<Bullet> -> unique_ptr<Entity> (default deleter)
+                bullet->SetExpiredCallback([this](Entity& e)
+                    {
+                        auto impact = std::make_unique<Entity>(e.GetPosition(), Vec3{ 1.0f, 1.0f, 1.0f }, Hit_box_type::quad);
+                        impact->OnCreate(impactRenderer);
+                        impact->SetLifeSpan(1.0f);
+                        effects.emplace_back(std::move(impact));
+                    });
                 bullets.emplace_back(std::move(bullet));
             }
             break;
@@ -330,10 +352,11 @@ void Scene0g::Update(const float deltaTime)
     // TODO Delete after demo.
     for (int i = 0; i < bullets.size(); i++)
     {
-        if (bullets[i] != bullets[0])
+        for (int j = i + 1; j < bullets.size(); j++)
         {
-            Collision::CollisionResponse(*bullets[i], *bullets[i - 1]);
+            Collision::CollisionResponse(*bullets[i], *bullets[j]);
         }
+		bullets[i]->UpdatePhysics(deltaTime);
     }
     bullets.erase(
         std::remove_if(bullets.begin(), bullets.end(),

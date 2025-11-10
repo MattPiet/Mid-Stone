@@ -11,6 +11,7 @@ Entity::Entity(const MATH::Vec3& position, const MATH::Vec3& scale)
     this->position = position;
     this->scale = scale;
     this->hitBoxType = Hit_box_type::quad;
+    velocity = Vec3(0.0f, 0.0f, 0.0f), acceleration = Vec3(0.0f, 0.0f, 0.0f), mass = 1.0f;
 }
 
 Entity::Entity(const Vec3& position, const Vec3& scale, const Hit_box_type& hitBoxType)
@@ -18,6 +19,7 @@ Entity::Entity(const Vec3& position, const Vec3& scale, const Hit_box_type& hitB
     this->position = position;
     this->scale = scale;
 	this->hitBoxType = hitBoxType;
+    velocity = Vec3(0.0f, 0.0f, 0.0f), acceleration = Vec3(0.0f, 0.0f, 0.0f), mass = 1.0f;
 }
 
 void Entity::OnCreate(SpriteRenderer* renderer) {
@@ -85,6 +87,17 @@ void Entity::Update(float deltaTime)
             if (onExpired) { onExpired(*this); }
         }
     }
+}
+
+void Entity::UpdatePhysics(float deltaTime)
+{
+    position += velocity * deltaTime + 0.5f * acceleration * deltaTime * deltaTime;
+    velocity += acceleration * deltaTime;
+	
+}
+
+void Entity::ApplyForce(Vec3 force) {
+	acceleration = force / mass;
 }
 
 void Entity::DrawHitBox(MATH::Matrix4 projectionMatrix, MATH::Matrix4 viewMatrix, SpriteMesh* mesh)
