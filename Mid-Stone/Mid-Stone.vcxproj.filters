@@ -20,9 +20,6 @@
     <ClCompile Include="src\Graphics\Shader.cpp">
       <Filter>Source\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scenes\Scene0p.cpp">
-      <Filter>Source\Scenes</Filter>
-    </ClCompile>
     <ClCompile Include="src\UI\GuiWindow.cpp">
       <Filter>Source\UI</Filter>
     </ClCompile>
@@ -92,6 +89,9 @@
     <ClCompile Include="src\Managers\PlayerController.cpp">
       <Filter>Source\Managers</Filter>
     </ClCompile>
+    <ClCompile Include="src\UI\UIManager.cpp">
+      <Filter>Source\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\GameDevM\imgui\imconfig.h">
@@ -148,9 +148,6 @@
     <ClInclude Include="include\Scenes\Scene0g.h">
       <Filter>Headers\Scenes</Filter>
     </ClInclude>
-    <ClInclude Include="include\Scenes\Scene0p.h">
-      <Filter>Headers\Scenes</Filter>
-    </ClInclude>
     <ClInclude Include="include\Core\SceneManager.h">
       <Filter>Headers\Core</Filter>
     </ClInclude>
@@ -201,6 +198,9 @@
     </ClInclude>
     <ClInclude Include="include\Managers\Actor.h">
       <Filter>Headers\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\UI\UIManager.h">
+      <Filter>Headers\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

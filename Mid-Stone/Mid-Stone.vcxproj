@@ -236,6 +236,7 @@
     <ClCompile Include="src\Scenes\AnimationScene.cpp" />
     <ClCompile Include="src\Scenes\Scene0g.cpp" />
     <ClCompile Include="src\UI\GuiWindow.cpp" />
+    <ClCompile Include="src\UI\UIManager.cpp" />
     <ClCompile Include="src\Utils\Debug.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -271,6 +272,7 @@
     <ClInclude Include="include\Scenes\Scene.h" />
     <ClInclude Include="include\Scenes\Scene0g.h" />
     <ClInclude Include="include\UI\GuiWindow.h" />
+    <ClInclude Include="include\UI\UIManager.h" />
     <ClInclude Include="include\Utils\Debug.h" />
     <ClInclude Include="include\Utils\MemoryMonitor.h" />
     <ClInclude Include="third_party\tiny_obj_loader.h" />

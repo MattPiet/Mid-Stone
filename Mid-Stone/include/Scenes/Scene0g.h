@@ -10,6 +10,7 @@
 #include "Graphics/Camera.h"
 #include "Graphics/CameraController.h"
 #include <Managers/2DActor.h>
+#include <UI/UIManager.h>
 
 #include "Managers/PlayerController.h"
 
@@ -29,6 +30,7 @@ class SpriteRenderer;
 class AnimationClip;
 class Animator;
 class Actor2D;
+class UIManager;
 
 class Scene0g : public Scene
 {
@@ -74,6 +76,9 @@ private:
 
 
     ImFont* MainFont;
+
+	
+	bool PauseAudio = true;
 
 public:
     explicit Scene0g();

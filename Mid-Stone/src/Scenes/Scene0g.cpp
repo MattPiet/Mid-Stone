@@ -51,7 +51,7 @@ bool Scene0g::OnCreate()
     }
 
     /** Load and play music **/
-    MIX_Audio* Music = MIX_LoadAudio(mixer, "Audio/CrabRaave.wav", true);
+    MIX_Audio* Music = MIX_LoadAudio(mixer, "Audio/CrabRave.wav", true);
     MIX_SetMasterGain(mixer, master_volume);
     MIX_PlayAudio(mixer, Music);
     MIX_DestroyAudio(Music);
@@ -288,24 +288,35 @@ void Scene0g::HandleEvents(const SDL_Event& sdlEvent)
 
 void Scene0g::RenderGUI()
 {
-    ImGui::Begin("Scene 0g Controls");
+    ImVec4 r = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+    ImVec4 g = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
+    ImVec4 b = ImVec4(0.0f, 0.0f, 1.0f, 1.0f);
+    
+    UIManager::StartInvisibleWindow(ImVec2(0, 100)); // we start an invisible window here
 
-    ImGui::Text("This is the Scene0g debug window");
-    ImGui::Checkbox("Wireframe Mode", &drawInWireMode);
+	UIManager::PushButtonStyle(b, g, r, 90.0f); // pushing button style
 
-    if (mixer)
-    {
-        if (ImGui::SliderFloat("Audio Volume", &master_volume, 0.0f, 1.0f))
-        {
-            MIX_SetMasterGain(mixer, master_volume);
-        }
+    if (ImGui::Button("DrawHitBox")) { // making a button to toggle hitbox drawing
+        mainPlayerActor->draw_Hitbox = !mainPlayerActor->draw_Hitbox;
     }
-    else
-    {
-        std::cout << "Audio is Null" << std::endl;
+	
+    if (ImGui::Button("Mute Audio")) { // making a button to toggle hitbox drawing
+        PauseAudio = !PauseAudio;
     }
+    
+    if (PauseAudio)  MIX_SetMasterGain(mixer, 0);
+	if (!PauseAudio) MIX_SetMasterGain(mixer, master_volume);
 
-    ImGui::End();
+    UIManager::PushSliderStyle(b, g, r, 90.0f); // pushing slider style
+
+    if (mixer && !PauseAudio)
+    {
+        ImGui::SliderFloat("Master Volume", &master_volume, 0.0f, 1.0f);
+    }
+	UIManager::PopSliderStyle(); // popping slider style
+	UIManager::PopButtonStyle(); // popping button style
+
+    UIManager::EndWindow(); // end the invisible window
 }
 
 void Scene0g::Update(const float deltaTime)
@@ -383,20 +394,11 @@ void Scene0g::Render() const
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	
-    ImGui::SetNextWindowPos(ImVec2(0, 100)); // (x, y) in screen coordinates
-    ImGui::SetNextWindowBgAlpha(0.0f); // Fully transparent background (0 = invisible, 1 = opaque)
-	ImGui::Begin("##HiddenLabel", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_AlwaysAutoResize); // this basically sets the window to be invisible
-	if (ImGui::Button("Draw HitBox")) { // making a button to toggle hitbox drawing
-		mainPlayerActor->draw_Hitbox = !mainPlayerActor->draw_Hitbox;
-	}
-	ImGui::End();// we end the invisible window here
-	ImGui::SetNextWindowBgAlpha(150.0f); // reset back to opaque for other windows
-	
 
 	ImDrawList* drawList = ImGui::GetBackgroundDrawList(); // Get the background draw list to draw behind all ImGui windows
 	drawList->AddRectFilled(ImVec2(10, 10), ImVec2(400, 100), IM_COL32(0, 0, 0, 150)); // Draw a semi-transparent rectangle as background for text
 	drawList->AddText(MainFont, 22.0f, ImVec2(20, 60), IM_COL32(0, 255, 0, 255), "Hello Im a different font then the rest!"); // Draw text with custom font and size
-	drawList->AddText(ImVec2(20, 20), IM_COL32(255, 255, 255, 255), "Hello from ImGui!"); // Draw text at position (20, 20)
+    drawList->AddText(ImVec2(20, 20), IM_COL32(255, 255, 255, 255), "Hello from ImGui!");
 	drawList->AddText(ImVec2(20, 40), IM_COL32(255, 255, 0, 255), "Players active: 1"); // Draw text at position (20, 40)
 
     if (drawInWireMode)
