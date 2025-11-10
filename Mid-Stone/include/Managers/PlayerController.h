@@ -32,9 +32,10 @@ public:
     {
         this->possessedActor = newPossessedActor;
     }
-
-
+    
     void MoveAim(float angleInDegrees);
     [[nodiscard]] MATH::Matrix4 GetAimModelMatrix() const;
     void RenderCrossHairs(Matrix4 viewMatrix, Matrix4 projectionMatrix) const;
+    Vec3 GetCrossHairsPosition() const;
+    
 };

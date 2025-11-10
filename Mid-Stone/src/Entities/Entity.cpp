@@ -80,10 +80,7 @@ void Entity::Update(float deltaTime)
         if (!hasFiredExpiredHooks && currentLifeTimeSeconds >= lifeSpanSeconds)
         {
             hasFiredExpiredHooks = true;
-            // Class Callback
             OnExpired();
-
-            // External Callback
             if (onExpired) { onExpired(*this); }
         }
     }

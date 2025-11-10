@@ -17,8 +17,12 @@ private:
     std::unique_ptr<CameraController> cameraController;
 
     /** Input System **/
-    bool leftPressed = true;
-    bool rightPressed = true;
+    bool leftPressed = false;
+    bool rightPressed = false;
+
+    /** Actor Managers **/
+    std::vector<std::unique_ptr<Actor2D>> actors;
+    
     
 public:
     explicit SceneLevel1();

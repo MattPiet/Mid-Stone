@@ -16,6 +16,19 @@ SceneLevel1::~SceneLevel1()
     Debug::Info("Deleted Scene Level 1: ", __FILE__, __LINE__);
 }
 
+void SceneLevel1::OnDestroy()
+{
+    Debug::Info("OnDestroy Scene Level 1: ", __FILE__, __LINE__);
+
+    /** Delete Main Player **/
+    mainPlayerActor.reset();
+    mainPlayerController.reset();
+
+    /** Camera **/
+    cameraController.reset();
+    camera.reset();
+}
+
 
 void SceneLevel1::Update(const float deltaTime)
 {
@@ -28,6 +41,19 @@ void SceneLevel1::Update(const float deltaTime)
     {
         mainPlayerController->MoveAim(-2.0f);
     }
+
+    /** Update Actors **/
+    for (const auto& actor : actors)
+    {
+        actor->Update(deltaTime);
+    }
+
+    /* Actor Cleanup */
+    actors.erase(
+        std::remove_if(actors.begin(), actors.end(),
+                       [](const std::unique_ptr<Actor2D>& e) { return e->HasExpired(); }),
+        actors.end()
+    );
 }
 
 void SceneLevel1::HandleEvents(const SDL_Event& sdlEvent)
@@ -55,6 +81,17 @@ void SceneLevel1::HandleEvents(const SDL_Event& sdlEvent)
         case SDL_SCANCODE_D:
             rightPressed = true;
             break;
+        case SDL_SCANCODE_SPACE:
+            {
+                const Vec3 currentCrossHairsPosition = mainPlayerController->GetCrossHairsPosition();
+                auto bullet = std::make_unique<Actor2D>();
+                bullet->OnCreate("sprites/fist.png");
+                bullet->getEntity()->SetPosition(currentCrossHairsPosition);
+                bullet->ConfigureLifeSpan(1.0f);
+                actors.emplace_back(std::move(bullet));
+                break;
+            }
+
         default: ;
         }
     case SDL_EVENT_MOUSE_MOTION:
@@ -125,8 +162,6 @@ bool SceneLevel1::OnCreate()
     /** Camera **/
     camera = std::make_unique<Camera>();
     cameraController = std::make_unique<CameraController>(camera.get());
-
-
     return true;
 }
 
@@ -134,18 +169,6 @@ void SceneLevel1::RenderGUI()
 {
 }
 
-void SceneLevel1::OnDestroy()
-{
-    Debug::Info("OnDestroy Scene Level 1: ", __FILE__, __LINE__);
-
-    /** Delete Main Player **/
-    mainPlayerActor.reset();
-    mainPlayerController.reset();
-
-    /** Camera **/
-    cameraController.reset();
-    camera.reset();
-}
 
 void SceneLevel1::Render() const
 {
@@ -160,6 +183,13 @@ void SceneLevel1::Render() const
     mainPlayerActor->Render(camera->GetViewMatrix(), camera->GetProjectionMatrix());
     /** Render Main Controller **/
     mainPlayerController->RenderCrossHairs(camera->GetViewMatrix(), camera->GetProjectionMatrix());
+
+    /** Render all Actors **/
+    /* Regular Loop for Rendering Players */
+    for (auto& actor : actors)
+    {
+        actor->Render(camera->GetViewMatrix(), camera->GetProjectionMatrix());
+    }
 
     glUseProgram(0);
 }

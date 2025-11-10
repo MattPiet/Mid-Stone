@@ -10,11 +10,11 @@ PlayerController::~PlayerController()
 {
     crosshairsShader->OnDestroy();
     delete crosshairsShader;
-	crosshairsShader = nullptr;
+    crosshairsShader = nullptr;
     crosshairsMesh->OnDestroy();
     delete crosshairsMesh;
-	crosshairsMesh = nullptr;
-	delete crosshairsRenderer;
+    crosshairsMesh = nullptr;
+    delete crosshairsRenderer;
 }
 
 bool PlayerController::OnCreate(const char* crossHairsFilename)
@@ -55,4 +55,14 @@ void PlayerController::RenderCrossHairs(Matrix4 viewMatrix, Matrix4 projectionMa
                        projectionMatrix);
     glUniformMatrix4fv(static_cast<GLint>(crosshairsShader->GetUniformID("viewMatrix")), 1, GL_FALSE, viewMatrix);
     crosshairsRenderer->renderSprite(crosshairsShader, crosshairsMesh, this->GetAimModelMatrix());
+}
+
+Vec3 PlayerController::GetCrossHairsPosition() const
+{
+    const Vec3 localForwardOffset(crossHairsOffset, 0.0f, 0.0f);
+    const Matrix4 trl = MMath::translate(possessedActor->getEntity()->GetPosition()) *
+        MMath::toMatrix4(crossHairsDirection) *
+        MMath::translate(localForwardOffset);
+    const Vec4 worldPoint = trl * Vec4(0, 0, 0, 1);
+    return {worldPoint.x, worldPoint.y, worldPoint.z};
 }
