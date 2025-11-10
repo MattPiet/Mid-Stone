@@ -15,6 +15,11 @@ private:
     /** Camera **/
     std::unique_ptr<Camera> camera;
     std::unique_ptr<CameraController> cameraController;
+
+    /** Input System **/
+    bool leftPressed = true;
+    bool rightPressed = true;
+    
 public:
     explicit SceneLevel1();
     virtual ~SceneLevel1();

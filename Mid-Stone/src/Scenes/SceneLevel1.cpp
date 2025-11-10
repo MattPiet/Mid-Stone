@@ -19,12 +19,44 @@ SceneLevel1::~SceneLevel1()
 
 void SceneLevel1::Update(const float deltaTime)
 {
+    /** Main Player Controller **/
+    if (leftPressed && !rightPressed)
+    {
+        mainPlayerController->MoveAim(2.0f);
+    }
+    if (rightPressed && !leftPressed)
+    {
+        mainPlayerController->MoveAim(-2.0f);
+    }
 }
 
 void SceneLevel1::HandleEvents(const SDL_Event& sdlEvent)
 {
     switch (sdlEvent.type)
     {
+    case SDL_EVENT_KEY_UP:
+        switch (sdlEvent.key.scancode)
+        {
+        case SDL_SCANCODE_A:
+            leftPressed = false;
+            break;
+        case SDL_SCANCODE_D:
+            rightPressed = false;
+            break;
+        default: ;
+        }
+        break;
+    case SDL_EVENT_KEY_DOWN:
+        switch (sdlEvent.key.scancode)
+        {
+        case SDL_SCANCODE_A:
+            leftPressed = true;
+            break;
+        case SDL_SCANCODE_D:
+            rightPressed = true;
+            break;
+        default: ;
+        }
     case SDL_EVENT_MOUSE_MOTION:
         cameraController->OnMouseMoved({static_cast<float>(sdlEvent.motion.x), static_cast<float>(sdlEvent.motion.y)});
         break;
