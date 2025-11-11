@@ -36,13 +36,19 @@ void SceneLevel1::PlayerShoot()
     const Vec3 currentCrossHairsPosition = mainPlayerController->GetCrossHairsPosition();
     auto bullet = std::make_unique<Actor2D>();
     bullet->OnCreate("sprites/fist.png");
-    bullet->getEntity()->SetPosition(currentCrossHairsPosition);
+    bullet->GetEntity()->SetPosition(currentCrossHairsPosition);
+    const auto crossHairsQuaternion = mainPlayerController->GetCrossHairsRotation();
+    const auto forward = Vec3(1.0f, 0.0f, 0.0f);
+    const Vec3 rotatedVector = crossHairsQuaternion * forward * QMath::inverse(crossHairsQuaternion); // QPQ-1 Formula
+    const Vec3 finalVelocity = rotatedVector * 100.0f;
+    bullet->GetEntity()->AdjustOrientation(crossHairsQuaternion);
+    bullet->GetEntity()->SetVelocity(finalVelocity);
     bullet->ConfigureLifeSpan(1.0f);
-    bullet->RegisterExpiredCallback([this](Actor2D& actor)
+    bullet->RegisterExpiredCallback([this](const Actor2D& actor)
     {
         auto impact = std::make_unique<Actor2D>();
         impact->OnCreate("sprites/impact.png");
-        impact->getEntity()->SetPosition(actor.getEntity()->GetPosition());
+        impact->GetEntity()->SetPosition(actor.GetEntity()->GetPosition());
         impact->ConfigureLifeSpan(1.0f);
         spawnQueue.emplace(std::move(impact));
     });
@@ -76,7 +82,7 @@ void SceneLevel1::Update(const float deltaTime)
     }
 
     /** Spawn Queue **/
-    while (!spawnQueue.empty()) 
+    while (!spawnQueue.empty())
     {
         actors.emplace_back(std::move(spawnQueue.front()));
         spawnQueue.pop();
@@ -171,8 +177,8 @@ bool SceneLevel1::OnCreate()
         1, 3
     );
     // TODO, The clip not being directly related to the spritesheet is weird no?
-    mainPlayerActor->getAnimator()->addAnimationClip("Idle", mainPlayerClipIdle);
-    mainPlayerActor->getAnimator()->playAnimationClip("Idle");
+    mainPlayerActor->GetAnimator()->addAnimationClip("Idle", mainPlayerClipIdle);
+    mainPlayerActor->GetAnimator()->playAnimationClip("Idle");
     mainPlayerActor->draw_Hitbox = true;
 
     /** Main Player Controller **/

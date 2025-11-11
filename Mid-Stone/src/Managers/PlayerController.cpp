@@ -42,7 +42,7 @@ void PlayerController::MoveAim(float angleInDegrees)
 MATH::Matrix4 PlayerController::GetAimModelMatrix() const
 {
     const MATH::Matrix4 initial_translation = MMath::translate(Vec3(this->crossHairsOffset, 0.0f, 0.0f));
-    const MATH::Matrix4 translation = MMath::translate(this->possessedActor->getEntity()->GetPosition());
+    const MATH::Matrix4 translation = MMath::translate(this->possessedActor->GetEntity()->GetPosition());
     const MATH::Matrix4 rotation = MMath::toMatrix4(crossHairsDirection);
     const MATH::Matrix4 modelScale = MMath::scale(this->crossHairsScale);
     return translation * rotation * initial_translation * modelScale;
@@ -60,7 +60,7 @@ void PlayerController::RenderCrossHairs(Matrix4 viewMatrix, Matrix4 projectionMa
 Vec3 PlayerController::GetCrossHairsPosition() const
 {
     const Vec3 localForwardOffset(crossHairsOffset, 0.0f, 0.0f);
-    const Matrix4 trl = MMath::translate(possessedActor->getEntity()->GetPosition()) *
+    const Matrix4 trl = MMath::translate(possessedActor->GetEntity()->GetPosition()) *
         MMath::toMatrix4(crossHairsDirection) *
         MMath::translate(localForwardOffset);
     const Vec4 worldPoint = trl * Vec4(0, 0, 0, 1);

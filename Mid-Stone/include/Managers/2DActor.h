@@ -64,10 +64,10 @@ public:
 
     void ReBuildAll(const char* FileName, int rows = NULL, int columns = NULL);
 
-    Entity* getEntity() const { return entity; }
-    SpriteMesh* getMesh() const { return sprite_Mesh; }
-    SpriteRenderer* getRenderer() { return sprite_Renderer; }
-    Animator* getAnimator() const { return animator; }
+    Entity* GetEntity() const { return entity; }
+    SpriteMesh* GetMesh() const { return sprite_Mesh; }
+    SpriteRenderer* GetRenderer() { return sprite_Renderer; }
+    Animator* GetAnimator() const { return animator; }
 
 
     /** --------- LifeSpan management --------- **/
