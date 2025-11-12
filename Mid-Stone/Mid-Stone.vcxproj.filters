@@ -92,6 +92,9 @@
     <ClCompile Include="src\UI\UIManager.cpp">
       <Filter>Source\UI</Filter>
     </ClCompile>
+    <ClCompile Include="src\Scenes\SceneLevel1.cpp">
+      <Filter>Source\Scenes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\GameDevM\imgui\imconfig.h">
@@ -201,6 +204,9 @@
     </ClInclude>
     <ClInclude Include="include\UI\UIManager.h">
       <Filter>Headers\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scenes\SceneLevel1.h">
+      <Filter>Headers\Scenes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

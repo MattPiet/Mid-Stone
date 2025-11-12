@@ -55,6 +55,7 @@ public:
     void Update(const float deltaTime) override;
 
     bool draw_Hitbox = false;
+	bool isStatic = false;
     
     virtual void OnDestroy() override;
     
@@ -123,4 +124,7 @@ public:
      * @return The elapsed lifespan in seconds.
      */
     [[nodiscard]] float GetElapsedLifeTime() const { return elapsedLifeTimeSeconds; }
+
+
+
 };

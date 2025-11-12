@@ -124,4 +124,6 @@ public:
     }
 	MATH::Vec3 GetVelocity() const { return velocity; }
 	void SetVelocity(const MATH::Vec3& velocity_) { velocity = velocity_; }
+
+	float GetMass() const { return mass; }
 };

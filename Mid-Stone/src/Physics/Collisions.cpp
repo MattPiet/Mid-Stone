@@ -1,115 +1,122 @@
 #include "Physics/Collisions.h"
 
-bool Collision::CheckCircleCircleCollision(const Entity& entity_1, const Entity& entity_2){
+bool Collision::CheckCircleCircleCollision(const Actor2D& entity_1, const Actor2D& entity_2){
 	// TODO This is wrong, rework later.
 	
 	//Check for overlap on all axes
 		//Distance between the centers of the circles
-	float distance = MATH::VMath::distance(entity_1.GetPosition(), entity_2.GetPosition()); //Assuming they are in the same plane
+	float distance = MATH::VMath::distance(entity_1.GetEntity()->GetPosition(), entity_2.GetEntity()->GetPosition()); //Assuming they are in the same plane
 	//Sum of the radii of the circles
-	float widthSum = entity_1.GetHitbox().x + entity_2.GetHitbox().x;
-	float heightSum = entity_1.GetHitbox().y + entity_2.GetHitbox().y;
+	float widthSum = entity_1.GetEntity()->GetHitbox().x + entity_2.GetEntity()->GetHitbox().x;
+	float heightSum = entity_1.GetEntity()->GetHitbox().y + entity_2.GetEntity()->GetHitbox().y;
 	return distance <= widthSum && distance <= heightSum;
 }
 
-bool Collision::CheckQuadQuadCollision(const Entity& entity_1, const Entity& entity_2) {
+bool Collision::CheckQuadQuadCollision(const Actor2D& entity_1, const Actor2D& entity_2) {
 	//Testing Quad to Quad collision
-	float minx1 = entity_1.GetPosition().x - entity_1.GetHitbox().x / 2.0f;
-	float maxx1 = entity_1.GetPosition().x + entity_1.GetHitbox().x / 2.0f;
-	float miny1 = entity_1.GetPosition().y - entity_1.GetHitbox().y / 2.0f;
-	float maxy1 = entity_1.GetPosition().y + entity_1.GetHitbox().y / 2.0f;
-	
-	float minx2 = entity_2.GetPosition().x - entity_2.GetHitbox().x / 2.0f;
-	float maxx2 = entity_2.GetPosition().x + entity_2.GetHitbox().x / 2.0f;
-	float miny2 = entity_2.GetPosition().y - entity_2.GetHitbox().y / 2.0f;
-	float maxy2 = entity_2.GetPosition().y + entity_2.GetHitbox().y / 2.0f;
+	float minx1 = entity_1.GetEntity()->GetPosition().x - entity_1.GetEntity()->GetHitbox().x / 2.0f;
+	float maxx1 = entity_1.GetEntity()->GetPosition().x + entity_1.GetEntity()->GetHitbox().x / 2.0f;
+	float miny1 = entity_1.GetEntity()->GetPosition().y - entity_1.GetEntity()->GetHitbox().y / 2.0f;
+	float maxy1 = entity_1.GetEntity()->GetPosition().y + entity_1.GetEntity()->GetHitbox().y / 2.0f;
+	                                                              
+	float minx2 = entity_2.GetEntity()->GetPosition().x - entity_2.GetEntity()->GetHitbox().x / 2.0f;
+	float maxx2 = entity_2.GetEntity()->GetPosition().x + entity_2.GetEntity()->GetHitbox().x / 2.0f;
+	float miny2 = entity_2.GetEntity()->GetPosition().y - entity_2.GetEntity()->GetHitbox().y / 2.0f;
+	float maxy2 = entity_2.GetEntity()->GetPosition().y + entity_2.GetEntity()->GetHitbox().y / 2.0f;
 
 	bool overlapx = (minx1 <= maxx2) && (maxx1 >= minx2);
 	bool overlapy = (miny1 <= maxy2) && (maxy1 >= miny2);
 
 	return overlapx && overlapy;
 }
+void Collision::CollisionResponse(Actor2D& entityA, Actor2D& entityB) {
+    if (entityA.HasExpired() || entityB.HasExpired()) return;
 
-void Collision::CollisionResponse(Entity& entityA, Entity& entityB) {
-    // Ignore expired entities
-    if (entityA.IsExpired() || entityB.IsExpired()) return;
-
-    // First, check for collision
+    // Check for collision
     if (!CheckOBBOBBCollision(entityA, entityB)) {
-        entityA.SetHitboxColor(MATH::Vec4(0.0f, 1.0f, 0.0f, 1.0f)); // Green = no collision
-        entityB.SetHitboxColor(MATH::Vec4(0.0f, 1.0f, 0.0f, 1.0f));
+        entityA.GetEntity()->SetHitboxColor(MATH::Vec4(0.0f, 1.0f, 0.0f, 1.0f));
+        entityB.GetEntity()->SetHitboxColor(MATH::Vec4(0.0f, 1.0f, 0.0f, 1.0f));
         return;
     }
 
     // Visual feedback: collided
-    entityA.SetHitboxColor(MATH::Vec4(1.0f, 0.0f, 0.0f, 1.0f)); // Red = collision
-    entityB.SetHitboxColor(MATH::Vec4(1.0f, 0.0f, 0.0f, 1.0f));
+    entityA.GetEntity()->SetHitboxColor(MATH::Vec4(1.0f, 0.0f, 0.0f, 1.0f));
+    entityB.GetEntity()->SetHitboxColor(MATH::Vec4(1.0f, 0.0f, 0.0f, 1.0f));
 
-    // --- Basic separation response ---
-    // Move entities slightly apart along the shortest vector between them
+    // Positions
+    Vec3 posA = entityA.GetEntity()->GetPosition();
+    Vec3 posB = entityB.GetEntity()->GetPosition();
+    Vec3 delta = posB - posA;
 
-    MATH::Vec3 positionA = entityA.GetPosition();
-    MATH::Vec3 positionB = entityB.GetPosition();
-    MATH::Vec3 directionAB = positionB - positionA;
+    float distance = VMath::mag(delta);
+    if (distance < 1e-6f) return;
 
-    float distance = VMath::distance(positionB , positionA);
-    if (distance < 0.0001f) return; // Prevent divide-by-zero if they're exactly overlapping
+    Vec3 normal = delta / distance;
 
-    directionAB /= distance; // Normalize
+    // Compute overlap depth roughly from AABB projection along normal (simplified)
+    Vec3 sizeA = entityA.GetEntity()->GetHitbox() * 0.5f;
+    Vec3 sizeB = entityB.GetEntity()->GetHitbox() * 0.5f;
 
-    // You can pick a small separation distance to "push" them apart
-    float separationDistance = 0.01f;
+    float overlap = (sizeA.x + sizeB.x) - std::fabs(VMath::dot(delta, normal));
+    if (overlap < 0.0f) overlap = 0.0f;
 
-    // Move both entities away from each other
-    positionA -= directionAB * (separationDistance * 0.5f);
-    positionB += directionAB * (separationDistance * 0.5f);
+    // --- Position correction ---
+    Vec3 correction = normal * (overlap * 0.5f);
+    posA -= correction;
+    posB += correction;
 
-    entityA.SetPosition(positionA);
-    entityB.SetPosition(positionB);
+	if (!entityA.isStatic) entityA.GetEntity()->SetPosition(posA);
 
-    // --- Optional bounce or velocity response ---
-    if (VMath::mag(entityA.GetVelocity()) > VERY_SMALL && VMath::mag(entityB.GetVelocity()) > VERY_SMALL) {
-        MATH::Vec3 velocityA = entityA.GetVelocity();
-        MATH::Vec3 velocityB = entityB.GetVelocity();
+   if(!entityB.isStatic) entityB.GetEntity()->SetPosition(posB);
 
-        // Reflect their velocities along the collision normal (basic elastic response)
-        MATH::Vec3 collisionNormal = directionAB;
-        //  Check if they’re moving apart
+    // --- Velocity response ---
+    Vec3 velA = entityA.GetEntity()->GetVelocity();
+    Vec3 velB = entityB.GetEntity()->GetVelocity();
 
-        MATH::Vec3 relativeVelocity = velocityB - velocityA;
-        float separatingVelocity = VMath::dot(relativeVelocity, collisionNormal);
-        if (separatingVelocity > 0.0f)
-            return; // No need for bounce if separating
+    
 
 
-        float vAAlongNormal = VMath::dot(velocityA, collisionNormal);
-        float vBAlongNormal = VMath::dot(velocityB, collisionNormal);
+    Vec3 relativeVel = velB - velA;
+    float separatingVel = VMath::dot(relativeVel, normal);
 
-        // Simple velocity swap (for similar masses)
-        float temp = vAAlongNormal;
-        vAAlongNormal = vBAlongNormal;
-        vBAlongNormal = temp;
+    // Avoid tiny floating-point overlap errors
+    const float overlapEpsilon = 0.0001f;
 
-        // Update new velocities
-        velocityA += (vAAlongNormal - VMath::dot(velocityA, collisionNormal)) * collisionNormal;
-        velocityB += (vBAlongNormal - VMath::dot(velocityB, collisionNormal)) * collisionNormal;
+    // Skip if moving apart AND not overlapping anymore
+    if (separatingVel > 0.0f && overlap <= overlapEpsilon)
+        return;
 
-        entityA.SetVelocity(velocityA);
-        entityB.SetVelocity(velocityB);
-    }
+    // Prevent small vibrations/jitter due to numerical noise
+    if (fabs(separatingVel) < 0.01f)
+        separatingVel = 0.0f;
+    float restitution = 1.8f; // 0 = no bounce, 1 = perfectly elastic
+    // Compute impulse magnitude (elastic collision, equal mass)
+    float impulse = -(1.0f + restitution) * separatingVel; // apply restitution
+   
+    float mA = entityA.GetEntity()->GetMass();
+    float mB = entityB.GetEntity()->GetMass();
+    float totalMass = mA + mB;
+  //  Vec3 impulseVec = normal * (impulse * mB / totalMass); // apply mass ratio
+    Vec3 impulseVec = normal * impulse * 0.5f; // no mass
+
+
+    if (!entityA.isStatic) entityA.GetEntity()->SetVelocity(velA - impulseVec);
+    if (!entityB.isStatic) entityB.GetEntity()->SetVelocity(velB + impulseVec);
+
 }
-bool Collision::CheckOBBOBBCollision(const Entity& boxA, const Entity& boxB) {
+
+bool Collision::CheckOBBOBBCollision(const Actor2D& boxA, const Actor2D& boxB) {
     // Centers
-    Vec3 centerA = boxA.GetPosition();
-    Vec3 centerB = boxB.GetPosition();
+    Vec3 centerA = boxA.GetEntity()->GetPosition();
+    Vec3 centerB = boxB.GetEntity()->GetPosition();
 
     // Half-extents (half width, half height, half depth)
-    Vec3 halfExtentsA = boxA.GetHitbox() * 0.5f;
-    Vec3 halfExtentsB = boxB.GetHitbox() * 0.5f;
+    Vec3 halfExtentsA = boxA.GetEntity()->GetHitbox() * 0.5f;
+    Vec3 halfExtentsB = boxB.GetEntity()->GetHitbox() * 0.5f;
 
     // Orientations (quaternions)
-    Quaternion orientationA = boxA.GetOrientation();
-    Quaternion orientationB = boxB.GetOrientation();
+    Quaternion orientationA = boxA.GetEntity()->GetOrientation();
+    Quaternion orientationB = boxB.GetEntity()->GetOrientation();
 
     // Local axes of each OBB expressed in world space (unit vectors)
     Vec3 axisA[3] = {
@@ -122,6 +129,12 @@ bool Collision::CheckOBBOBBCollision(const Entity& boxA, const Entity& boxB) {
         orientationB * MATH::Vec3(0.0f, 1.0f, 0.0f), // B local Y axis in world coords
         orientationB * MATH::Vec3(0.0f, 0.0f, 1.0f)  // B local Z axis in world coords
     };
+
+    //  normalize axes
+    for (int i = 0; i < 3; ++i) {
+        axisA[i] = VMath::normalize(axisA[i]);
+        axisB[i] = VMath::normalize(axisB[i]);
+    }
 
     // Rotation / dot-product matrix between A's axes and B's axes:
     // rotationDotMatrix[i][j] = axisA[i] · axisB[j]
@@ -169,10 +182,9 @@ bool Collision::CheckOBBOBBCollision(const Entity& boxA, const Entity& boxB) {
         );
         if (projectedTranslationOnBj > radiusA + radiusB) return false; // separation found
     }
-
+    //// No separating axis found => boxes overlap
     // ---------- Test cross-product axes (Ai x Bj), 9 tests ----------
-    // These are the cross axes; scalar-expanded form from Gottschalk's SAT
-    // A0 x B0
+// A0 x B0
     radiusA = halfExtentsA.y * absRotationDotMatrix[2][0] + halfExtentsA.z * absRotationDotMatrix[1][0];
     radiusB = halfExtentsB.y * absRotationDotMatrix[0][2] + halfExtentsB.z * absRotationDotMatrix[0][1];
     if (std::fabs(translationInA.z * rotationDotMatrix[1][0] - translationInA.y * rotationDotMatrix[2][0]) > radiusA + radiusB) return false;
@@ -217,8 +229,10 @@ bool Collision::CheckOBBOBBCollision(const Entity& boxA, const Entity& boxB) {
     radiusB = halfExtentsB.x * absRotationDotMatrix[2][1] + halfExtentsB.y * absRotationDotMatrix[2][0];
     if (std::fabs(translationInA.y * rotationDotMatrix[0][2] - translationInA.x * rotationDotMatrix[1][2]) > radiusA + radiusB) return false;
 
-    // No separating axis found => boxes overlap
     return true;
 }
+
+
+
 
 

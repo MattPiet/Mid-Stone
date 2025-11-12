@@ -4,6 +4,9 @@
 #include "Vector.h"
 #include <Matrix.h>
 #include <SDL_mixer.h>
+#include <memory>
+#include <queue>
+
 
 #include "Entities/Entity.h"
 #include "Entities/Player.h"
@@ -60,25 +63,17 @@ private:
 
     /** Entity containers **/
     std::vector<std::unique_ptr<Actor2D>> actors;
-    std::vector<std::unique_ptr<Player>> players;
-    std::vector<std::unique_ptr<Entity>> bullets;
-    std::vector<std::unique_ptr<Entity>> effects;
 
-    /** Renderers **/
-    SpriteRenderer* playerRenderer;
-    SpriteRenderer* bulletsRenderer;
-    SpriteRenderer* impactRenderer;
-
-
-    Shader* shader;
-    SpriteMesh* sprite_Mesh;
-    SpriteRenderer* sprite_Renderer;
-
+	std::vector<std::unique_ptr<Actor2D>> objects;
 
     ImFont* MainFont;
 
+    /** Entity Spawn Queue **/
+    std::queue<std::unique_ptr<Actor2D>> spawnQueue;
 	
 	bool PauseAudio = true;
+
+    bool globalDrawHitboxes = false;
 
 public:
     explicit Scene0g();
@@ -89,7 +84,11 @@ public:
     virtual void Update(const float deltaTime) override;
     virtual void Render() const override;
     virtual void HandleEvents(const SDL_Event& sdlEvent) override;
-    virtual void RenderGUI();
+    virtual void RenderGUI() override;
+
+
+    /** Gameplay Functions **/
+    void PlayerShoot();
 };
 
 

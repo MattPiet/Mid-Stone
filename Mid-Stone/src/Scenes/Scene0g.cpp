@@ -24,9 +24,8 @@
 #include <Utils/MemoryMonitor.h>
 
 
-Scene0g::Scene0g() : shader{nullptr},
-                     drawInWireMode{false}, master_volume{1.0f}, mixer{nullptr}, sprite_Mesh{nullptr},
-                     sprite_Renderer{nullptr}
+Scene0g::Scene0g() : 
+                     drawInWireMode{false}, master_volume{1.0f}, mixer{nullptr}
 {
     Debug::Info("Created Scene0: ", __FILE__, __LINE__);
 }
@@ -84,30 +83,6 @@ bool Scene0g::OnCreate()
     mainPlayerController->OnCreate("sprites/crosshairs.png");
     mainPlayerController->SetPossessedActor(mainPlayerActor.get());
 
-    /** Renderer Setup **/
-    playerRenderer = new SpriteRenderer();
-    playerRenderer->loadImage("sprites/Attack_Top.png", 1, 3);
-    bulletsRenderer = new SpriteRenderer();
-    bulletsRenderer->loadImage("sprites/fist.png", 2, 8);
-    impactRenderer = new SpriteRenderer();
-    impactRenderer->loadImage("sprites/impact.png", 2, 4);
-    players.emplace_back(std::make_unique<Player>(Vec3{-50, -20, 0}, Vec3{2.0f, 2.0f, 2.0f}));
-
-    for (auto& player : players)
-    {
-        player->OnCreate(playerRenderer);
-    }
-
-
-    /** Sprite Setup **/
-    sprite_Mesh = new SpriteMesh();
-    sprite_Mesh->OnCreate();
-
-    shader = new Shader("shaders/spriteVert.glsl", "shaders/spriteFrag.glsl");
-    if (!shader->OnCreate())
-    {
-        std::cout << "Shader failed ... we have a problem\n";
-    }
 
 	ImGuiIO& io = ImGui::GetIO(); // access the ImGuiIO structure
 	io.Fonts->AddFontDefault(); // add default font
@@ -117,7 +92,31 @@ bool Scene0g::OnCreate()
     
 	MainFont = io.Fonts->AddFontFromFileTTF("Fonts/times.ttf", 18.5f); // load a custom font
 
-
+	// Spawn Test Objects
+    // top left
+    auto NewOBJ = std::make_unique<Actor2D>();
+    NewOBJ->OnCreate("sprites/impact.png");
+    NewOBJ->GetEntity()->SetPosition(Vec3(-50.0f,10.0f,0.0f));
+	NewOBJ->isStatic = true;
+    objects.emplace_back(std::move(NewOBJ));
+    // top right
+    NewOBJ = std::make_unique<Actor2D>();
+   NewOBJ->OnCreate("sprites/impact.png");
+   NewOBJ->GetEntity()->SetPosition(Vec3(50.0f, 10.0f, 0.0f));
+   NewOBJ->isStatic = true;
+   objects.emplace_back(std::move(NewOBJ));
+   // bottom left
+    NewOBJ = std::make_unique<Actor2D>();
+   NewOBJ->OnCreate("sprites/impact.png");
+   NewOBJ->GetEntity()->SetPosition(Vec3(-50.0f, 0.0f, 0.0f));
+   NewOBJ->isStatic = true;
+   objects.emplace_back(std::move(NewOBJ));
+   // bottom right
+    NewOBJ = std::make_unique<Actor2D>();
+   NewOBJ->OnCreate("sprites/impact.png");
+   NewOBJ->GetEntity()->SetPosition(Vec3(50.0f, 0.0f, 0.0f));
+   NewOBJ->isStatic = true;
+   objects.emplace_back(std::move(NewOBJ));
 
     return true;
 }
@@ -129,42 +128,17 @@ void Scene0g::OnDestroy()
     mainPlayerActor.reset();
     mainPlayerController.reset();
 
-    if (shader != nullptr)
-    {
-        shader->OnDestroy();
-        delete shader;
-        shader = nullptr;
-    }
-
-    if (sprite_Mesh != nullptr)
-    {
-        sprite_Mesh->OnDestroy();
-        delete sprite_Mesh;
-        sprite_Mesh = nullptr;
-    }
-
-
-    delete sprite_Renderer;
-    sprite_Renderer = nullptr;
-
-    delete playerRenderer;
-    playerRenderer = nullptr;
-
-    delete bulletsRenderer;
-    bulletsRenderer = nullptr;
-    
-
-    delete impactRenderer;
-    impactRenderer = nullptr;
-
-
     cameraController.reset();
     camera.reset();
 
-    for (auto& player : players)
+    for (auto& actor : actors)
+	{
+		actor.reset();
+	}
+    for (auto& object : objects)
     {
-		player.reset();
-    }
+        object.reset();
+	}
 
     //// Turn off audio
     if (mixer)
@@ -172,6 +146,31 @@ void Scene0g::OnDestroy()
         MIX_DestroyMixer(mixer);
         MIX_Quit();
     }
+}
+void Scene0g::PlayerShoot() {
+    const Vec3 currentCrossHairsPosition = mainPlayerController->GetCrossHairsPosition();
+    auto bullet = std::make_unique<Actor2D>();
+    bullet->OnCreate("sprites/fatty_clicked.png");
+    bullet->GetEntity()->SetPosition(currentCrossHairsPosition);
+    const auto crossHairsQuaternion = mainPlayerController->GetCrossHairsRotation();
+    const auto forward = Vec3(1.0f, 0.0f, 0.0f);
+    const Vec3 rotatedVector = crossHairsQuaternion * forward * QMath::inverse(crossHairsQuaternion); // QPQ-1 Formula
+    const Vec3 finalVelocity = rotatedVector * 100.0f;
+    bullet->GetEntity()->AdjustOrientation(crossHairsQuaternion);
+    bullet->GetEntity()->SetVelocity(finalVelocity);
+    bullet->ConfigureLifeSpan(2.0f);
+	//bullet->draw_Hitbox = globalDrawHitboxes;
+    bullet->RegisterExpiredCallback([this](const Actor2D& actor)
+        {
+            auto impact = std::make_unique<Actor2D>();
+            impact->OnCreate("sprites/impact.png");
+            impact->GetEntity()->SetPosition(actor.GetEntity()->GetPosition());
+            impact->ConfigureLifeSpan(1.0f);
+			//impact->draw_Hitbox = globalDrawHitboxes;
+            spawnQueue.emplace(std::move(impact));
+        });
+    spawnQueue.emplace(std::move(bullet));
+
 }
 
 void Scene0g::HandleEvents(const SDL_Event& sdlEvent)
@@ -191,42 +190,9 @@ void Scene0g::HandleEvents(const SDL_Event& sdlEvent)
             pressingRight = true;
             break;
         case SDL_SCANCODE_SPACE:
-            if (auto bullet = players.front()->Shoot())
-            {
-                bullet->SetPosition(Vec3(30.0f, 20.0f, 0));
-                bullet->AdjustOrientation(QMath::angleAxisRotation(45.0f, MATH::Vec3(0.0f, 0.0f, 1.0f)));
-				bullet->SetVelocity(Vec3(-50.0f, 0.0f, 0.0f));
-                bullet->OnCreate(bulletsRenderer);
-                bullet->AdjustHitboxSize(Vec3{-10.f, -10.f, 0.0f});
-                // implicit upcast unique_ptr<Bullet> -> unique_ptr<Entity> (default deleter)
-                bullet->SetExpiredCallback([this](Entity& e)
-                {
-                    auto impact = std::make_unique<Entity>(e.GetPosition(), Vec3{1.0f, 1.0f, 1.0f}, Hit_box_type::quad);
-                    impact->OnCreate(impactRenderer);
-                    impact->SetLifeSpan(1.0f);
-                    effects.emplace_back(std::move(impact));
-                });
-                bullets.emplace_back(std::move(bullet));
-            }
+            PlayerShoot();
             break;
         case SDL_SCANCODE_P:
-            if (auto bullet = players.front()->Shoot())
-            {
-                bullet->SetPosition(Vec3(-30.0f, 15.0f, 0));
-				bullet->AdjustOrientation(QMath::angleAxisRotation(45.0f, MATH::Vec3(0.0f, 0.0f, 1.0f)));
-				bullet->SetVelocity(Vec3(50.0f, 0.0f, 0.0f));
-                bullet->OnCreate(bulletsRenderer);
-                bullet->AdjustHitboxSize(Vec3{ -10.f, -10.f, 0.0f });
-                // implicit upcast unique_ptr<Bullet> -> unique_ptr<Entity> (default deleter)
-                bullet->SetExpiredCallback([this](Entity& e)
-                    {
-                        auto impact = std::make_unique<Entity>(e.GetPosition(), Vec3{ 1.0f, 1.0f, 1.0f }, Hit_box_type::quad);
-                        impact->OnCreate(impactRenderer);
-                        impact->SetLifeSpan(1.0f);
-                        effects.emplace_back(std::move(impact));
-                    });
-                bullets.emplace_back(std::move(bullet));
-            }
             break;
         }
         break;
@@ -298,6 +264,12 @@ void Scene0g::RenderGUI()
 
     if (ImGui::Button("DrawHitBox")) { // making a button to toggle hitbox drawing
         mainPlayerActor->draw_Hitbox = !mainPlayerActor->draw_Hitbox;
+		globalDrawHitboxes = !globalDrawHitboxes;
+        for (auto& object : objects)
+        {
+            object->draw_Hitbox = globalDrawHitboxes;
+		}
+     
     }
 	
     if (ImGui::Button("Mute Audio")) { // making a button to toggle hitbox drawing
@@ -321,6 +293,14 @@ void Scene0g::RenderGUI()
 
 void Scene0g::Update(const float deltaTime)
 {
+    /** Spawn Queue **/
+    while (!spawnQueue.empty())
+    {
+        actors.emplace_back(std::move(spawnQueue.front()));
+        spawnQueue.pop();
+    }
+   
+
     /** Update Main Player **/
     mainPlayerActor->Update(deltaTime);
 
@@ -334,54 +314,50 @@ void Scene0g::Update(const float deltaTime)
         mainPlayerController->MoveAim(-2.0f);
     }
 
-    /* Regular Loop for Updating Players */
-    for (auto& player : players)
-    {
-        player->Update(deltaTime);
-    }
-    /* Regular Loop for Updating Bullets */
-    for (auto& bullet : bullets)
-    {
-        bullet->Update(deltaTime);
-    }
-    /* Regular Loop for Updating Effects */
-    for (auto& effect : effects)
-    {
-        effect->Update(deltaTime);
-    }
-
-
-    /* Removes and Deletes Players if they expire */
-    players.erase(
-        std::remove_if(players.begin(), players.end(),
-                       [](const std::unique_ptr<Player>& e) { return e->IsExpired(); }),
-        players.end()
+    /* Actor Cleanup */
+    actors.erase(
+        std::remove_if(actors.begin(), actors.end(),
+            [](const std::unique_ptr<Actor2D>& e) { return e->HasExpired(); }),
+        actors.end()
     );
+
+    /** Update Actors **/
+    for (const auto& actor : actors)
+    {
+        actor->Update(deltaTime);
+    }
+
 
 
     /* Removes and Deletes bullets if they expire */
     // TODO Delete after demo.
-    for (int i = 0; i < bullets.size(); i++)
-    {
-        for (int j = i + 1; j < bullets.size(); j++)
-        {
-            Collision::CollisionResponse(*bullets[i], *bullets[j]);
+ //   for (auto& object : objects)
+ //   {
+ //       object->Update(deltaTime);
+	//}
+    for (auto& actor : actors) {
+        for (auto& object : objects) {
+            Collision::CollisionResponse(*actor, *object);
         }
-		bullets[i]->UpdatePhysics(deltaTime);
     }
-    bullets.erase(
-        std::remove_if(bullets.begin(), bullets.end(),
-                       [](const std::unique_ptr<Entity>& e) { return e->IsExpired(); }),
-        bullets.end()
-    );
-
-
-    /* Removes and Deletes effects if they expire */
-    effects.erase(
-        std::remove_if(effects.begin(), effects.end(),
-                       [](const std::unique_ptr<Entity>& e) { return e->IsExpired(); }),
-        effects.end()
-    );
+    for (int i = 0; i < objects.size(); i++)
+    {
+        for (int j = i + 1; j < objects.size(); j++)
+        {
+            Collision::CollisionResponse(*objects[i], *objects[j]);
+        }
+    }
+    for (int i = 0; i < actors.size(); i++)
+    {
+        for (int j = i + 1; j < actors.size(); j++)
+        {
+            Collision::CollisionResponse(*actors[i], *actors[j]);
+        }
+    }
+    for (auto& actor : actors)
+    {
+        actor->draw_Hitbox = globalDrawHitboxes;
+    }
 }
 
 void Scene0g::Render() const
@@ -392,7 +368,6 @@ void Scene0g::Render() const
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 	
 
 	ImDrawList* drawList = ImGui::GetBackgroundDrawList(); // Get the background draw list to draw behind all ImGui windows
@@ -410,44 +385,22 @@ void Scene0g::Render() const
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
-    glUseProgram(shader->GetProgram());
-    glUniformMatrix4fv(static_cast<GLint>(shader->GetUniformID("projectionMatrix")), 1, GL_FALSE,
-                       camera->GetProjectionMatrix());
-    glUniformMatrix4fv(static_cast<GLint>(shader->GetUniformID("viewMatrix")), 1, GL_FALSE, camera->GetViewMatrix());
-
-    /** Render Main Player **/
+      /** Render Main Player **/
     mainPlayerActor->Render(camera->GetViewMatrix(), camera->GetProjectionMatrix());
     /** Render Main Controller **/
     mainPlayerController->RenderCrossHairs(camera->GetViewMatrix(), camera->GetProjectionMatrix());
 
-    
-
-    glUseProgram(shader->GetProgram());
-    
-
-    /* Regular Loop for Rendering Players */
-    for (auto& player : players)
-    {
-        playerRenderer->renderSpriteSheet(shader, sprite_Mesh, player->GetModelMatrix(), 1);
-        player->DrawHitBox(camera->GetProjectionMatrix(), camera->GetViewMatrix(), sprite_Mesh);
-        glUseProgram(shader->GetProgram());
-    }
-
     /* Regular Loop for Rendering Bullets */
-    for (auto& bullet : bullets)
+    for (auto& actor : actors)
     {
-        bulletsRenderer->renderSpriteSheet(shader, sprite_Mesh, bullet->GetModelMatrix(), 1);
-        bullet->DrawHitBox(camera->GetProjectionMatrix(), camera->GetViewMatrix(), sprite_Mesh);
-        glUseProgram(shader->GetProgram());
+        actor->Render(camera->GetViewMatrix(), camera->GetProjectionMatrix());
     }
 
-    /* Regular Loop for Rendering Effects */
-    for (auto& effect : effects)
+    for (auto& objects : objects)
     {
-        impactRenderer->renderSpriteSheet(shader, sprite_Mesh, effect->GetModelMatrix(), 1);
-        effect->DrawHitBox(camera->GetProjectionMatrix(), camera->GetViewMatrix(), sprite_Mesh);
-        glUseProgram(shader->GetProgram());
-    }
+        objects->Render(camera->GetViewMatrix(), camera->GetProjectionMatrix());
+	}
+
 
 
     glUseProgram(0);
