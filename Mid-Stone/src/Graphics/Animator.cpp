@@ -25,3 +25,34 @@ void Animator::playAnimationClip(const std::string& name) {
 		throw std::runtime_error("Animation clip'" + name + "'not found.");
 	}
 }
+
+void Animator::update(float deltaSeconds) {
+	if (currentClip) {
+		currentClip->update(deltaSeconds);
+		//std::cout << "Current frame " << currentClip->getCurrentFrame() << std::endl;
+		if (currentClip->getIsFinished()) {
+			animationCallback();
+		}
+	}
+}
+
+void Animator::setDefaultAnimation(const std::string name) {
+	if (animationClips.find(name) != animationClips.end()) {
+		defaultClipName = name;
+		std::cout << "Default animation set to \"" << name << "\"\n";
+	}
+	else {
+		std::cerr << "Error: Default animation \"" << name << "\" not found!\n";
+	}
+}
+
+void Animator::animationCallback() {
+	if (currentClipName != defaultClipName) {
+		if (currentClip && currentClip->getIsFinished()) {
+			if (!defaultClipName.empty()) {
+				playAnimationClip(defaultClipName);
+				std::cout << "playing default animation" << std::endl;
+			}
+		}
+	}
+}
