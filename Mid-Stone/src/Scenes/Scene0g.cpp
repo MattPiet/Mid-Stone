@@ -74,8 +74,8 @@ bool Scene0g::OnCreate()
         1, 3
     );
     // TODO, The clip not being directly related to the spritesheet is weird no?
-    mainPlayerActor->getAnimator()->addAnimationClip("Idle", mainPlayerClipIdle);
-    mainPlayerActor->getAnimator()->playAnimationClip("Idle");
+    mainPlayerActor->GetAnimator()->addAnimationClip("Idle", mainPlayerClipIdle);
+    mainPlayerActor->GetAnimator()->playAnimationClip("Idle");
     mainPlayerActor->draw_Hitbox = true;
 
     /** Set up Main Player Controller **/

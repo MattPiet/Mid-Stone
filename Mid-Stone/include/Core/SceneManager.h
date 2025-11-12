@@ -22,14 +22,8 @@ public:
 private:
 	enum class Scene_number : uint8_t {
 		scene0_g = 0,
-		scene0_p,
+		scene_level_1,
 		animation_scene,
-		scene1,
-		scene2,
-		scene3,
-		scene4,
-		scene5,
-		scene6
 	};
 
 	Scene* currentScene;

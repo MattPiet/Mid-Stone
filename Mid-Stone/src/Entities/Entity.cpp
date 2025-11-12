@@ -74,16 +74,14 @@ MATH::Matrix4 Entity::GetModelMatrix() const
 
 void Entity::Update(float deltaTime)
 {
+    UpdatePhysics(deltaTime);
     if (lifeSpanSeconds > 0.0f)
     {
         currentLifeTimeSeconds += std::max(0.0f, deltaTime);
         if (!hasFiredExpiredHooks && currentLifeTimeSeconds >= lifeSpanSeconds)
         {
             hasFiredExpiredHooks = true;
-            // Class Callback
             OnExpired();
-
-            // External Callback
             if (onExpired) { onExpired(*this); }
         }
     }
