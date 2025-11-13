@@ -120,14 +120,14 @@ bool Collision::CheckOBBOBBCollision(const Actor2D& boxA, const Actor2D& boxB) {
 
     // Local axes of each OBB expressed in world space (unit vectors)
     Vec3 axisA[3] = {
-        orientationA * MATH::Vec3(1.0f, 0.0f, 0.0f), // A local X axis in world coords
-        orientationA * MATH::Vec3(0.0f, 1.0f, 0.0f), // A local Y axis in world coords
-        orientationA * MATH::Vec3(0.0f, 0.0f, 1.0f)  // A local Z axis in world coords
+        QMath::rotate(MATH::Vec3(1.0f, 0.0f, 0.0f),orientationA),// get the ori of the object based off a quat
+		QMath::rotate(MATH::Vec3(0.0f, 1.0f, 0.0f),orientationA),// get the ori of the object based off a quat
+		QMath::rotate(MATH::Vec3(0.0f, 0.0f, 1.0f),orientationA) // get the ori of the object based off a quat
     };
     Vec3 axisB[3] = {
-        orientationB * MATH::Vec3(1.0f, 0.0f, 0.0f), // B local X axis in world coords
-        orientationB * MATH::Vec3(0.0f, 1.0f, 0.0f), // B local Y axis in world coords
-        orientationB * MATH::Vec3(0.0f, 0.0f, 1.0f)  // B local Z axis in world coords
+		QMath::rotate(MATH::Vec3(1.0f, 0.0f, 0.0f),orientationB), // get the ori of the object based off a quat
+		QMath::rotate(MATH::Vec3(0.0f, 1.0f, 0.0f),orientationB), // get the ori of the object based off a quat
+		QMath::rotate(MATH::Vec3(0.0f, 0.0f, 1.0f),orientationB)  // get the ori of the object based off a quat
     };
 
     //  normalize axes
