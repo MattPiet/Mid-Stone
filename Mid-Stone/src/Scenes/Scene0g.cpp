@@ -66,7 +66,7 @@ bool Scene0g::OnCreate()
         std::cout << "Failed to create test actor spritesheet\n";
         return false;
     }
-	mainPlayerActor->noVelocity = true;
+	mainPlayerActor->LowPosistionCorrection = true;
     // TODO Why do i set rows and columns twice my n word
     auto mainPlayerClipIdle = new AnimationClip(
         AnimationClip::PlayMode::PINGPONG,

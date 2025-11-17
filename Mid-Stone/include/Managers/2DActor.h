@@ -35,7 +35,7 @@ private:
     Animator* animator;
 
 public:
-	bool noVelocity = false;
+	
     Actor2D();
     virtual ~Actor2D();
     
@@ -57,6 +57,7 @@ public:
 
     bool draw_Hitbox = false;
 	bool isStatic = false;
+    bool LowPosistionCorrection = false;
     
     virtual void OnDestroy() override;
     
