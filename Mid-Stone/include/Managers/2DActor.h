@@ -35,6 +35,7 @@ private:
     Animator* animator;
 
 public:
+	bool noVelocity = false;
     Actor2D();
     virtual ~Actor2D();
     

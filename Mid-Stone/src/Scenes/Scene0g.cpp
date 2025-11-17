@@ -66,6 +66,7 @@ bool Scene0g::OnCreate()
         std::cout << "Failed to create test actor spritesheet\n";
         return false;
     }
+	mainPlayerActor->noVelocity = true;
     // TODO Why do i set rows and columns twice my n word
     auto mainPlayerClipIdle = new AnimationClip(
         AnimationClip::PlayMode::PINGPONG,
@@ -82,6 +83,7 @@ bool Scene0g::OnCreate()
 
     mainPlayerController->OnCreate("sprites/crosshairs.png");
     mainPlayerController->SetPossessedActor(mainPlayerActor.get());
+
 
 
 	ImGuiIO& io = ImGui::GetIO(); // access the ImGuiIO structure
@@ -102,7 +104,7 @@ bool Scene0g::OnCreate()
     // top right
     NewOBJ = std::make_unique<Actor2D>();
    NewOBJ->OnCreate("sprites/impact.png");
-   NewOBJ->GetEntity()->SetPosition(Vec3(50.0f, 10.0f, 0.0f));
+   NewOBJ->GetEntity()->SetPosition(Vec3(0.0f, -10.0f, 0.0f));
    NewOBJ->isStatic = true;
    objects.emplace_back(std::move(NewOBJ));
    // bottom left
@@ -293,6 +295,8 @@ void Scene0g::RenderGUI()
 
 void Scene0g::Update(const float deltaTime)
 {
+	Vec3 Gravity = Vec3(0.0f, -9.81f, 0.0f);
+    
     /** Spawn Queue **/
     while (!spawnQueue.empty())
     {
@@ -302,16 +306,17 @@ void Scene0g::Update(const float deltaTime)
    
 
     /** Update Main Player **/
+	mainPlayerActor->GetEntity()->ApplyForce(Gravity * mainPlayerActor->GetEntity()->GetMass());
     mainPlayerActor->Update(deltaTime);
 
     /** Update Players **/
     if (pressingLeft && !pressingRight)
     {
-        mainPlayerController->MoveAim(2.0f);
+        mainPlayerController->MoveAim(1.0f);
     }
     if (pressingRight && !pressingLeft)
     {
-        mainPlayerController->MoveAim(-2.0f);
+        mainPlayerController->MoveAim(-1.0f);
     }
 
     /* Actor Cleanup */
@@ -347,6 +352,10 @@ void Scene0g::Update(const float deltaTime)
             Collision::CollisionResponse(*objects[i], *objects[j]);
         }
     }
+    for(auto& objects : objects)
+    {
+		Collision::CollisionResponse(*mainPlayerActor, *objects);
+	}
     for (int i = 0; i < actors.size(); i++)
     {
         for (int j = i + 1; j < actors.size(); j++)

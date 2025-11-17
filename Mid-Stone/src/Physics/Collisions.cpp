@@ -59,22 +59,23 @@ void Collision::CollisionResponse(Actor2D& entityA, Actor2D& entityB) {
 
     float overlap = (sizeA.x + sizeB.x) - std::fabs(VMath::dot(delta, normal));
     if (overlap < 0.0f) overlap = 0.0f;
-
+    float kick = 0.5f;
+    if (entityA.noVelocity) kick = 0.0001f;
+    if (entityB.noVelocity) kick = 0.0001f;
     // --- Position correction ---
-    Vec3 correction = normal * (overlap * 0.5f);
+    Vec3 correction = normal * (overlap * kick);
+
     posA -= correction;
     posB += correction;
-
-	if (!entityA.isStatic) entityA.GetEntity()->SetPosition(posA);
+ 
+    if (!entityA.isStatic) entityA.GetEntity()->SetPosition(posA);
 
    if(!entityB.isStatic) entityB.GetEntity()->SetPosition(posB);
 
+ 
     // --- Velocity response ---
     Vec3 velA = entityA.GetEntity()->GetVelocity();
     Vec3 velB = entityB.GetEntity()->GetVelocity();
-
-    
-
 
     Vec3 relativeVel = velB - velA;
     float separatingVel = VMath::dot(relativeVel, normal);
