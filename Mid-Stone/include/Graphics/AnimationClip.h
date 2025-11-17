@@ -84,6 +84,5 @@ public:
   // Updates the animation clip based on the elapsed time since the last update
   void update(float deltaSeconds);
 
-
   
 };

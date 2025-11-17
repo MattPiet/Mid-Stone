@@ -15,6 +15,9 @@ private:
 	//Holds the animation clips in an unordered map for easy access via a name that is tied to the animation clip
 	std::unordered_map<std::string, AnimationClip*> animationClips;
 
+	//Holds the name of the default animation clip
+	std::string defaultClipName;
+
 	bool isPlaying = false;
 public:
 
@@ -31,20 +34,21 @@ public:
 	//Adds a new Animation clip to the animator using emplace (emplace adds new data into the map)
 	void addAnimationClip(const std::string& name, AnimationClip* clip);
 
+	void addDefaultAnimationClip(const std::string& name, AnimationClip* clip) {addAnimationClip(name, clip);setDefaultAnimation(name);}
+
 	//Plays an animation clip based off a name provided
 	void playAnimationClip(const std::string& name);
 
 	AnimationClip* getCurrentClip() const { return currentClip; }
 
 	//calls update on the current clip (currently there is no update function in AnimationClip so this does nothing)
-	void update(float deltaSeconds) {
-		if (currentClip) {
-			currentClip->update(deltaSeconds);
-			//std::cout << "Current frame " << currentClip->getCurrentFrame() << std::endl;
-		}
-	}
+	void update(float deltaSeconds);
 
+	//Sets the default animation clip by name
+	void setDefaultAnimation(const std::string name);
 
+	//Callback function to be called when an animation clip finishes playing
+	void animationCallback();
 	
 };
 

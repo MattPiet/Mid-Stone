@@ -27,6 +27,7 @@ void AnimationClip::update(float deltaSeconds) {
             
             break;
         case PlayMode::ONCE:
+			isFinished = false;
             if (currentFrame <= totalFrames) {
                 currentFrame++;
                 if (currentFrame >= totalFrames) {
@@ -37,9 +38,11 @@ void AnimationClip::update(float deltaSeconds) {
             }
             break;
         case PlayMode::REVERSE:
+            isFinished = false;
             currentFrame--;
             if (currentFrame < 0) {
                 currentFrame = totalFrames - 1;
+				isFinished = true;
              //  std::cout << "[AnimationClip] Playing animation in reverse." << std::endl;
             }
             break;
@@ -52,7 +55,7 @@ void AnimationClip::update(float deltaSeconds) {
                    // std::cout << "[AnimationClip] PingPong: reversing direction (backward)." << std::endl;
                 }
             }
-            else {
+            if (!isPlayingForward) {
                 currentFrame--;
                 if (currentFrame < 0) {
                     currentFrame = 1;
