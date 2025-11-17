@@ -58,7 +58,7 @@ void UIManager::PopButtonStyle()
 
 void UIManager::PopSliderStyle()
 {
-	ImGui::PopStyleColor(5); // Pop 3 colors
+	ImGui::PopStyleColor(5); // Pop 5 colors
 	ImGui::PopStyleVar(2);   // Pop 1 style var
 
 }

@@ -6,6 +6,7 @@
 
 #include "Graphics/CameraController.h"
 #include "Utils/Debug.h"
+#include <Utils/MemoryMonitor.h>
 
 
 SceneLevel1::SceneLevel1()

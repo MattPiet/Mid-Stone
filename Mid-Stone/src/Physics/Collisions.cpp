@@ -182,9 +182,23 @@ bool Collision::CheckOBBOBBCollision(const Actor2D& boxA, const Actor2D& boxB) {
         );
         if (projectedTranslationOnBj > radiusA + radiusB) return false; // separation found
     }
+    /*  ________                  ________
+		A_2    |                 B_2    | hit box half extents
+        |      |                 |      |
+        |      |                 |      |
+        |      |                 |      |
+        |      |                 |      |
+		+------|A_0              +------|B_0
+       /       |                /       |
+      /        |               /        |
+     /         |              /         |
+	    --------                 --------
+     A_3                      B_3
+        */
+
     //// No separating axis found => boxes overlap
     // ---------- Test cross-product axes (Ai x Bj), 9 tests ----------
-// A0 x B0
+    // A0 x B0
     radiusA = halfExtentsA.y * absRotationDotMatrix[2][0] + halfExtentsA.z * absRotationDotMatrix[1][0];
     radiusB = halfExtentsB.y * absRotationDotMatrix[0][2] + halfExtentsB.z * absRotationDotMatrix[0][1];
     if (std::fabs(translationInA.z * rotationDotMatrix[1][0] - translationInA.y * rotationDotMatrix[2][0]) > radiusA + radiusB) return false;
