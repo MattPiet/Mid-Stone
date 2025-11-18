@@ -119,6 +119,9 @@ public:
     Quaternion GetOrientation() const {
         return orientation;
 	}
+   void SetOrientation(Quaternion orientation_) {
+        orientation = orientation_;
+    }
     void AdjustOrientation(const MATH::Quaternion& adjustment) {
         orientation = adjustment * orientation;
     }
