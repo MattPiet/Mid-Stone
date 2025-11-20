@@ -22,31 +22,37 @@ private:
   float secondsSinceLastUpdate;
   bool isPlayingForward;
   bool isFinished;
-
+  
+  int startFrame;
+  int endFrame;
 
 public:  
   // Default constructor which sets the frame duration to 0.1 with a default playmode to loop  
   AnimationClip() :  
-      playMode{ PlayMode::LOOP }, 
-      frameDuration{ 0.1f },  
-   rows{ 1 },
-   columns{ 1 },
-      totalFrames { 1 }, 
+      playMode{ PlayMode::LOOP },
+      frameDuration{ 0.1f },
+      rows{ 1 },
+      columns{ 1 },
+      totalFrames{ 1 },
+      endFrame{ totalFrames },
+      startFrame{ 0 },
       currentFrame{ 0 },
-   secondsSinceLastUpdate{ 0.0f },
-   isPlayingForward{ true },
-   isFinished{ false }
+      secondsSinceLastUpdate{ 0.0f },
+      isPlayingForward{ true },
+      isFinished{ false }
   
   {}
 
   //dynamic constructor 
-  AnimationClip(PlayMode playMode_ = PlayMode::ONCE, float frameDuration_ = 0.1f, int rows_ = 1, int columns_ = 1) : 
+  AnimationClip(PlayMode playMode_ = PlayMode::ONCE, float frameDuration_ = 0.1f, int rows_ = 1, int columns_ = 1, int startFrame_ = 0, int endFrame_ = 1) : 
       playMode{ playMode_ },
       frameDuration{ frameDuration_ },
       rows{ rows_ },
       columns{ columns_ },
       totalFrames{  (columns_ * rows_) }, 
-      currentFrame{ 0 },
+      startFrame{ startFrame_ },
+      endFrame{ endFrame_ },
+      currentFrame{ startFrame },
       secondsSinceLastUpdate{ 0.0f },
       isPlayingForward{ true },
       isFinished{ false }
@@ -75,7 +81,7 @@ public:
 
   // Resets the animation clip to the first frame and initial state
   void reset() { 
-  currentFrame = 0; 
+  currentFrame = startFrame; 
   secondsSinceLastUpdate = 0.0f;
   isPlayingForward = true;
   isFinished = false;

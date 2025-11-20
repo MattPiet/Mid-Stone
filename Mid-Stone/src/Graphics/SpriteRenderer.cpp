@@ -41,8 +41,8 @@ std::pair<std::pair<float, float>, std::pair<float, float>> SpriteRenderer::runS
     float cellHeight = 1.0f / static_cast<float>(rows);
 	// calculate the current row and column based on the current sprite index
     int currentSpriteCol = current_sprite_index % columns;
-    int currentSpriteRow = current_sprite_index / columns;
-	// calculate the UV offset for the current sprite
+    int currentSpriteRow = (rows - 1) - (current_sprite_index / columns);
+    // calculate the UV offset for the current sprite
     float uOffset = static_cast<float>(currentSpriteCol) * cellWidth;
     float vOffset = static_cast<float>(currentSpriteRow) * cellHeight;
 	// return the UV scale and offset as a pair of pairs

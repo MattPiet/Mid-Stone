@@ -127,6 +127,6 @@ public:
      */
     [[nodiscard]] float GetElapsedLifeTime() const { return elapsedLifeTimeSeconds; }
 
-
+    void FaceVelocity(float deltaTime);
 
 };

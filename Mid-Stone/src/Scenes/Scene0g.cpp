@@ -61,21 +61,37 @@ bool Scene0g::OnCreate()
 
     /** Set up Player **/
     mainPlayerActor = std::make_unique<Actor2D>();
-    if (!mainPlayerActor->OnCreate("sprites/Idle.png", 1, 3))
+    if (!mainPlayerActor->OnCreate("sprites/guy_tilesheet.png", 2, 17))
     {
         std::cout << "Failed to create test actor spritesheet\n";
         return false;
     }
 	mainPlayerActor->LowPosistionCorrection = true;
+    mainPlayerActor->GetEntity()->AdjustHitboxSize(Vec3(-5.0f,-5.0f, 0.0f));
     // TODO Why do i set rows and columns twice my n word
     auto mainPlayerClipIdle = new AnimationClip(
         AnimationClip::PlayMode::PINGPONG,
-        0.1f,
-        1, 3
+        0.2f,
+        2, 17,
+        9, 13
+    );
+    auto mainPlayerClipRun = new AnimationClip(
+        AnimationClip::PlayMode::ONCE,
+        0.2f,
+        2, 17,
+        20, 28
+    );
+    auto mainPlayerClipAttack = new AnimationClip(
+        AnimationClip::PlayMode::ONCE,
+        0.2f,
+        2, 17,
+        29, 32
     );
     // TODO, The clip not being directly related to the spritesheet is weird no?
-    mainPlayerActor->GetAnimator()->addAnimationClip("Idle", mainPlayerClipIdle);
-    mainPlayerActor->GetAnimator()->playAnimationClip("Idle");
+    mainPlayerActor->GetAnimator()->addDefaultAnimationClip("Idle", mainPlayerClipIdle);
+    mainPlayerActor->GetAnimator()->addAnimationClip("Run", mainPlayerClipRun);
+    mainPlayerActor->GetAnimator()->addAnimationClip("Attack", mainPlayerClipAttack);
+    mainPlayerActor->GetAnimator()->playAnimationClip("Run");
     //mainPlayerActor->draw_Hitbox = true;
 
     /** Set up Main Player Controller **/
@@ -192,9 +208,12 @@ void Scene0g::HandleEvents(const SDL_Event& sdlEvent)
             pressingRight = true;
             break;
         case SDL_SCANCODE_SPACE:
+
+            mainPlayerActor->GetAnimator()->playAnimationClip("Attack");
             PlayerShoot();
             break;
-        case SDL_SCANCODE_P:
+        case SDL_SCANCODE_R:
+            mainPlayerActor->GetAnimator()->playAnimationClip("Run");
             break;
         }
         break;
@@ -330,6 +349,11 @@ void Scene0g::Update(const float deltaTime)
     for (const auto& actor : actors)
     {
         actor->Update(deltaTime);
+
+        /** Rotate Bullet Fired Toward Velocity **/
+        
+        actor->FaceVelocity(deltaTime);
+        
     }
 
 
