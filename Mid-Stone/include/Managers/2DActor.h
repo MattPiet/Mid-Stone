@@ -47,6 +47,18 @@ public:
         std::cout << "Entity expired" << std::endl;
     }
 
+    using CollisionCallback = std::function<void(Actor2D&)>;
+    /**
+     * Callback for a function that will be executed once this entity collides with another
+     */
+    CollisionCallback onCollisionCallback;
+    /**
+     * Registers a callback function to be executed when the entity collides.
+     *
+     * @param callback A function object that takes a reference to an Actor2D instance and is called upon collision.
+     */
+    void RegisterCollisionCallback(ExpiredCallback callback) { onCollisionCallback = std::move(callback); }
+    
     /**
      * Updates the state of the Actor2D instance for the current frame.
      * This method processes animations, updates related entities, and evaluates the entity's lifespan.

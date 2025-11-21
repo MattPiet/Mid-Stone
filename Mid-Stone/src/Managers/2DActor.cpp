@@ -77,6 +77,7 @@ void Actor2D::OnDestroy()
     animator = nullptr;
 }
 
+
 void Actor2D::Update(const float deltaTime)
 {
     /** Updating Entities **/

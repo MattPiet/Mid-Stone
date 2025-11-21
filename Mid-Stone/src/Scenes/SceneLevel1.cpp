@@ -39,13 +39,15 @@ void SceneLevel1::PlayerShoot()
     mainPlayerActor->GetAnimator()->playAnimationClip("Attack");
     const Vec3 currentCrossHairsPosition = mainPlayerController->GetCrossHairsPosition();
     auto bullet = std::make_unique<Actor2D>();
-    bullet->OnCreate("sprites/fatty_clicked.png");
+    bullet->OnCreate("sprites/punch.png");
     bullet->GetEntity()->SetPosition(currentCrossHairsPosition);
     const auto crossHairsQuaternion = mainPlayerController->GetCrossHairsRotation();
     const auto forward = Vec3(1.0f, 0.0f, 0.0f);
     const Vec3 rotatedVector = crossHairsQuaternion * forward * QMath::inverse(crossHairsQuaternion); // QPQ-1 Formula
     const Vec3 finalVelocity = rotatedVector * 200.0f;\
     // TODO We have to rebuild after adjusting Scale, change this
+    bullet->GetEntity()->SetScale(Vec3(0.3f, 0.3f, 0.3f));
+    bullet->ReBuildAll("sprites/punch.png");
     bullet->GetEntity()->AdjustOrientation(crossHairsQuaternion);
     bullet->GetEntity()->SetVelocity(finalVelocity);
     bullet->draw_Hitbox = true;
@@ -115,13 +117,18 @@ bool SceneLevel1::OnCreate()
 
     /** Terrain Objects **/
 
+    // Terrain Size 25.6
     const std::vector terrainPositions = {
-        std::make_pair(Vec3(-20.0f, 30.0f, 0.0f), 0.0f),
-        std::make_pair(Vec3(5.0f, 30.0f, 0.0f), 0.0f),
-        std::make_pair(Vec3(25.0f, 30.0f, 0.0f), 0.0f),
+        std::make_pair(Vec3(-30.0f, 30.0f, 0.0f), 0.0f),
+        std::make_pair(Vec3(-4.4f, 30.0f, 0.0f), 0.0f),
+        std::make_pair(Vec3(21.2f, 30.0f, 0.0f), 0.0f),
+        std::make_pair(Vec3(46.8f, 30.0f, 0.0f), 0.0f),
         std::make_pair(Vec3(40.0f, -20.0f, 0.0f), 0.0f),
         std::make_pair(Vec3(0.0f, -10.0f, 0.0f), 90.0f),
         std::make_pair(Vec3(0.0f, -35.5f, 0.0f), 90.0f),
+        std::make_pair(Vec3(60.0f, 0.0f, 0.0f), 90.0f),
+        std::make_pair(Vec3(60.0f, 25.6f, 0.0f), 90.0f),
+        
     };
 
     /** Terrain Setup **/
@@ -134,7 +141,6 @@ bool SceneLevel1::OnCreate()
             terrain->GetEntity()->GetOrientation() * QMath::angleAxisRotation(position.second, Vec3(0.0f, 0.0f, 1.0f)));
         terrain->GetEntity()->SetScale(Vec3(1.0f, 1.0f, 1.0f));
         terrain->isStatic = true;
-        terrain->draw_Hitbox = true;
         terrainActors.emplace_back(std::move(terrain));
     }
 
@@ -165,7 +171,7 @@ bool SceneLevel1::OnCreate()
     );
     auto targetPlayerClipHurt = new AnimationClip(
         AnimationClip::PlayMode::ONCE,
-        0.2f,
+        0.1f,
         2, 17,
         1, 3
     );
@@ -175,8 +181,11 @@ bool SceneLevel1::OnCreate()
     target->GetAnimator()->addAnimationClip("Attack", targetPlayerClipAttack);
     target->GetAnimator()->addAnimationClip("Hurt", targetPlayerClipHurt);
     target->GetAnimator()->playAnimationClip("Idle");
+    target->RegisterCollisionCallback([this](const Actor2D& actor)
+    {
+        actor.GetAnimator()->playAnimationClip("Hurt");
+    });
     target->isStatic = true;
-
     target->GetEntity()->SetPosition(Vec3(40.0f, -10.0f, 0.0f));
     target->draw_Hitbox = true;
 
@@ -207,8 +216,9 @@ void SceneLevel1::Update(const float deltaTime)
         actors.end()
     );
 
-    /** Update Main Player **/
+    /** Update Main Player and Target **/
     mainPlayerActor->Update(deltaTime);
+    target->Update(deltaTime);
 
     /** Update Actors **/
     for (const auto& actor : actors)

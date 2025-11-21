@@ -39,6 +39,10 @@ void Collision::CollisionResponse(Actor2D& entityA, Actor2D& entityB) {
         return;
     }
 
+	// Call LifeCycle Event if present
+	if (entityA.onCollisionCallback) entityA.onCollisionCallback(entityA);
+	if (entityB.onCollisionCallback) entityB.onCollisionCallback(entityB);
+
     // Visual feedback: collided
     entityA.GetEntity()->SetHitboxColor(MATH::Vec4(1.0f, 0.0f, 0.0f, 1.0f));
     entityB.GetEntity()->SetHitboxColor(MATH::Vec4(1.0f, 0.0f, 0.0f, 1.0f));
@@ -99,7 +103,7 @@ void Collision::CollisionResponse(Actor2D& entityA, Actor2D& entityB) {
     float mB = entityB.GetEntity()->GetMass();
     float totalMass = mA + mB;
   //  Vec3 impulseVec = normal * (impulse * mB / totalMass); // apply mass ratio
-    Vec3 impulseVec = normal * impulse * 0.5f; // no mass
+    Vec3 impulseVec = normal * impulse * 0.7f; // no mass
 
 
     if (!entityA.isStatic) entityA.GetEntity()->SetVelocity(velA - impulseVec);
@@ -139,7 +143,7 @@ bool Collision::CheckOBBOBBCollision(const Actor2D& boxA, const Actor2D& boxB) {
     }
 
     // Rotation / dot-product matrix between A's axes and B's axes:
-    // rotationDotMatrix[i][j] = axisA[i] · axisB[j]
+    // rotationDotMatrix[i][j] = axisA[i] ï¿½ axisB[j]
     float rotationDotMatrix[3][3];
     float absRotationDotMatrix[3][3];
     const float EPSILON = 1e-5f;
