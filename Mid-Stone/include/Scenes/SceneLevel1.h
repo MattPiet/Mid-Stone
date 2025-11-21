@@ -23,6 +23,8 @@ private:
 
     /** Actor Managers **/
     std::vector<std::unique_ptr<Actor2D>> actors;
+    std::vector<std::unique_ptr<Actor2D>> terrainActors;
+    std::unique_ptr<Actor2D> target;
 
     /** Entity Spawn Queue **/
     std::queue<std::unique_ptr<Actor2D>> spawnQueue;

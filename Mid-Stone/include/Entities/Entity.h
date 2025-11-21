@@ -8,7 +8,8 @@
 #include <Graphics/SpriteMesh.h>
 #include <Graphics/SpriteRenderer.h>
 
-enum class Hit_box_type : uint8_t {
+enum class Hit_box_type : uint8_t
+{
     quad = 0,
     circle,
 };
@@ -16,19 +17,17 @@ enum class Hit_box_type : uint8_t {
 class Entity
 {
 private:
-
-
     MATH::Vec3 scale;
     MATH::Vec3 position;
-	MATH::Vec3 velocity;
-	MATH::Vec3 acceleration;
+    MATH::Vec3 velocity;
+    MATH::Vec3 acceleration;
     float mass = 1.0f;
 
     Hit_box_type hitBoxType; // 'c' for circle, Hit_box_type::quad for quad, etc.
     MATH::Vec3 hitbox;
-	MATH::Vec4 hitboxColor{ 0.0f, 1.0f, 0.0f, 1.0f }; // RGBA
+    MATH::Vec4 hitboxColor{0.0f, 1.0f, 0.0f, 1.0f}; // RGBA
 
-	Shader* shader;
+    Shader* shader;
 
     using ExpiredCallback = std::function<void(Entity&)>;
     /**
@@ -40,16 +39,15 @@ private:
      * Life span for the entity, if it's 0, the object is immortal, if not, it will be the time in
      * seconds that the entity will live before destructing itself.
      */
-    float lifeSpanSeconds{ 0.0f };
+    float lifeSpanSeconds{0.0f};
 
     /**
      * Counter of seconds to calculate the lifespan of this entity.
      */
-    float currentLifeTimeSeconds{ 0.0f };
-    bool hasFiredExpiredHooks{ false };
+    float currentLifeTimeSeconds{0.0f};
+    bool hasFiredExpiredHooks{false};
 
 protected:
-
     MATH::Quaternion orientation;
 
     virtual void OnExpired()
@@ -58,14 +56,19 @@ protected:
     }
 
 public:
-    Entity() { position = Vec3(0.0f, 0.0f, 0.0f), scale = Vec3(1.0f, 1.0f, 1.0f), velocity = Vec3(0.0f, 0.0f, 0.0f), acceleration = Vec3(0.0f, 0.0f, 0.0f), mass = 1.0f; }
+    Entity()
+    {
+        position = Vec3(0.0f, 0.0f, 0.0f), scale = Vec3(1.0f, 1.0f, 1.0f), velocity = Vec3(0.0f, 0.0f, 0.0f),
+            acceleration = Vec3(0.0f, 0.0f, 0.0f), mass = 1.0f;
+    }
+
     Entity(const MATH::Vec3& position, const MATH::Vec3& scale);
     Entity(const MATH::Vec3& position, const MATH::Vec3& scale, const Hit_box_type& hitBoxType);
 
     void OnCreate(SpriteRenderer* renderer);
     void CreateHitBox(SpriteRenderer* renderer);
-	void CreateHitBox(SpriteRenderer* renderer, int CurrentIndex);
-	void OnDestroy();
+    void CreateHitBox(SpriteRenderer* renderer, int CurrentIndex);
+    void OnDestroy();
 
     virtual ~Entity()
     {
@@ -79,7 +82,7 @@ public:
     void SetExpiredCallback(ExpiredCallback callback) { onExpired = std::move(callback); }
 
     Hit_box_type GetHitBoxType() const { return hitBoxType; }
-    
+
 
     /**
      * Checks whether the current lifetime surpasses the expected lifespan, as long as the lifespan is > 0
@@ -95,38 +98,50 @@ public:
     [[nodiscard]] MATH::Matrix4 GetModelMatrix() const;
 
     void Update(float deltaTime);
-	void UpdatePhysics(float deltaTime);
+    void UpdatePhysics(float deltaTime);
     void ApplyForce(Vec3 force);
 
-	void DrawHitBox(MATH::Matrix4 projectionMatrix, MATH::Matrix4 viewMatrix, SpriteMesh* mesh);
+    void DrawHitBox(MATH::Matrix4 projectionMatrix, MATH::Matrix4 viewMatrix, SpriteMesh* mesh);
 
-    void SetHitboxColor(const MATH::Vec4& color) {
+    void SetScale(const MATH::Vec3& scale_) { scale = scale_; }
+
+    void SetHitboxColor(const MATH::Vec4& color)
+    {
         hitboxColor = color;
     }
 
-    MATH::Vec3 GetHitbox() const {
+    MATH::Vec3 GetHitbox() const
+    {
         return hitbox;
-	}
+    }
 
-    void AdjustHitboxSize(const MATH::Vec3& adjustment) {
+    void AdjustHitboxSize(const MATH::Vec3& adjustment)
+    {
         hitbox = hitbox + adjustment;
-	}
+    }
 
-    void SetPosition(const MATH::Vec3& position_) {
+    void SetPosition(const MATH::Vec3& position_)
+    {
         position = position_;
     }
 
-    Quaternion GetOrientation() const {
+    Quaternion GetOrientation() const
+    {
         return orientation;
-	}
-   void SetOrientation(Quaternion orientation_) {
+    }
+
+    void SetOrientation(Quaternion orientation_)
+    {
         orientation = orientation_;
     }
-    void AdjustOrientation(const MATH::Quaternion& adjustment) {
+
+    void AdjustOrientation(const MATH::Quaternion& adjustment)
+    {
         orientation = adjustment * orientation;
     }
-	MATH::Vec3 GetVelocity() const { return velocity; }
-	void SetVelocity(const MATH::Vec3& velocity_) { velocity = velocity_; }
 
-	float GetMass() const { return mass; }
+    MATH::Vec3 GetVelocity() const { return velocity; }
+    void SetVelocity(const MATH::Vec3& velocity_) { velocity = velocity_; }
+
+    float GetMass() const { return mass; }
 };
