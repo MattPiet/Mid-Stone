@@ -7,6 +7,7 @@ class SpriteMesh;
 class SpriteRenderer;
 class AnimationClip;
 class Animator;
+class Guns;
 
 enum class Actor_tags : uint8_t
 {
@@ -46,6 +47,7 @@ private:
     SpriteMesh* spriteMesh;
     SpriteRenderer* spriteRenderer;
     Animator* animator;
+    Guns* gun;
 
 public:
 	
@@ -87,6 +89,7 @@ public:
     [[nodiscard]] SpriteMesh* GetMesh() const { return spriteMesh; }
     [[nodiscard]] SpriteRenderer* GetRenderer() const { return spriteRenderer; }
     [[nodiscard]] Animator* GetAnimator() const { return animator; }
+    [[nodiscard]] Guns* GetGuns() const { return gun; }
 
     /** --------- Metadata --------- **/
     [[nodiscard]] Actor_tags Tag() const

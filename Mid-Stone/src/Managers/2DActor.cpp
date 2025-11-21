@@ -8,6 +8,7 @@ Actor2D::Actor2D()
     spriteMesh = nullptr;
     spriteRenderer = nullptr;
     animator = nullptr;
+    gun = nullptr;
 }
 
 Actor2D::~Actor2D()
@@ -58,6 +59,8 @@ bool Actor2D::OnCreate(const char* FileName, int rows, int columns)
     entity = new Entity();
     entity->OnCreate(spriteRenderer);
 
+	gun = new Guns();
+
     return true;
 }
 
@@ -75,6 +78,8 @@ void Actor2D::OnDestroy()
     spriteRenderer = nullptr;
     delete animator;
     animator = nullptr;
+	delete gun;
+	gun = nullptr;
 }
 
 

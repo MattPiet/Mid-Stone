@@ -288,7 +288,7 @@ void Shader::SetUniformLocations() {
 		sprintf_s(buffer, 512, "\"%s\" loc:%d\n", uniformName.c_str(), uniformMap[uniformName]);
 		activeUniformList += buffer;
 	}
-	Debug::Info(activeUniformList, __FILE__, __LINE__);
+	//Debug::Info(activeUniformList, __FILE__, __LINE__);
 	free(name);
 }
 

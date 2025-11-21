@@ -70,6 +70,10 @@ private:
 
     /** Entity Spawn Queue **/
     std::queue<std::unique_ptr<Actor2D>> spawnQueue;
+
+    std::vector<std::unique_ptr<Actor2D>> impacts;
+
+	bool canShoot = true;
 	
 	bool PauseAudio = true;
 
@@ -86,9 +90,6 @@ public:
     virtual void HandleEvents(const SDL_Event& sdlEvent) override;
     virtual void RenderGUI() override;
 
-
-    /** Gameplay Functions **/
-    void PlayerShoot();
 };
 
 

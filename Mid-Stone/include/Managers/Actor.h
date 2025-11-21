@@ -10,6 +10,7 @@
 #include <Entities/Entity.h>
 #include <Graphics/Animator.h>
 #include <Graphics/AnimationClip.h>
+#include <Entities/Guns.h>
 
 class Actor
 {
