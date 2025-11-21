@@ -161,15 +161,17 @@ void Actor2D::EvaluateLifeSpan(float deltaTime)
 void Actor2D::FaceVelocity(float deltaTime)
 {
     Vec3 vel = entity->GetVelocity();
-    if (VMath::mag(vel) > VERY_SMALL) {
+    if (VMath::mag(vel) > VERY_SMALL)
+    {
         Vec3 dir = VMath::normalize(vel);
-        Vec3 localForward(1.0f, 0.0f, -1.0f);  
+        Vec3 localForward(1.0f, 0.0f, -1.0f);
         Vec3 currentForward = MATH::QMath::rotate(localForward, entity->GetOrientation());
         float dot = VMath::dot(currentForward, dir);
         float angle = acosf(std::clamp(dot, -1.0f, 1.0f)); // clamp to avoid NaNs
         Quaternion deltaRot = MATH::QMath::angleAxisRotation(angle * RADIANS_TO_DEGREES, Vec3(0.0f, 0.0f, 1.0f));
         Quaternion targetOri = deltaRot * entity->GetOrientation();
-        Quaternion finalOri = MATH::QMath::slerp(entity->GetOrientation(), targetOri, deltaTime * 25.0f); // last number used as rotation speed
+        Quaternion finalOri = MATH::QMath::slerp(entity->GetOrientation(), targetOri, deltaTime * 25.0f);
+        // last number used as rotation speed
         entity->SetOrientation(finalOri);
     }
 }

@@ -44,7 +44,7 @@ void SceneLevel1::PlayerShoot()
     const auto crossHairsQuaternion = mainPlayerController->GetCrossHairsRotation();
     const auto forward = Vec3(1.0f, 0.0f, 0.0f);
     const Vec3 rotatedVector = crossHairsQuaternion * forward * QMath::inverse(crossHairsQuaternion); // QPQ-1 Formula
-    const Vec3 finalVelocity = rotatedVector * 200.0f;\
+    const Vec3 finalVelocity = rotatedVector * 150.0f;\
     // TODO We have to rebuild after adjusting Scale, change this
     bullet->GetEntity()->SetScale(Vec3(0.3f, 0.3f, 0.3f));
     bullet->ReBuildAll("sprites/punch.png");
@@ -59,6 +59,18 @@ void SceneLevel1::PlayerShoot()
         impact->GetEntity()->SetPosition(actor.GetEntity()->GetPosition());
         impact->ConfigureLifeSpan(1.0f);
         spawnQueue.emplace(std::move(impact));
+    });
+    bullet->RegisterCollisionCallback([this](Actor2D& actor, const Actor2D& otherActor)
+    {
+        if (otherActor.Tag() == Actor_tags::target)
+        {
+            actor.ConfigureLifeSpan(0.01f);
+            auto impact = std::make_unique<Actor2D>();
+            impact->OnCreate("sprites/impact.png");
+            impact->GetEntity()->SetPosition(actor.GetEntity()->GetPosition());
+            impact->ConfigureLifeSpan(1.0f);
+            spawnQueue.emplace(std::move(impact));
+        }
     });
     spawnQueue.emplace(std::move(bullet));
 }
@@ -128,7 +140,7 @@ bool SceneLevel1::OnCreate()
         std::make_pair(Vec3(0.0f, -35.5f, 0.0f), 90.0f),
         std::make_pair(Vec3(60.0f, 0.0f, 0.0f), 90.0f),
         std::make_pair(Vec3(60.0f, 25.6f, 0.0f), 90.0f),
-        
+
     };
 
     /** Terrain Setup **/
@@ -140,7 +152,9 @@ bool SceneLevel1::OnCreate()
         terrain->GetEntity()->SetOrientation(
             terrain->GetEntity()->GetOrientation() * QMath::angleAxisRotation(position.second, Vec3(0.0f, 0.0f, 1.0f)));
         terrain->GetEntity()->SetScale(Vec3(1.0f, 1.0f, 1.0f));
+        terrain->ReBuildAll("sprites/horizontal-platform.png");
         terrain->isStatic = true;
+        terrain->draw_Hitbox = true;
         terrainActors.emplace_back(std::move(terrain));
     }
 
@@ -181,7 +195,8 @@ bool SceneLevel1::OnCreate()
     target->GetAnimator()->addAnimationClip("Attack", targetPlayerClipAttack);
     target->GetAnimator()->addAnimationClip("Hurt", targetPlayerClipHurt);
     target->GetAnimator()->playAnimationClip("Idle");
-    target->RegisterCollisionCallback([this](const Actor2D& actor)
+    target->SetTag(Actor_tags::target);
+    target->RegisterCollisionCallback([this](const Actor2D& actor, const Actor2D& otherActor)
     {
         actor.GetAnimator()->playAnimationClip("Hurt");
     });
@@ -221,11 +236,14 @@ void SceneLevel1::Update(const float deltaTime)
     target->Update(deltaTime);
 
     /** Update Actors **/
-    for (const auto& actor : actors)
+    for (auto& actor : actors)
     {
         actor->Update(deltaTime);
         actor->FaceVelocity(deltaTime);
-        /** Collide if possible **/
+    }
+    
+    for (const auto& actor : actors)
+    {
         for (const auto& terrainActor : terrainActors)
         {
             Collision::CollisionResponse(*actor, *terrainActor);
@@ -326,7 +344,7 @@ void SceneLevel1::Render() const
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+    
     /** Render Main Player **/
     mainPlayerActor->Render(camera->GetViewMatrix(), camera->GetProjectionMatrix());
     /** Render Main Controller **/

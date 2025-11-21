@@ -8,8 +8,19 @@ class SpriteRenderer;
 class AnimationClip;
 class Animator;
 
+enum class Actor_tags : uint8_t
+{
+    player = 0,
+    target,
+};
+
 class Actor2D : public Actor
 {
+private:
+    /** --------- MetaData  --------- **/
+    // TODO, if we need more than one tag this might need to be upgraded
+    Actor_tags tag;
+
 private:
     /** --------- LifeSpan management --------- **/
     using ExpiredCallback = std::function<void(Actor2D&)>;
@@ -47,7 +58,7 @@ public:
         std::cout << "Entity expired" << std::endl;
     }
 
-    using CollisionCallback = std::function<void(Actor2D&)>;
+    using CollisionCallback = std::function<void(Actor2D&, Actor2D&)>;
     /**
      * Callback for a function that will be executed once this entity collides with another
      */
@@ -55,9 +66,9 @@ public:
     /**
      * Registers a callback function to be executed when the entity collides.
      *
-     * @param callback A function object that takes a reference to an Actor2D instance and is called upon collision.
+     * @param callback A function object that taadkes references to two Actor2D instances and is called upon collision.
      */
-    void RegisterCollisionCallback(ExpiredCallback callback) { onCollisionCallback = std::move(callback); }
+    void RegisterCollisionCallback(CollisionCallback callback) { onCollisionCallback = std::move(callback); }
     
     /**
      * Updates the state of the Actor2D instance for the current frame.
@@ -84,6 +95,17 @@ public:
     SpriteRenderer* GetRenderer() { return sprite_Renderer; }
     Animator* GetAnimator() const { return animator; }
 
+
+    /** --------- Metadata --------- **/
+    [[nodiscard]] Actor_tags Tag() const
+    {
+        return tag;
+    }
+
+    void SetTag(Actor_tags tag_)
+    {
+        this->tag = tag_;
+    }
 
     /** --------- LifeSpan management --------- **/
     
