@@ -24,6 +24,7 @@ private:
 		scene0_g = 0,
 		scene_level_1,
 		animation_scene,
+		scene_main_menu,
 	};
 
 	Scene* currentScene;
