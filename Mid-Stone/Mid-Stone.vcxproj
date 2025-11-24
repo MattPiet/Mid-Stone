@@ -314,6 +314,7 @@
       <AdditionalIncludeDirectories>C:\GameDevM\imgui;C:\Users\sebas\RiderProjects\Mid-Stone\\Mid-Stone\include;</AdditionalIncludeDirectories>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="src\Scenes\SceneLevel2.cpp" />
     <ClCompile Include="src\UI\GuiWindow.cpp" />
     <ClCompile Include="src\UI\UIManager.cpp" />
     <ClCompile Include="src\Utils\Debug.cpp" />
@@ -352,6 +353,7 @@
     <ClInclude Include="include\Scenes\Scene.h" />
     <ClInclude Include="include\Scenes\Scene0g.h" />
     <ClInclude Include="include\Scenes\SceneLevel1.h" />
+    <ClInclude Include="include\Scenes\SceneLevel2.h" />
     <ClInclude Include="include\UI\GuiWindow.h" />
     <ClInclude Include="include\UI\UIManager.h" />
     <ClInclude Include="include\Utils\Debug.h" />

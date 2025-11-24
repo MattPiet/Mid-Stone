@@ -13,6 +13,7 @@
 #include <imgui_impl_opengl3.h>
 
 #include "Scenes/SceneLevel1.h"
+#include "Scenes/SceneLevel2.h"
 
 
 SceneManager::SceneManager() :
@@ -88,7 +89,7 @@ bool SceneManager::Initialize(std::string name_, int width_, int height_)
     }
 
     /********************************   Default first scene   ***********************/
-    BuildNewScene(Scene_number::scene_level_1);
+    BuildNewScene(Scene_number::scene_level_2);
     /********************************************************************************/
     return true;
 }
@@ -182,7 +183,11 @@ void SceneManager::HandleEvents()
             case SDL_SCANCODE_F3:
                 DestroyScene();
                 BuildNewScene(Scene_number::scene_level_1);
+                break;
             case SDL_SCANCODE_F4:
+                DestroyScene();
+                BuildNewScene(Scene_number::scene_level_2);
+                break;
             case SDL_SCANCODE_F5:
                 break;
 
@@ -226,6 +231,11 @@ bool SceneManager::BuildNewScene(Scene_number scene)
 
     case Scene_number::scene_level_1:
         currentScene = new SceneLevel1();
+        status = currentScene->OnCreate();
+        break;
+
+    case Scene_number::scene_level_2:
+        currentScene = new SceneLevel2();
         status = currentScene->OnCreate();
         break;
 
