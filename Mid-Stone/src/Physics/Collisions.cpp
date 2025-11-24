@@ -35,54 +35,38 @@ bool Collision::CheckQuadQuadCollision(const Actor2D& entity_1, const Actor2D& e
 
 void Collision::CollisionResponse(Actor2D& entityA, Actor2D& entityB)
 {
-    if (entityA.HasExpired() || entityB.HasExpired()) return;
+    Vec3 normal;
+    float penetration;
 
-    // Check for collision
-    if (!CheckOBBOBBCollision(entityA, entityB))
-    {
-        entityA.GetEntity()->SetHitboxColor(MATH::Vec4(0.0f, 1.0f, 0.0f, 1.0f));
-        entityB.GetEntity()->SetHitboxColor(MATH::Vec4(0.0f, 1.0f, 0.0f, 1.0f));
+    // Use SAT collision normal + penetration
+    if (!CheckOBBOBBCollision(entityA, entityB, normal, penetration))
         return;
-    }
 
-    // Call LifeCycle Event if present
-    if (entityA.onCollisionCallback) entityA.onCollisionCallback(entityA, entityB);
-    if (entityB.onCollisionCallback) entityB.onCollisionCallback(entityB, entityA);
-
-    // Visual feedback: collided
-    entityA.GetEntity()->SetHitboxColor(MATH::Vec4(1.0f, 0.0f, 0.0f, 1.0f));
-    entityB.GetEntity()->SetHitboxColor(MATH::Vec4(1.0f, 0.0f, 0.0f, 1.0f));
-
-    // Positions
     Vec3 posA = entityA.GetEntity()->GetPosition();
     Vec3 posB = entityB.GetEntity()->GetPosition();
-    Vec3 delta = posB - posA;
+    float overlap = penetration;
 
-    float distance = VMath::mag(delta);
-    if (distance < 1e-6f) return;
+    float kick = 1.5f;
+    if (entityA.lowPositionCorrection) kick = 0.001f;
+    if (entityB.lowPositionCorrection) kick = 0.001f;
 
-    Vec3 normal = delta / distance;
+    Vec3 correction = normal * overlap;
 
-    // Compute overlap depth roughly from AABB projection along normal (simplified)
-    Vec3 sizeA = entityA.GetEntity()->GetHitbox() * 0.5f;
-    Vec3 sizeB = entityB.GetEntity()->GetHitbox() * 0.5f;
-
-    float overlap = (sizeA.x + sizeB.x) - std::fabs(VMath::dot(delta, normal));
-    if (overlap < 0.0f) overlap = 0.0f;
-
-    float kick = 0.5f;
-    if (entityA.lowPositionCorrection) kick = 0.0001f;
-    if (entityB.lowPositionCorrection) kick = 0.0001f;
     // --- Position correction ---
-    Vec3 correction = normal * (overlap * kick);
-
-    posA -= correction;
-    posB += correction;
-
-    if (!entityA.isStatic) entityA.GetEntity()->SetPosition(posA);
-
-    if (!entityB.isStatic) entityB.GetEntity()->SetPosition(posB);
-
+    if (entityA.isStatic && !entityB.isStatic) {
+        posB += normal * overlap;
+        entityB.GetEntity()->SetPosition(posB);
+    }
+    else if (!entityA.isStatic && entityB.isStatic) {
+        posA -= normal * overlap;
+        entityA.GetEntity()->SetPosition(posA);
+    }
+    else {
+        posA -= normal * (overlap * 0.5f);
+        posB += normal * (overlap * 0.5f);
+        entityA.GetEntity()->SetPosition(posA);
+        entityB.GetEntity()->SetPosition(posB);
+    }
 
     // --- Velocity response ---
     Vec3 velA = entityA.GetEntity()->GetVelocity();
@@ -91,29 +75,147 @@ void Collision::CollisionResponse(Actor2D& entityA, Actor2D& entityB)
     Vec3 relativeVel = velB - velA;
     float separatingVel = VMath::dot(relativeVel, normal);
 
-    // Avoid tiny floating-point overlap errors
-    const float overlapEpsilon = 0.0001f;
-
-    // Skip if moving apart AND not overlapping anymore
-    if (separatingVel > 0.0f && overlap <= overlapEpsilon)
+    if (separatingVel > 0.2f)
         return;
 
-    // Prevent small vibrations/jitter due to numerical noise
-    if (fabs(separatingVel) < 0.01f)
-        separatingVel = 0.0f;
-    float restitution = 1.8f; // 0 = no bounce, 1 = perfectly elastic
-    // Compute impulse magnitude (elastic collision, equal mass)
-    float impulse = -(1.0f + restitution) * separatingVel; // apply restitution
+    float restitution = 1.8f;
+    float impulse = -(1.0f + restitution) * separatingVel;
 
-    float mA = entityA.GetEntity()->GetMass();
-    float mB = entityB.GetEntity()->GetMass();
-    float totalMass = mA + mB;
-    //  Vec3 impulseVec = normal * (impulse * mB / totalMass); // apply mass ratio
-    Vec3 impulseVec = normal * impulse * 0.7f; // no mass
+    Vec3 impulseVec = normal * impulse * 0.7f;
 
+    if (entityA.isStatic && !entityB.isStatic)
+        entityB.GetEntity()->SetVelocity(velB + impulseVec);
+    else if (!entityA.isStatic && entityB.isStatic)
+        entityA.GetEntity()->SetVelocity(velA - impulseVec);
+    else {
+        entityA.GetEntity()->SetVelocity(velA - impulseVec);
+        entityB.GetEntity()->SetVelocity(velB + impulseVec);
+    }
+    // Call LifeCycle Event if present
+    if (entityA.onCollisionCallback) entityA.onCollisionCallback(entityA, entityB);
+    if (entityB.onCollisionCallback) entityB.onCollisionCallback(entityB, entityA);
+}
 
-    if (!entityA.isStatic) entityA.GetEntity()->SetVelocity(velA - impulseVec);
-    if (!entityB.isStatic) entityB.GetEntity()->SetVelocity(velB + impulseVec);
+bool Collision::CheckOBBOBBCollision(const Actor2D& boxA, const Actor2D& boxB, Vec3& outNormal, float& outPenetration)
+{
+    Vec3 centerA = boxA.GetEntity()->GetPosition();
+    Vec3 centerB = boxB.GetEntity()->GetPosition();
+
+    Vec3 halfExtA = boxA.GetEntity()->GetHitbox() * 0.5f;
+    Vec3 halfExtB = boxB.GetEntity()->GetHitbox() * 0.5f;
+
+    Quaternion qA = boxA.GetEntity()->GetOrientation();
+    Quaternion qB = boxB.GetEntity()->GetOrientation();
+
+    Vec3 axisA[3] = {
+        QMath::rotate(Vec3(1,0,0), qA),
+        QMath::rotate(Vec3(0,1,0), qA),
+        QMath::rotate(Vec3(0,0,1), qA)
+    };
+    Vec3 axisB[3] = {
+        QMath::rotate(Vec3(1,0,0), qB),
+        QMath::rotate(Vec3(0,1,0), qB),
+        QMath::rotate(Vec3(0,0,1), qB)
+    };
+
+    for (int i = 0; i < 3; i++) {
+        axisA[i] = VMath::normalize(axisA[i]);
+        axisB[i] = VMath::normalize(axisB[i]);
+    }
+
+    float R[3][3], AbsR[3][3];
+    const float EPS = 1e-5f;
+
+    for (int i = 0; i < 3; i++)
+        for (int j = 0; j < 3; j++) {
+            R[i][j] = VMath::dot(axisA[i], axisB[j]);
+            AbsR[i][j] = std::fabs(R[i][j]) + EPS;
+        }
+
+    Vec3 tWorld = centerB - centerA;
+    Vec3 t(
+        VMath::dot(tWorld, axisA[0]),
+        VMath::dot(tWorld, axisA[1]),
+        VMath::dot(tWorld, axisA[2])
+    );
+
+    float minPen = FLT_MAX;
+    Vec3 bestAxis = Vec3(0, 0, 0);
+
+    auto CheckAxis = [&](const Vec3& axis, float dist, float ra, float rb) {
+        float overlap = ra + rb - std::fabs(dist);
+        if (overlap < 0.0f)
+            return false;
+
+        if (overlap < minPen) {
+            minPen = overlap;
+
+            // normal must point from A → B
+            bestAxis = (dist < 0.0f ? -axis : axis);
+        }
+        return true;
+        };
+
+    float ra, rb, dist;
+
+    // Axes A0, A1, A2
+    for (int i = 0; i < 3; i++) {
+        ra = halfExtA[i];
+        rb = halfExtB.x * AbsR[i][0] +
+            halfExtB.y * AbsR[i][1] +
+            halfExtB.z * AbsR[i][2];
+
+        dist = t[i];
+        if (!CheckAxis(axisA[i], dist, ra, rb))
+            return false;
+    }
+
+    // Axes B0, B1, B2
+    for (int j = 0; j < 3; j++) {
+        ra = halfExtA.x * AbsR[0][j] +
+            halfExtA.y * AbsR[1][j] +
+            halfExtA.z * AbsR[2][j];
+
+        rb = halfExtB[j];
+
+        dist = t.x * R[0][j] +
+            t.y * R[1][j] +
+            t.z * R[2][j];
+
+        if (!CheckAxis(axisB[j], dist, ra, rb))
+            return false;
+    }
+
+    // Cross products Ai × Bj
+    for (int i = 0; i < 3; i++)
+        for (int j = 0; j < 3; j++) {
+            Vec3 axis = VMath::cross(axisA[i], axisB[j]);
+            if (VMath::mag(axis) < 1e-5f) continue; // parallel
+
+            axis = VMath::normalize(axis);
+
+            // Project radii
+            ra =
+                halfExtA.x * std::fabs(VMath::dot(axisA[0], axis)) +
+                halfExtA.y * std::fabs(VMath::dot(axisA[1], axis)) +
+                halfExtA.z * std::fabs(VMath::dot(axisA[2], axis));
+
+            rb =
+                halfExtB.x * std::fabs(VMath::dot(axisB[0], axis)) +
+                halfExtB.y * std::fabs(VMath::dot(axisB[1], axis)) +
+                halfExtB.z * std::fabs(VMath::dot(axisB[2], axis));
+
+            dist = VMath::dot(tWorld, axis);
+
+            if (!CheckAxis(axis, dist, ra, rb))
+                return false;
+        }
+
+    // === If we got here, collision exists ===
+    outNormal = bestAxis;
+    outPenetration = minPen;
+
+    return true;
 }
 
 bool Collision::CheckOBBOBBCollision(const Actor2D& boxA, const Actor2D& boxB)

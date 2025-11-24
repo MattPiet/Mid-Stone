@@ -47,6 +47,7 @@ std::vector<std::unique_ptr<Actor2D>> Guns::shoot(PlayerController* controller, 
         bullet->GetEntity()->SetPosition(pos);
         bullet->GetEntity()->AdjustOrientation(quat);
         bullet->GetEntity()->SetVelocity(velocity);
+        bullet->SetTag(Actor_tags::bullets);
         bullet->ConfigureLifeSpan(2.0f);
 
         bullet->RegisterExpiredCallback([&impacts](const Actor2D& actor) {
@@ -71,6 +72,7 @@ std::vector<std::unique_ptr<Actor2D>> Guns::shoot(PlayerController* controller, 
             bullet->GetEntity()->SetPosition(spreadPos);
             bullet->GetEntity()->AdjustOrientation(quat);
             bullet->GetEntity()->SetVelocity(velocity);
+            bullet->SetTag(Actor_tags::bullets);
             bullet->ConfigureLifeSpan(2.0f);
 
             bullet->RegisterExpiredCallback([&impacts](const Actor2D& actor) {
@@ -96,6 +98,7 @@ std::vector<std::unique_ptr<Actor2D>> Guns::shoot(PlayerController* controller, 
         bullet->GetEntity()->SetPosition(pos);
         bullet->GetEntity()->AdjustOrientation(quat);
         bullet->GetEntity()->SetVelocity(velocity);
+        bullet->SetTag(Actor_tags::bullets);
         bullet->ConfigureLifeSpan(3.0f); // longer lifespan
 
         bullet->RegisterExpiredCallback([&impacts](const Actor2D& actor) {

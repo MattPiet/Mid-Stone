@@ -47,7 +47,7 @@ void SceneLevel1::PlayerShoot()
     const auto crossHairsQuaternion = mainPlayerController->GetCrossHairsRotation();
     const auto forward = Vec3(1.0f, 0.0f, 0.0f);
     const Vec3 rotatedVector = crossHairsQuaternion * forward * QMath::inverse(crossHairsQuaternion); // QPQ-1 Formula
-    const Vec3 finalVelocity = rotatedVector * 150.0f;\
+    const Vec3 finalVelocity = rotatedVector * 100.0f;
     // TODO We have to rebuild after adjusting Scale, change this
     bullet->GetEntity()->SetScale(Vec3(0.3f, 0.3f, 0.3f));
     bullet->ReBuildAll("sprites/punch.png");
@@ -89,6 +89,9 @@ bool SceneLevel1::OnCreate()
         std::cout << "Failed to create test actor spritesheet\n";
         return false;
     }
+    mainPlayerActor->GetGuns()->setGunType(Guns::GunType::SHOTGUN);
+   // mainPlayerActor->GetGuns()->setMixer(mixer);
+   // mainPlayerActor->GetGuns()->funnyNoises = true;
     const auto mainPlayerClipIdle = new AnimationClip(
         AnimationClip::Play_mode::pingpong,
         0.2f,
@@ -133,7 +136,7 @@ bool SceneLevel1::OnCreate()
 
     // Terrain Size 25.6
     const std::vector terrainPositions = {
-        std::make_pair(Vec3(-30.0f, 30.0f, 0.0f), 0.0f),
+        std::make_pair(Vec3(-30.0f, 30.0f, 0.0f), -45.0f),
         std::make_pair(Vec3(-4.4f, 30.0f, 0.0f), 0.0f),
         std::make_pair(Vec3(21.2f, 30.0f, 0.0f), 0.0f),
         std::make_pair(Vec3(46.8f, 30.0f, 0.0f), 0.0f),
@@ -251,6 +254,11 @@ void SceneLevel1::Update(const float deltaTime)
     mainPlayerActor->Update(deltaTime);
     if (target != nullptr) target->Update(deltaTime);
 
+    for (auto& impact : impacts) spawnQueue.emplace(std::move(impact));
+    if (impacts.size() > 0) {
+        impacts.clear();
+        canShoot = true;
+    }
 
     /** Update Actors **/
     for (const auto& actor : actors)
@@ -305,7 +313,15 @@ void SceneLevel1::HandleEvents(const SDL_Event& sdlEvent)
             break;
         case SDL_SCANCODE_SPACE:
             {
-                PlayerShoot();
+            if (canShoot) {
+                mainPlayerActor->GetAnimator()->PlayAnimationClip("Attack");
+                //PlayerShoot();
+                auto bullets = mainPlayerActor->GetGuns()->shoot(mainPlayerController.get(), impacts);
+                for (auto& bullet : bullets)  spawnQueue.emplace(std::move(bullet));
+                canShoot = false;
+                /** Load and play music **/
+
+            }
                 break;
             }
 
@@ -351,6 +367,27 @@ void SceneLevel1::HandleEvents(const SDL_Event& sdlEvent)
 
 void SceneLevel1::RenderGUI()
 {
+    ImVec4 r = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+    ImVec4 g = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
+    ImVec4 b = ImVec4(0.0f, 0.0f, 1.0f, 1.0f);
+    // Invisible window for gun selection
+    UIManager::StartInvisibleWindow("GunSelector", ImVec2(0, 1000));
+    UIManager::PushButtonStyle(b, g, r, 5.0f);
+
+    if (ImGui::Button("Pistol")) {
+        mainPlayerActor->GetGuns()->setGunType(Guns::GunType::PISTOL);
+    }
+
+    if (ImGui::Button("Shotgun")) {
+        mainPlayerActor->GetGuns()->setGunType(Guns::GunType::SHOTGUN);
+    }
+
+    if (ImGui::Button("Rifle")) {
+        mainPlayerActor->GetGuns()->setGunType(Guns::GunType::RIFLE);
+    }
+
+    UIManager::PopButtonStyle();
+    UIManager::EndWindow();
 }
 
 

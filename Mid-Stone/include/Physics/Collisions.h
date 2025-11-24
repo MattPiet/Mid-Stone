@@ -15,5 +15,7 @@ public:
 	static void CollisionResponse(Actor2D& a, Actor2D& b);
 
 
-	static bool CheckOBBOBBCollision(const Actor2D& A, const Actor2D& B);
+	//static bool CheckOBBOBBCollision(const Actor2D& A, const Actor2D& B);
+	static bool CheckOBBOBBCollision(const Actor2D& boxA, const Actor2D& boxB, Vec3& outNormal, float& outPenetration);
+	static bool CheckOBBOBBCollision(const Actor2D& boxA, const Actor2D& boxB);
 };
