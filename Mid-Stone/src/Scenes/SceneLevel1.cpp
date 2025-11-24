@@ -29,6 +29,9 @@ void SceneLevel1::OnDestroy()
     mainPlayerActor.reset();
     mainPlayerController.reset();
 
+    /** Destroy Target **/
+    target.reset();
+
     /** Camera **/
     cameraController.reset();
     camera.reset();
@@ -36,7 +39,7 @@ void SceneLevel1::OnDestroy()
 
 void SceneLevel1::PlayerShoot()
 {
-    mainPlayerActor->GetAnimator()->playAnimationClip("Attack");
+    mainPlayerActor->GetAnimator()->PlayAnimationClip("Attack");
     const Vec3 currentCrossHairsPosition = mainPlayerController->GetCrossHairsPosition();
     auto bullet = std::make_unique<Actor2D>();
     bullet->OnCreate("sprites/punch.png");
@@ -50,14 +53,18 @@ void SceneLevel1::PlayerShoot()
     bullet->ReBuildAll("sprites/punch.png");
     bullet->GetEntity()->AdjustOrientation(crossHairsQuaternion);
     bullet->GetEntity()->SetVelocity(finalVelocity);
-    bullet->draw_Hitbox = true;
+    // bullet->draw_Hitbox = true;
     bullet->ConfigureLifeSpan(4.0f);
+    bullet->SetTag(Actor_tags::bullets);
     bullet->RegisterExpiredCallback([this](const Actor2D& actor)
     {
         auto impact = std::make_unique<Actor2D>();
-        impact->OnCreate("sprites/impact.png");
+        impact->OnCreate("sprites/impact.png", 2, 4);
         impact->GetEntity()->SetPosition(actor.GetEntity()->GetPosition());
-        impact->ConfigureLifeSpan(1.0f);
+        impact->ConfigureLifeSpan(0.27f);
+        const auto clip = new AnimationClip(AnimationClip::Play_mode::once, 0.03f, 2, 4, 0, 7);
+        impact->GetAnimator()->AddDefaultAnimationClip("Idle", clip);
+        impact->GetAnimator()->PlayAnimationClip("Idle");
         spawnQueue.emplace(std::move(impact));
     });
     bullet->RegisterCollisionCallback([this](Actor2D& actor, const Actor2D& otherActor)
@@ -65,11 +72,6 @@ void SceneLevel1::PlayerShoot()
         if (otherActor.Tag() == Actor_tags::target)
         {
             actor.ConfigureLifeSpan(0.01f);
-            auto impact = std::make_unique<Actor2D>();
-            impact->OnCreate("sprites/impact.png");
-            impact->GetEntity()->SetPosition(actor.GetEntity()->GetPosition());
-            impact->ConfigureLifeSpan(1.0f);
-            spawnQueue.emplace(std::move(impact));
         }
     });
     spawnQueue.emplace(std::move(bullet));
@@ -87,39 +89,39 @@ bool SceneLevel1::OnCreate()
         std::cout << "Failed to create test actor spritesheet\n";
         return false;
     }
-    auto mainPlayerClipIdle = new AnimationClip(
-        AnimationClip::PlayMode::PINGPONG,
+    const auto mainPlayerClipIdle = new AnimationClip(
+        AnimationClip::Play_mode::pingpong,
         0.2f,
         2, 17,
         9, 13
     );
-    auto mainPlayerClipRun = new AnimationClip(
-        AnimationClip::PlayMode::ONCE,
+    const auto mainPlayerClipRun = new AnimationClip(
+        AnimationClip::Play_mode::once,
         0.2f,
         2, 17,
         20, 28
     );
-    auto mainPlayerClipAttack = new AnimationClip(
-        AnimationClip::PlayMode::ONCE,
+    const auto mainPlayerClipAttack = new AnimationClip(
+        AnimationClip::Play_mode::once,
         0.2f,
         2, 17,
         29, 32
     );
-    auto mainPlayerClipHurt = new AnimationClip(
-        AnimationClip::PlayMode::ONCE,
+    const auto mainPlayerClipHurt = new AnimationClip(
+        AnimationClip::Play_mode::once,
         0.2f,
         2, 17,
         1, 3
     );
     // TODO, The clip not being directly related to the spritesheet is weird no?
-    mainPlayerActor->GetAnimator()->addDefaultAnimationClip("Idle", mainPlayerClipIdle);
-    mainPlayerActor->GetAnimator()->addAnimationClip("Run", mainPlayerClipRun);
-    mainPlayerActor->GetAnimator()->addAnimationClip("Attack", mainPlayerClipAttack);
-    mainPlayerActor->GetAnimator()->addAnimationClip("Hurt", mainPlayerClipHurt);
-    mainPlayerActor->GetAnimator()->playAnimationClip("Idle");
+    mainPlayerActor->GetAnimator()->AddDefaultAnimationClip("Idle", mainPlayerClipIdle);
+    mainPlayerActor->GetAnimator()->AddAnimationClip("Run", mainPlayerClipRun);
+    mainPlayerActor->GetAnimator()->AddAnimationClip("Attack", mainPlayerClipAttack);
+    mainPlayerActor->GetAnimator()->AddAnimationClip("Hurt", mainPlayerClipHurt);
+    mainPlayerActor->GetAnimator()->PlayAnimationClip("Idle");
 
     mainPlayerActor->GetEntity()->SetPosition(Vec3(-80.0f, -40.0f, 0.0f));
-    mainPlayerActor->draw_Hitbox = true;
+    // mainPlayerActor->draw_Hitbox = true;
 
     /** Main Player Controller **/
 
@@ -154,7 +156,7 @@ bool SceneLevel1::OnCreate()
         terrain->GetEntity()->SetScale(Vec3(1.0f, 1.0f, 1.0f));
         terrain->ReBuildAll("sprites/horizontal-platform.png");
         terrain->isStatic = true;
-        terrain->draw_Hitbox = true;
+        // terrain->draw_Hitbox = true;
         terrainActors.emplace_back(std::move(terrain));
     }
 
@@ -165,44 +167,56 @@ bool SceneLevel1::OnCreate()
         std::cout << "Failed to create test actor spritesheet\n";
         return false;
     }
-    auto targetPlayerClipIdle = new AnimationClip(
-        AnimationClip::PlayMode::PINGPONG,
+    const auto targetPlayerClipIdle = new AnimationClip(
+        AnimationClip::Play_mode::pingpong,
         0.2f,
         2, 17,
         9, 13
     );
-    auto targetPlayerClipRun = new AnimationClip(
-        AnimationClip::PlayMode::ONCE,
+    const auto targetPlayerClipRun = new AnimationClip(
+        AnimationClip::Play_mode::once,
         0.2f,
         2, 17,
         20, 28
     );
-    auto targetPlayerClipAttack = new AnimationClip(
-        AnimationClip::PlayMode::ONCE,
+    const auto targetPlayerClipAttack = new AnimationClip(
+        AnimationClip::Play_mode::once,
         0.2f,
         2, 17,
-        29, 32
+        28, 31
     );
-    auto targetPlayerClipHurt = new AnimationClip(
-        AnimationClip::PlayMode::ONCE,
+    const auto targetPlayerClipHurt = new AnimationClip(
+        AnimationClip::Play_mode::once,
         0.1f,
         2, 17,
-        1, 3
+        0, 2
+    );
+    const auto targetPlayerClipDeath = new AnimationClip(
+        AnimationClip::Play_mode::once,
+        0.1f,
+        2, 17,
+        3, 7
     );
     // TODO, The clip not being directly related to the spritesheet is weird no?
-    target->GetAnimator()->addDefaultAnimationClip("Idle", targetPlayerClipIdle);
-    target->GetAnimator()->addAnimationClip("Run", targetPlayerClipRun);
-    target->GetAnimator()->addAnimationClip("Attack", targetPlayerClipAttack);
-    target->GetAnimator()->addAnimationClip("Hurt", targetPlayerClipHurt);
-    target->GetAnimator()->playAnimationClip("Idle");
+    target->GetAnimator()->AddDefaultAnimationClip("Idle", targetPlayerClipIdle);
+    target->GetAnimator()->AddAnimationClip("Run", targetPlayerClipRun);
+    target->GetAnimator()->AddAnimationClip("Attack", targetPlayerClipAttack);
+    target->GetAnimator()->AddAnimationClip("Hurt", targetPlayerClipHurt);
+    target->GetAnimator()->AddAnimationClip("Death", targetPlayerClipDeath);
+    target->GetAnimator()->PlayAnimationClip("Idle");
+    target->SetHealth(5);
     target->SetTag(Actor_tags::target);
-    target->RegisterCollisionCallback([this](const Actor2D& actor, const Actor2D& otherActor)
+    target->RegisterCollisionCallback([this](Actor2D& actor, const Actor2D& otherActor)
     {
-        actor.GetAnimator()->playAnimationClip("Hurt");
+        if (otherActor.Tag() == Actor_tags::bullets)
+        {
+            actor.GetAnimator()->PlayAnimationClip("Hurt");
+            actor.TakeDamage(1);
+        }
     });
     target->isStatic = true;
     target->GetEntity()->SetPosition(Vec3(40.0f, -10.0f, 0.0f));
-    target->draw_Hitbox = true;
+    // target->draw_Hitbox = true;
 
 
     /** Camera **/
@@ -230,25 +244,29 @@ void SceneLevel1::Update(const float deltaTime)
                        [](const std::unique_ptr<Actor2D>& e) { return e->HasExpired(); }),
         actors.end()
     );
+    if (target != nullptr && target->HasExpired()) target.reset();
+
 
     /** Update Main Player and Target **/
     mainPlayerActor->Update(deltaTime);
-    target->Update(deltaTime);
+    if (target != nullptr) target->Update(deltaTime);
+
 
     /** Update Actors **/
-    for (auto& actor : actors)
+    for (const auto& actor : actors)
     {
         actor->Update(deltaTime);
         actor->FaceVelocity(deltaTime);
     }
-    
+
     for (const auto& actor : actors)
     {
         for (const auto& terrainActor : terrainActors)
         {
             Collision::CollisionResponse(*actor, *terrainActor);
         }
-        Collision::CollisionResponse(*actor, *target);
+        if (target != nullptr)
+            Collision::CollisionResponse(*actor, *target);
     }
 
 
@@ -344,7 +362,7 @@ void SceneLevel1::Render() const
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
+
     /** Render Main Player **/
     mainPlayerActor->Render(camera->GetViewMatrix(), camera->GetProjectionMatrix());
     /** Render Main Controller **/
@@ -362,7 +380,11 @@ void SceneLevel1::Render() const
         actor->Render(camera->GetViewMatrix(), camera->GetProjectionMatrix());
     }
     /** Render Target **/
-    target->Render(camera->GetViewMatrix(), camera->GetProjectionMatrix());
+    if (target != nullptr)
+    {
+        target->Render(camera->GetViewMatrix(), camera->GetProjectionMatrix());
+    }
+
 
     glUseProgram(0);
 }

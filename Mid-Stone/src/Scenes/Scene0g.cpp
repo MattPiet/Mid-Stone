@@ -66,32 +66,32 @@ bool Scene0g::OnCreate()
         std::cout << "Failed to create test actor spritesheet\n";
         return false;
     }
-	mainPlayerActor->LowPosistionCorrection = true;
+	mainPlayerActor->lowPositionCorrection = true;
     mainPlayerActor->GetEntity()->AdjustHitboxSize(Vec3(-5.0f,-5.0f, 0.0f));
     // TODO Why do i set rows and columns twice my n word
     auto mainPlayerClipIdle = new AnimationClip(
-        AnimationClip::PlayMode::PINGPONG,
+        AnimationClip::Play_mode::pingpong,
         0.2f,
         2, 17,
         9, 13
     );
     auto mainPlayerClipRun = new AnimationClip(
-        AnimationClip::PlayMode::ONCE,
+        AnimationClip::Play_mode::once,
         0.2f,
         2, 17,
         20, 28
     );
     auto mainPlayerClipAttack = new AnimationClip(
-        AnimationClip::PlayMode::ONCE,
+        AnimationClip::Play_mode::once,
         0.2f,
         2, 17,
         29, 32
     );
     // TODO, The clip not being directly related to the spritesheet is weird no?
-    mainPlayerActor->GetAnimator()->addDefaultAnimationClip("Idle", mainPlayerClipIdle);
-    mainPlayerActor->GetAnimator()->addAnimationClip("Run", mainPlayerClipRun);
-    mainPlayerActor->GetAnimator()->addAnimationClip("Attack", mainPlayerClipAttack);
-    mainPlayerActor->GetAnimator()->playAnimationClip("Run");
+    mainPlayerActor->GetAnimator()->AddDefaultAnimationClip("Idle", mainPlayerClipIdle);
+    mainPlayerActor->GetAnimator()->AddAnimationClip("Run", mainPlayerClipRun);
+    mainPlayerActor->GetAnimator()->AddAnimationClip("Attack", mainPlayerClipAttack);
+    mainPlayerActor->GetAnimator()->PlayAnimationClip("Run");
     //mainPlayerActor->draw_Hitbox = true;
 
     /** Set up Main Player Controller **/
@@ -209,11 +209,11 @@ void Scene0g::HandleEvents(const SDL_Event& sdlEvent)
             break;
         case SDL_SCANCODE_SPACE:
 
-            mainPlayerActor->GetAnimator()->playAnimationClip("Attack");
+            mainPlayerActor->GetAnimator()->PlayAnimationClip("Attack");
             PlayerShoot();
             break;
         case SDL_SCANCODE_R:
-            mainPlayerActor->GetAnimator()->playAnimationClip("Run");
+            mainPlayerActor->GetAnimator()->PlayAnimationClip("Run");
             break;
         }
         break;
@@ -284,11 +284,11 @@ void Scene0g::RenderGUI()
 	UIManager::PushButtonStyle(b, g, r, 90.0f); // pushing button style
 
     if (ImGui::Button("DrawHitBox")) { // making a button to toggle hitbox drawing
-        mainPlayerActor->draw_Hitbox = !mainPlayerActor->draw_Hitbox;
+        mainPlayerActor->drawHitbox = !mainPlayerActor->drawHitbox;
 		globalDrawHitboxes = !globalDrawHitboxes;
         for (auto& object : objects)
         {
-            object->draw_Hitbox = globalDrawHitboxes;
+            object->drawHitbox = globalDrawHitboxes;
 		}
      
     }
@@ -389,7 +389,7 @@ void Scene0g::Update(const float deltaTime)
     }
     for (auto& actor : actors)
     {
-        actor->draw_Hitbox = globalDrawHitboxes;
+        actor->drawHitbox = globalDrawHitboxes;
     }
 }
 

@@ -1,9 +1,12 @@
 #include "Graphics/AnimationClip.h"
+#include <algorithm>
 #include <iostream>
 
-void AnimationClip::update(float deltaSeconds) {
+void AnimationClip::Update(float deltaSeconds)
+{
     // If there are no frames do nothing
-    if (totalFrames <= 0) {
+    if (totalFrames <= 0)
+    {
         std::cout << "[AnimationClip] No frames to update." << std::endl;
         return;
     }
@@ -12,64 +15,71 @@ void AnimationClip::update(float deltaSeconds) {
     secondsSinceLastUpdate += deltaSeconds;
 
     // Only update frame if enough time has passed
-    if (secondsSinceLastUpdate >= frameDuration && !isFinished) {
+    if (secondsSinceLastUpdate >= frameDuration && !isFinished)
+    {
         secondsSinceLastUpdate -= frameDuration; // subtract frame duration, preserve remainder
 
         // Playback logic
-        switch (playMode) {
-        case PlayMode::LOOP:
+        switch (playMode)
+        {
+        case Play_mode::loop:
             if (currentFrame < startFrame) { currentFrame = startFrame; }
 
-                currentFrame++;
-                if (currentFrame >= endFrame) {
-                    currentFrame = 0;
-                    std::cout << "[AnimationClip] Looping animation." << std::endl;
-                }
-            
+            currentFrame++;
+            if (currentFrame >= endFrame)
+            {
+                currentFrame = 0;
+                std::cout << "[AnimationClip] Looping animation." << std::endl;
+            }
+
             break;
-        case PlayMode::ONCE:
-			isFinished = false;
-            if (currentFrame < startFrame) { currentFrame = startFrame; }
-            if (currentFrame <= endFrame) {
+        case Play_mode::once:
+            isFinished = false;
+            currentFrame = std::max(currentFrame, startFrame);
+            if (currentFrame <= endFrame)
+            {
                 currentFrame++;
-
-                if (currentFrame >= endFrame) {
+                if (currentFrame > endFrame)
+                {
                     currentFrame = endFrame - 1;
                     isFinished = true;
-                  //  std::cout << "[AnimationClip] Animation finished (ONCE)." << std::endl;
+                    //  std::cout << "[AnimationClip] Animation finished (ONCE)." << std::endl;
                 }
             }
             break;
-        case PlayMode::REVERSE:
+        case Play_mode::reverse:
             isFinished = false;
             currentFrame--;
-            if (currentFrame < startFrame) {
+            if (currentFrame < startFrame)
+            {
                 currentFrame = endFrame - 1;
-				isFinished = true;
-             //  std::cout << "[AnimationClip] Playing animation in reverse." << std::endl;
+                isFinished = true;
+                //  std::cout << "[AnimationClip] Playing animation in reverse." << std::endl;
             }
             break;
-        case PlayMode::PINGPONG:
-            if (isPlayingForward) {
+        case Play_mode::pingpong:
+            if (isPlayingForward)
+            {
                 if (currentFrame < startFrame) { currentFrame = startFrame; }
                 currentFrame++;
-                if (currentFrame >= endFrame) {
+                if (currentFrame >= endFrame)
+                {
                     currentFrame = endFrame - 1;
                     isPlayingForward = false;
-                   // std::cout << "[AnimationClip] PingPong: reversing direction (backward)." << std::endl;
+                    // std::cout << "[AnimationClip] PingPong: reversing direction (backward)." << std::endl;
                 }
             }
-            if (!isPlayingForward) {
+            if (!isPlayingForward)
+            {
                 currentFrame--;
-                if (currentFrame < startFrame) {
+                if (currentFrame < startFrame)
+                {
                     currentFrame = startFrame;
                     isPlayingForward = true;
-                   // std::cout << "[AnimationClip] PingPong: reversing direction (forward)." << std::endl;
+                    // std::cout << "[AnimationClip] PingPong: reversing direction (forward)." << std::endl;
                 }
             }
             break;
         }
     }
 }
-
-

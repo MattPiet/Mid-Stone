@@ -71,8 +71,8 @@ void Collision::CollisionResponse(Actor2D& entityA, Actor2D& entityB)
     if (overlap < 0.0f) overlap = 0.0f;
 
     float kick = 0.5f;
-    if (entityA.LowPosistionCorrection) kick = 0.0001f;
-    if (entityB.LowPosistionCorrection) kick = 0.0001f;
+    if (entityA.lowPositionCorrection) kick = 0.0001f;
+    if (entityB.lowPositionCorrection) kick = 0.0001f;
     // --- Position correction ---
     Vec3 correction = normal * (overlap * kick);
 
