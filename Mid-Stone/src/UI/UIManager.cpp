@@ -11,10 +11,10 @@ UIManager::~UIManager() {}
 
 
 
-void UIManager::StartInvisibleWindow(ImVec2 pos){
+void UIManager::StartInvisibleWindow(const char* Label,ImVec2 pos){
 	ImGui::SetNextWindowPos(pos); // (x, y) in screen coordinates
 	ImGui::SetNextWindowBgAlpha(0.0f); // Fully opaque background (0 = invisible, 1 = opaque)
-	ImGui::Begin("##HiddenLabel", nullptr, ImGuiWindowFlags_NoTitleBar 
+	ImGui::Begin(Label, nullptr, ImGuiWindowFlags_NoTitleBar
 										 | ImGuiWindowFlags_NoBackground 
 										 | ImGuiWindowFlags_AlwaysAutoResize); // this basically sets the window to be invisible
 }

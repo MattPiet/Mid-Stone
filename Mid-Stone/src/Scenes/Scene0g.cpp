@@ -68,7 +68,10 @@ bool Scene0g::OnCreate()
     }
 	mainPlayerActor->lowPositionCorrection = true;
     mainPlayerActor->GetEntity()->AdjustHitboxSize(Vec3(-5.0f,-5.0f, 0.0f));
-    // TODO Why do i set rows and columns twice my n word
+	mainPlayerActor->GetGuns()->setGunType(Guns::GunType::SHOTGUN);
+    mainPlayerActor->GetGuns()->setMixer(mixer);
+	mainPlayerActor->GetGuns()->funnyNoises = true;
+
     auto mainPlayerClipIdle = new AnimationClip(
         AnimationClip::Play_mode::pingpong,
         0.2f,
@@ -165,31 +168,6 @@ void Scene0g::OnDestroy()
         MIX_Quit();
     }
 }
-void Scene0g::PlayerShoot() {
-    const Vec3 currentCrossHairsPosition = mainPlayerController->GetCrossHairsPosition();
-    auto bullet = std::make_unique<Actor2D>();
-    bullet->OnCreate("sprites/fatty_clicked.png");
-    bullet->GetEntity()->SetPosition(currentCrossHairsPosition);
-    const auto crossHairsQuaternion = mainPlayerController->GetCrossHairsRotation();
-    const auto forward = Vec3(1.0f, 0.0f, 0.0f);
-    const Vec3 rotatedVector = crossHairsQuaternion * forward * QMath::inverse(crossHairsQuaternion); // QPQ-1 Formula
-    const Vec3 finalVelocity = rotatedVector * 100.0f;
-    bullet->GetEntity()->AdjustOrientation(crossHairsQuaternion);
-    bullet->GetEntity()->SetVelocity(finalVelocity);
-    bullet->ConfigureLifeSpan(2.0f);
-	//bullet->draw_Hitbox = globalDrawHitboxes;
-    bullet->RegisterExpiredCallback([this](const Actor2D& actor)
-        {
-            auto impact = std::make_unique<Actor2D>();
-            impact->OnCreate("sprites/impact.png");
-            impact->GetEntity()->SetPosition(actor.GetEntity()->GetPosition());
-            impact->ConfigureLifeSpan(1.0f);
-			//impact->draw_Hitbox = globalDrawHitboxes;
-            spawnQueue.emplace(std::move(impact));
-        });
-    spawnQueue.emplace(std::move(bullet));
-
-}
 
 void Scene0g::HandleEvents(const SDL_Event& sdlEvent)
 {
@@ -208,9 +186,17 @@ void Scene0g::HandleEvents(const SDL_Event& sdlEvent)
             pressingRight = true;
             break;
         case SDL_SCANCODE_SPACE:
+        {
+            if (canShoot) {
+                mainPlayerActor->GetAnimator()->PlayAnimationClip("Attack");
+                //PlayerShoot();
+                auto bullets = mainPlayerActor->GetGuns()->shoot(mainPlayerController.get(), impacts);
+                for (auto& bullet : bullets)  spawnQueue.emplace(std::move(bullet));
+                canShoot = false;
+                /** Load and play music **/
 
-            mainPlayerActor->GetAnimator()->PlayAnimationClip("Attack");
-            PlayerShoot();
+            }
+        }
             break;
         case SDL_SCANCODE_R:
             mainPlayerActor->GetAnimator()->PlayAnimationClip("Run");
@@ -279,7 +265,7 @@ void Scene0g::RenderGUI()
     ImVec4 g = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
     ImVec4 b = ImVec4(0.0f, 0.0f, 1.0f, 1.0f);
     
-    UIManager::StartInvisibleWindow(ImVec2(0, 100)); // we start an invisible window here
+    UIManager::StartInvisibleWindow("Hidden Window1", ImVec2(0, 100)); // we start an invisible window here
 
 	UIManager::PushButtonStyle(b, g, r, 90.0f); // pushing button style
 
@@ -310,6 +296,25 @@ void Scene0g::RenderGUI()
 	UIManager::PopButtonStyle(); // popping button style
 
     UIManager::EndWindow(); // end the invisible window
+
+    // Invisible window for gun selection
+    UIManager::StartInvisibleWindow("GunSelector", ImVec2(0, 1000));
+    UIManager::PushButtonStyle(b, g, r, 5.0f);
+
+    if (ImGui::Button("Pistol")) {
+        mainPlayerActor->GetGuns()->setGunType(Guns::GunType::PISTOL);
+    }
+
+    if (ImGui::Button("Shotgun")) {
+        mainPlayerActor->GetGuns()->setGunType(Guns::GunType::SHOTGUN);
+    }
+
+    if (ImGui::Button("Rifle")) {
+        mainPlayerActor->GetGuns()->setGunType(Guns::GunType::RIFLE);
+    }
+
+    UIManager::PopButtonStyle();
+    UIManager::EndWindow();
 }
 
 void Scene0g::Update(const float deltaTime)
@@ -356,7 +361,11 @@ void Scene0g::Update(const float deltaTime)
         
     }
 
-
+    for (auto& impact : impacts) spawnQueue.emplace(std::move(impact));
+    if (impacts.size() > 0) {
+        impacts.clear(); 
+        canShoot = true;
+    }
 
     /* Removes and Deletes bullets if they expire */
     // TODO Delete after demo.

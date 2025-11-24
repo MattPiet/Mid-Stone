@@ -144,6 +144,7 @@
     <ClCompile Include="src\Core\Window.cpp" />
     <ClCompile Include="src\Entities\Body.cpp" />
     <ClCompile Include="src\Entities\Entity.cpp" />
+    <ClCompile Include="src\Entities\Guns.cpp" />
     <ClCompile Include="src\Entities\Player.cpp" />
     <ClCompile Include="src\Graphics\AnimationClip.cpp" />
     <ClCompile Include="src\Graphics\Animator.cpp" />
@@ -333,6 +334,7 @@
     <ClInclude Include="include\Core\Window.h" />
     <ClInclude Include="include\Entities\Body.h" />
     <ClInclude Include="include\Entities\Entity.h" />
+    <ClInclude Include="include\Entities\Guns.h" />
     <ClInclude Include="include\Entities\Player.h" />
     <ClInclude Include="include\Graphics\AnimationClip.h" />
     <ClInclude Include="include\Graphics\Animator.h" />

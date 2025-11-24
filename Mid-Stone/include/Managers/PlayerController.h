@@ -1,7 +1,10 @@
 #pragma once
 #include <Quaternion.h>
 
-#include "2DActor.h"
+#include <Managers/2DActor.h>
+
+using namespace MATH;
+class Actor2D;
 
 class PlayerController
 {
