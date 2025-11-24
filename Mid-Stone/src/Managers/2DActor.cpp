@@ -4,15 +4,15 @@
 Actor2D::Actor2D()
 {
     entity = nullptr;
-    SpriteShader = nullptr;
-    sprite_Mesh = nullptr;
-    sprite_Renderer = nullptr;
+    spriteShader = nullptr;
+    spriteMesh = nullptr;
+    spriteRenderer = nullptr;
     animator = nullptr;
 }
 
 Actor2D::~Actor2D()
 {
-    OnDestroy();
+    Actor2D::OnDestroy();
 }
 
 
@@ -37,26 +37,26 @@ Actor2D::~Actor2D()
  */
 bool Actor2D::OnCreate(const char* FileName, int rows, int columns)
 {
-    SpriteShader = new Shader("shaders/spriteVert.glsl", "shaders/spriteFrag.glsl");
-    if (!SpriteShader->OnCreate())
+    spriteShader = new Shader("shaders/spriteVert.glsl", "shaders/spriteFrag.glsl");
+    if (!spriteShader->OnCreate())
     {
         std::cout << "Sprite Shader failed ... we have a problem\n";
         return false;
     }
-    sprite_Mesh = new SpriteMesh();
-    sprite_Mesh->OnCreate();
+    spriteMesh = new SpriteMesh();
+    spriteMesh->OnCreate();
 
-    sprite_Renderer = new SpriteRenderer();
+    spriteRenderer = new SpriteRenderer();
     if (rows == NULL || columns == NULL)
-        sprite_Renderer->loadImage(FileName);
+        spriteRenderer->loadImage(FileName);
     else
     {
-        sprite_Renderer->loadImage(FileName, rows, columns);
+        spriteRenderer->loadImage(FileName, rows, columns);
         animator = new Animator();
     }
 
     entity = new Entity();
-    entity->OnCreate(sprite_Renderer);
+    entity->OnCreate(spriteRenderer);
 
     return true;
 }
@@ -65,17 +65,18 @@ void Actor2D::OnDestroy()
 {
     delete entity;
     entity = nullptr;
-    SpriteShader->OnDestroy();
-    delete SpriteShader;
-    SpriteShader = nullptr;
-    sprite_Mesh->OnDestroy();
-    delete sprite_Mesh;
-    sprite_Mesh = nullptr;
-    delete sprite_Renderer;
-    sprite_Renderer = nullptr;
+    spriteShader->OnDestroy();
+    delete spriteShader;
+    spriteShader = nullptr;
+    spriteMesh->OnDestroy();
+    delete spriteMesh;
+    spriteMesh = nullptr;
+    delete spriteRenderer;
+    spriteRenderer = nullptr;
     delete animator;
     animator = nullptr;
 }
+
 
 void Actor2D::Update(const float deltaTime)
 {
@@ -84,7 +85,7 @@ void Actor2D::Update(const float deltaTime)
     /** Update Animators if present **/
     if (animator != nullptr)
     {
-        animator->update(deltaTime);
+        animator->Update(deltaTime);
     }
     /** Evaluate LifeSpan **/
     EvaluateLifeSpan(deltaTime);
@@ -92,46 +93,77 @@ void Actor2D::Update(const float deltaTime)
 
 void Actor2D::Render(Matrix4 viewMatrix, Matrix4 projectionMatrix) const
 {
-    if (draw_Hitbox)
+    if (drawHitbox)
     {
-        entity->DrawHitBox(projectionMatrix, viewMatrix, sprite_Mesh);
+        entity->DrawHitBox(projectionMatrix, viewMatrix, spriteMesh);
     }
-    if (sprite_Renderer->GetColumns() != NULL)
+    if (spriteRenderer->GetColumns() != NULL)
     {
-        glUseProgram(SpriteShader->GetProgram());
-        glUniformMatrix4fv(static_cast<GLint>(SpriteShader->GetUniformID("projectionMatrix")), 1, GL_FALSE,
+        glUseProgram(spriteShader->GetProgram());
+        glUniformMatrix4fv(static_cast<GLint>(spriteShader->GetUniformID("projectionMatrix")), 1, GL_FALSE,
                            projectionMatrix);
-        glUniformMatrix4fv(static_cast<GLint>(SpriteShader->GetUniformID("viewMatrix")), 1, GL_FALSE, viewMatrix);
-        sprite_Renderer->renderSpriteSheet(SpriteShader, sprite_Mesh, entity->GetModelMatrix(),
-                                           animator->getCurrentClip()->getCurrentFrame());
+        glUniformMatrix4fv(static_cast<GLint>(spriteShader->GetUniformID("viewMatrix")), 1, GL_FALSE, viewMatrix);
+        spriteRenderer->renderSpriteSheet(spriteShader, spriteMesh, entity->GetModelMatrix(),
+                                           animator->GetCurrentClip()->GetCurrentFrame());
     }
     else
     {
-        glUseProgram(SpriteShader->GetProgram());
-        glUniformMatrix4fv(static_cast<GLint>(SpriteShader->GetUniformID("projectionMatrix")), 1, GL_FALSE,
+        glUseProgram(spriteShader->GetProgram());
+        glUniformMatrix4fv(static_cast<GLint>(spriteShader->GetUniformID("projectionMatrix")), 1, GL_FALSE,
                            projectionMatrix);
-        glUniformMatrix4fv(static_cast<GLint>(SpriteShader->GetUniformID("viewMatrix")), 1, GL_FALSE, viewMatrix);
-        sprite_Renderer->renderSprite(SpriteShader, sprite_Mesh, entity->GetModelMatrix());
+        glUniformMatrix4fv(static_cast<GLint>(spriteShader->GetUniformID("viewMatrix")), 1, GL_FALSE, viewMatrix);
+        spriteRenderer->renderSprite(spriteShader, spriteMesh, entity->GetModelMatrix());
     }
 }
 
 void Actor2D::AddClip(const std::string& name, const AnimationClip* clip) const
 {
-    animator->addAnimationClip(name, const_cast<AnimationClip*>(clip));
+    animator->AddAnimationClip(name, const_cast<AnimationClip*>(clip));
 }
 
 void Actor2D::ReBuildAll(const char* FileName, int rows, int columns)
 {
     if (rows != NULL && columns != NULL)
     {
-        sprite_Renderer->loadImage(FileName, rows, columns);
-        entity->CreateHitBox(sprite_Renderer, animator->getCurrentClip()->getCurrentFrame());
+        spriteRenderer->loadImage(FileName, rows, columns);
+        entity->CreateHitBox(spriteRenderer, animator->GetCurrentClip()->GetCurrentFrame());
     }
     else
     {
-        sprite_Renderer->loadImage(FileName);
-        entity->CreateHitBox(sprite_Renderer);
+        spriteRenderer->loadImage(FileName);
+        entity->CreateHitBox(spriteRenderer);
     }
+}
+
+void Actor2D::TakeDamage(const int damage)
+{
+    // Actors without health don't count
+    if (health == NULL) return;
+    health -= damage;
+    if (health <= 0)
+    {
+        Perish();
+    }
+}
+
+void Actor2D::Perish()
+{
+    // If the entity has a death animation, play it
+    if (animator != nullptr)
+    {
+        std::cout << "Actor2D Perished With Animation" << std::endl;
+        if (auto const deathClip = animator->GetAnimationClip("Death"))
+        {
+            /** Disable collition response **/
+            onCollisionCallback = nullptr;
+            animator->PlayAnimationClip("Death");
+            const float clipDuration = deathClip->GetAnimationDuration();
+            std::cout << "Clip Duration Death: " << clipDuration << std::endl;
+            ConfigureLifeSpan(clipDuration);
+            return;
+        }
+    }
+    ConfigureLifeSpan(0.01f);
 }
 
 void Actor2D::ConfigureLifeSpan(const float newLifeSpanSeconds)
@@ -160,15 +192,17 @@ void Actor2D::EvaluateLifeSpan(float deltaTime)
 void Actor2D::FaceVelocity(float deltaTime)
 {
     Vec3 vel = entity->GetVelocity();
-    if (VMath::mag(vel) > VERY_SMALL) {
+    if (VMath::mag(vel) > VERY_SMALL)
+    {
         Vec3 dir = VMath::normalize(vel);
-        Vec3 localForward(1.0f, 0.0f, -1.0f);  
+        Vec3 localForward(1.0f, 0.0f, -1.0f);
         Vec3 currentForward = MATH::QMath::rotate(localForward, entity->GetOrientation());
         float dot = VMath::dot(currentForward, dir);
         float angle = acosf(std::clamp(dot, -1.0f, 1.0f)); // clamp to avoid NaNs
         Quaternion deltaRot = MATH::QMath::angleAxisRotation(angle * RADIANS_TO_DEGREES, Vec3(0.0f, 0.0f, 1.0f));
         Quaternion targetOri = deltaRot * entity->GetOrientation();
-        Quaternion finalOri = MATH::QMath::slerp(entity->GetOrientation(), targetOri, deltaTime * 25.0f); // last number used as rotation speed
+        Quaternion finalOri = MATH::QMath::slerp(entity->GetOrientation(), targetOri, deltaTime * 25.0f);
+        // last number used as rotation speed
         entity->SetOrientation(finalOri);
     }
 }

@@ -8,9 +8,22 @@ class SpriteRenderer;
 class AnimationClip;
 class Animator;
 
+enum class Actor_tags : uint8_t
+{
+    player = 0,
+    target,
+    bullets,
+};
+
 class Actor2D : public Actor
 {
 private:
+    /** --------- MetaData  --------- **/
+    // TODO, if we need more than one tag this might need to be upgraded to an array
+    Actor_tags tag;
+
+    /** --------- Gameplay Data  --------- **/
+    int health = NULL;
     /** --------- LifeSpan management --------- **/
     using ExpiredCallback = std::function<void(Actor2D&)>;
     /**
@@ -29,9 +42,9 @@ private:
     bool hasTriggeredExpiredHook{false};
 
     Entity* entity;
-    Shader* SpriteShader;
-    SpriteMesh* sprite_Mesh;
-    SpriteRenderer* sprite_Renderer;
+    Shader* spriteShader;
+    SpriteMesh* spriteMesh;
+    SpriteRenderer* spriteRenderer;
     Animator* animator;
 
 public:
@@ -47,6 +60,8 @@ public:
         std::cout << "Entity expired" << std::endl;
     }
 
+    
+    
     /**
      * Updates the state of the Actor2D instance for the current frame.
      * This method processes animations, updates related entities, and evaluates the entity's lifespan.
@@ -55,9 +70,9 @@ public:
      */
     void Update(const float deltaTime) override;
 
-    bool draw_Hitbox = false;
+    bool drawHitbox = false;
 	bool isStatic = false;
-    bool LowPosistionCorrection = false;
+    bool lowPositionCorrection = false;
     
     virtual void OnDestroy() override;
     
@@ -66,12 +81,71 @@ public:
     void AddClip(const std::string& name, const AnimationClip* clip) const;
 
     void ReBuildAll(const char* FileName, int rows = NULL, int columns = NULL);
+    void FaceVelocity(float deltaTime);
 
-    Entity* GetEntity() const { return entity; }
-    SpriteMesh* GetMesh() const { return sprite_Mesh; }
-    SpriteRenderer* GetRenderer() { return sprite_Renderer; }
-    Animator* GetAnimator() const { return animator; }
+    [[nodiscard]] Entity* GetEntity() const { return entity; }
+    [[nodiscard]] SpriteMesh* GetMesh() const { return spriteMesh; }
+    [[nodiscard]] SpriteRenderer* GetRenderer() const { return spriteRenderer; }
+    [[nodiscard]] Animator* GetAnimator() const { return animator; }
 
+    /** --------- Metadata --------- **/
+    [[nodiscard]] Actor_tags Tag() const
+    {
+        return tag;
+    }
+
+    void SetTag(Actor_tags tag_)
+    {
+        this->tag = tag_;
+    }
+
+    /**
+     * Reduces the health of the Actor2D by the specified damage amount.
+     * If the health drops to zero or below, the Actor2D will perish.
+     *
+     * @param damage The amount of damage to be deducted from the actor's health.
+     */
+    void TakeDamage(int damage);
+    /**
+     * Updates the health of the Actor2D instance.
+     *
+     * @param health_ The new health value to be set for the actor.
+     */
+    void SetHealth(const int health_) { health = health_; }
+    /**
+     * Retrieves the current health of the actor.
+     * The health represents the actor's capacity to sustain damage or engage in gameplay mechanics related to vitality.
+     *
+     * @return The current health value of the actor.
+     */
+    [[nodiscard]] int GetHealth() const { return health; }
+    /**
+     * Handles the destruction sequence of the Actor2D object.
+     *
+     * If an animator is attached to the object and a "Death" animation clip is
+     * available, the method disables collision handling, plays the "Death"
+     * animation, and adjusts the object's lifespan to match the duration of the
+     * animation. If no such animation is found, it sets a minimal lifespan for
+     * the object, effectively removing it shortly.
+     *
+     * This method ensures that any visual or procedural death sequence tied to
+     * the actor is correctly executed before the object is removed.
+     */
+    void Perish();
+
+    /** --------- Collisions --------- **/
+
+    using CollisionCallback = std::function<void(Actor2D&, Actor2D&)>;
+    /**
+     * Callback for a function that will be executed once this entity collides with another
+     */
+    CollisionCallback onCollisionCallback;
+    /**
+     * Registers a callback function to be executed when the entity collides.
+     *
+     * @param callback A function object that taadkes references to two Actor2D instances and is called upon collision.
+     */
+    void RegisterCollisionCallback(CollisionCallback callback) { onCollisionCallback = std::move(callback); }
 
     /** --------- LifeSpan management --------- **/
     
@@ -127,6 +201,6 @@ public:
      */
     [[nodiscard]] float GetElapsedLifeTime() const { return elapsedLifeTimeSeconds; }
 
-    void FaceVelocity(float deltaTime);
+    
 
 };
