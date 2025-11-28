@@ -29,7 +29,7 @@ void SceneLevel1::OnDestroy()
     /** Delete Main Player **/
     mainPlayerActor.reset();
     mainPlayerController.reset();
-    
+
     /** Camera **/
     cameraController.reset();
     camera.reset();
@@ -308,7 +308,6 @@ void SceneLevel1::Update(const float deltaTime)
         {
             Collision::CollisionResponse(*actor, *target);
         }
-        
     }
 
 
@@ -317,6 +316,12 @@ void SceneLevel1::Update(const float deltaTime)
     {
         actors.emplace_back(std::move(spawnQueue.front()));
         spawnQueue.pop();
+    }
+
+    /** Check Targets Destroyed **/
+    if (targets.empty())
+    {
+        levelFinished = true;
     }
 }
 
@@ -401,6 +406,37 @@ void SceneLevel1::HandleEvents(const SDL_Event& sdlEvent)
 
 void SceneLevel1::RenderGUI()
 {
+    /** Level Finish Popup **/
+    if (levelFinished)
+        ImGui::OpenPopup("Level Finished!");
+
+    if (ImGui::BeginPopupModal("Level Finished!", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        ImGui::Text("Congratulations, all targets have been hit");
+        ImGui::Separator();
+
+        if (ImGui::Button("Go to next level", ImVec2(120, 0)))
+        {
+            ImGui::CloseCurrentPopup();
+            RequestChangeScene(Scene_number::scene0_g);
+        }
+        ImGui::SetItemDefaultFocus();
+        ImGui::SameLine();
+        if (ImGui::Button("Restart Level", ImVec2(120, 0)))
+        {
+            ImGui::CloseCurrentPopup();
+            RequestRestartScene();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Quit Game", ImVec2(120, 0)))
+        {
+            ImGui::CloseCurrentPopup();
+            RequestQuitApplication();
+        }
+        ImGui::EndPopup();
+    }
+    
+
     ImVec4 r = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
     ImVec4 g = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
     ImVec4 b = ImVec4(0.0f, 0.0f, 1.0f, 1.0f);
