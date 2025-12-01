@@ -467,7 +467,7 @@ void SceneLevel1::RenderGUI()
 void SceneLevel1::Render() const
 {
     /** Render Setup **/
-    glClearColor(0.541f, 0.765f, 0.922f, 1.0f);
+    glClearColor(0.241f, 0.265f, 0.422f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     glEnable(GL_BLEND);
