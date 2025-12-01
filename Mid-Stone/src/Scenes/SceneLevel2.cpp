@@ -130,17 +130,34 @@ bool SceneLevel2::OnCreate()
     mainPlayerController->SetPossessedActor(mainPlayerActor.get());
 
     /** Terrain Objects **/
-	//Postions for 1x3 terrain pieces
+	//Positions for 1x1 terrain pieces
+    const std::vector terrain1Positions = {
+        std::make_pair(Vec3(-48.0f, -50.6f, 0.f), 0.f),
+		std::make_pair(Vec3(-22.6f, 20.6f, 0.f), 0.f),
+    };
+	//Positions for 1x5 terrain pieces
     const std::vector terrain3Positions = {
         std::make_pair(Vec3(-96.f, 41.6f, 0.f), -90.f),
         std::make_pair(Vec3(-96.f, -41.6f, 0.f), -90.f),
         std::make_pair(Vec3(96.f, 41.6f, 0.f), -90.f),
         std::make_pair(Vec3(96.f, -41.6f, 0.f), -90.f),
+
+        std::make_pair(Vec3(-86.4f, 44.4f, 0.f), 45.f),
+        std::make_pair(Vec3(-60.8f, 44.4f, 0.f), -45.f),
+        std::make_pair(Vec3(-60.8f, -44.4f, 0.f), -45.f),
+        std::make_pair(Vec3(-35.2f, -44.4f, 0.f), 45.f),
+        std::make_pair(Vec3(-35.2f, 44.4f, 0.f), 45.f),
+		std::make_pair(Vec3(-9.6f, 44.4f, 0.f), -45.f),
+        std::make_pair(Vec3(-9.6f, -44.4f, 0.f), -45.f),
+        
     };
 	//Positions for 1x10 terrain pieces
     const std::vector terrain10Positions = {
 		std::make_pair(Vec3(-96.f, 0.f, 0.f), 90.f),
         std::make_pair(Vec3(96.f, 0.f, 0.f), 90.f),
+        std::make_pair(Vec3(-73.4f, -22.f, 0.f), 90.f),
+        std::make_pair(Vec3(-48.0f, 22.f, 0.f), 90.f),
+        std::make_pair(Vec3(-22.6f, -22.f, 0.f), 90.f),
     };
 	// Positions for 1x20 terrain pieces
     const std::vector terrain20Positions = {
@@ -151,16 +168,29 @@ bool SceneLevel2::OnCreate()
     };
 
     /** Terrain Setup **/
-    //Terrain Setup for 1x3 pieces
-    for (const auto& position : terrain3Positions) 
+    //Terrain Setup for 1x1 pieces
+    for (const auto& position : terrain1Positions)
     {
         auto terrain = std::make_unique<Actor2D>();
-        terrain->OnCreate("sprites/rock_wall_1x3.png");
+        terrain->OnCreate("sprites/rock_wall_1x1.png");
         terrain->GetEntity()->SetPosition(position.first);
         terrain->GetEntity()->SetOrientation(
             terrain->GetEntity()->GetOrientation() * QMath::angleAxisRotation(position.second, Vec3(0.0f, 0.0f, 1.0f)));
         terrain->GetEntity()->SetScale(Vec3(1.f, 1.f, 1.f));
-        terrain->ReBuildAll("sprites/rock_wall_1x3.png");
+        terrain->ReBuildAll("sprites/rock_wall_1x1.png");
+        terrain->isStatic = true;
+        terrainActors.emplace_back(std::move(terrain));
+    }
+    //Terrain Setup for 1x5 pieces
+    for (const auto& position : terrain3Positions) 
+    {
+        auto terrain = std::make_unique<Actor2D>();
+        terrain->OnCreate("sprites/rock_wall_1x5.png");
+        terrain->GetEntity()->SetPosition(position.first);
+        terrain->GetEntity()->SetOrientation(
+            terrain->GetEntity()->GetOrientation() * QMath::angleAxisRotation(position.second, Vec3(0.0f, 0.0f, 1.0f)));
+        terrain->GetEntity()->SetScale(Vec3(1.f, 1.f, 1.f));
+        terrain->ReBuildAll("sprites/rock_wall_1x5.png");
         terrain->isStatic = true;
         terrainActors.emplace_back(std::move(terrain));
     }
@@ -194,62 +224,67 @@ bool SceneLevel2::OnCreate()
     }
 
     /** Target Setup **/
-    target = std::make_unique<Actor2D>();
-    if (!target->OnCreate("sprites/guy_tilesheet.png", 2, 17))
+	const std::vector<Vec3> targetPositions = {
+        {Vec3(-48.0f, -44.0f, 0.0f)},
+        {Vec3(-22.6f, 26.6f, 0.f)},
+    };
+    
+    
+    for (const auto& data : targetPositions)
     {
-        std::cout << "Failed to create test actor spritesheet\n";
-        return false;
+        auto target = std::make_unique<Actor2D>();
+        const auto targetPlayerClipIdle = new AnimationClip(
+            AnimationClip::Play_mode::pingpong,
+            0.2f,
+            2, 17,
+            9, 13
+        );
+        const auto targetPlayerClipRun = new AnimationClip(
+            AnimationClip::Play_mode::once,
+            0.2f,
+            2, 17,
+            20, 28
+        );
+        const auto targetPlayerClipAttack = new AnimationClip(
+            AnimationClip::Play_mode::once,
+            0.2f,
+            2, 17,
+            28, 31
+        );
+        const auto targetPlayerClipHurt = new AnimationClip(
+            AnimationClip::Play_mode::once,
+            0.1f,
+            2, 17,
+            0, 2
+        );
+        const auto targetPlayerClipDeath = new AnimationClip(
+            AnimationClip::Play_mode::once,
+            0.1f,
+            2, 17,
+            3, 7
+        );
+        target->GetAnimator()->AddDefaultAnimationClip("Idle", targetPlayerClipIdle);
+        target->GetAnimator()->AddAnimationClip("Run", targetPlayerClipRun);
+        target->GetAnimator()->AddAnimationClip("Attack", targetPlayerClipAttack);
+        target->GetAnimator()->AddAnimationClip("Hurt", targetPlayerClipHurt);
+        target->GetAnimator()->AddAnimationClip("Death", targetPlayerClipDeath);
+        target->GetAnimator()->PlayAnimationClip("Idle");
+        target->SetHealth(1);
+        target->SetTag(Actor_tags::target);
+        target->RegisterCollisionCallback([this](Actor2D& actor, const Actor2D& otherActor)
+            {
+                if (otherActor.Tag() == Actor_tags::bullets)
+                {
+                    actor.GetAnimator()->PlayAnimationClip("Hurt");
+                    actor.TakeDamage(1);
+                }
+            });
+        target->isStatic = true;
+        target->GetEntity()->SetPosition(data);
+		targets.emplace_back(std::move(target));
+        // target->draw_Hitbox = true;
+
     }
-    const auto targetPlayerClipIdle = new AnimationClip(
-        AnimationClip::Play_mode::pingpong,
-        0.2f,
-        2, 17,
-        9, 13
-    );
-    const auto targetPlayerClipRun = new AnimationClip(
-        AnimationClip::Play_mode::once,
-        0.2f,
-        2, 17,
-        20, 28
-    );
-    const auto targetPlayerClipAttack = new AnimationClip(
-        AnimationClip::Play_mode::once,
-        0.2f,
-        2, 17,
-        28, 31
-    );
-    const auto targetPlayerClipHurt = new AnimationClip(
-        AnimationClip::Play_mode::once,
-        0.1f,
-        2, 17,
-        0, 2
-    );
-    const auto targetPlayerClipDeath = new AnimationClip(
-        AnimationClip::Play_mode::once,
-        0.1f,
-        2, 17,
-        3, 7
-    );
-    // TODO, The clip not being directly related to the spritesheet is weird no?
-    target->GetAnimator()->AddDefaultAnimationClip("Idle", targetPlayerClipIdle);
-    target->GetAnimator()->AddAnimationClip("Run", targetPlayerClipRun);
-    target->GetAnimator()->AddAnimationClip("Attack", targetPlayerClipAttack);
-    target->GetAnimator()->AddAnimationClip("Hurt", targetPlayerClipHurt);
-    target->GetAnimator()->AddAnimationClip("Death", targetPlayerClipDeath);
-    target->GetAnimator()->PlayAnimationClip("Idle");
-    target->SetHealth(5);
-    target->SetTag(Actor_tags::target);
-    target->RegisterCollisionCallback([this](Actor2D& actor, const Actor2D& otherActor)
-    {
-        if (otherActor.Tag() == Actor_tags::bullets)
-        {
-            actor.GetAnimator()->PlayAnimationClip("Hurt");
-            actor.TakeDamage(1);
-        }
-    });
-    target->isStatic = true;
-    target->GetEntity()->SetPosition(Vec3(40.0f, -10.0f, 0.0f));
-    // target->draw_Hitbox = true;
 
 
     /** Camera **/
