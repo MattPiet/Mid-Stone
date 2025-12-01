@@ -68,8 +68,8 @@ bool Scene0g::OnCreate()
     }
 	mainPlayerActor->lowPositionCorrection = true;
     mainPlayerActor->GetEntity()->AdjustHitboxSize(Vec3(-5.0f,-5.0f, 0.0f));
-	mainPlayerActor->GetGuns()->setGunType(Guns::GunType::SHOTGUN);
-    mainPlayerActor->GetGuns()->setMixer(mixer);
+	mainPlayerActor->GetGuns()->SetGunType(Guns::Gun_type::shotgun);
+    mainPlayerActor->GetGuns()->SetMixer(mixer);
 	mainPlayerActor->GetGuns()->funnyNoises = true;
 
     auto mainPlayerClipIdle = new AnimationClip(
@@ -190,7 +190,7 @@ void Scene0g::HandleEvents(const SDL_Event& sdlEvent)
             if (canShoot) {
                 mainPlayerActor->GetAnimator()->PlayAnimationClip("Attack");
                 //PlayerShoot();
-                auto bullets = mainPlayerActor->GetGuns()->shoot(mainPlayerController.get(), impacts);
+                auto bullets = mainPlayerActor->GetGuns()->Shoot(mainPlayerController.get(), impacts);
                 for (auto& bullet : bullets)  spawnQueue.emplace(std::move(bullet));
                 canShoot = false;
                 /** Load and play music **/
@@ -302,15 +302,15 @@ void Scene0g::RenderGUI()
     UIManager::PushButtonStyle(b, g, r, 5.0f);
 
     if (ImGui::Button("Pistol")) {
-        mainPlayerActor->GetGuns()->setGunType(Guns::GunType::PISTOL);
+        mainPlayerActor->GetGuns()->SetGunType(Guns::Gun_type::pistol);
     }
 
     if (ImGui::Button("Shotgun")) {
-        mainPlayerActor->GetGuns()->setGunType(Guns::GunType::SHOTGUN);
+        mainPlayerActor->GetGuns()->SetGunType(Guns::Gun_type::shotgun);
     }
 
     if (ImGui::Button("Rifle")) {
-        mainPlayerActor->GetGuns()->setGunType(Guns::GunType::RIFLE);
+        mainPlayerActor->GetGuns()->SetGunType(Guns::Gun_type::rifle);
     }
 
     UIManager::PopButtonStyle();

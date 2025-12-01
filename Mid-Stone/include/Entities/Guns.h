@@ -13,19 +13,19 @@ class PlayerController;
 class Guns {
 	MIX_Mixer* mixer;
 public:
-    enum class GunType {
-        PISTOL,
-        SHOTGUN,
-        RIFLE,
+    enum class Gun_type {
+        pistol,
+        shotgun,
+        rifle,
         // ... other gun types
     };
     bool funnyNoises = false;
-    GunType currentGunType;
+    Gun_type currentGunType;
     Guns();
 	~Guns();
-    void setGunType(GunType type);
-    std::vector<std::unique_ptr<Actor2D>> shoot(PlayerController* controller, std::vector<std::unique_ptr<Actor2D>>& impacts);
-	void setMixer(MIX_Mixer* mixer_) { mixer = mixer_; }
-	void playShootSound();
+    void SetGunType(Gun_type type);
+    std::vector<std::unique_ptr<Actor2D>> Shoot(PlayerController* controller, std::vector<std::unique_ptr<Actor2D>>& impacts);
+	void SetMixer(MIX_Mixer* mixer_) { mixer = mixer_; }
+	void PlayShootSound();
 };
 

@@ -53,15 +53,18 @@ void Collision::CollisionResponse(Actor2D& entityA, Actor2D& entityB)
     Vec3 correction = normal * overlap;
 
     // --- Position correction ---
-    if (entityA.isStatic && !entityB.isStatic) {
+    if (entityA.isStatic && !entityB.isStatic)
+    {
         posB += normal * overlap;
         entityB.GetEntity()->SetPosition(posB);
     }
-    else if (!entityA.isStatic && entityB.isStatic) {
+    else if (!entityA.isStatic && entityB.isStatic)
+    {
         posA -= normal * overlap;
         entityA.GetEntity()->SetPosition(posA);
     }
-    else {
+    else
+    {
         posA -= normal * (overlap * 0.5f);
         posB += normal * (overlap * 0.5f);
         entityA.GetEntity()->SetPosition(posA);
@@ -87,7 +90,8 @@ void Collision::CollisionResponse(Actor2D& entityA, Actor2D& entityB)
         entityB.GetEntity()->SetVelocity(velB + impulseVec);
     else if (!entityA.isStatic && entityB.isStatic)
         entityA.GetEntity()->SetVelocity(velA - impulseVec);
-    else {
+    else
+    {
         entityA.GetEntity()->SetVelocity(velA - impulseVec);
         entityB.GetEntity()->SetVelocity(velB + impulseVec);
     }
@@ -108,17 +112,18 @@ bool Collision::CheckOBBOBBCollision(const Actor2D& boxA, const Actor2D& boxB, V
     Quaternion qB = boxB.GetEntity()->GetOrientation();
 
     Vec3 axisA[3] = {
-        QMath::rotate(Vec3(1,0,0), qA),
-        QMath::rotate(Vec3(0,1,0), qA),
-        QMath::rotate(Vec3(0,0,1), qA)
+        QMath::rotate(Vec3(1, 0, 0), qA),
+        QMath::rotate(Vec3(0, 1, 0), qA),
+        QMath::rotate(Vec3(0, 0, 1), qA)
     };
     Vec3 axisB[3] = {
-        QMath::rotate(Vec3(1,0,0), qB),
-        QMath::rotate(Vec3(0,1,0), qB),
-        QMath::rotate(Vec3(0,0,1), qB)
+        QMath::rotate(Vec3(1, 0, 0), qB),
+        QMath::rotate(Vec3(0, 1, 0), qB),
+        QMath::rotate(Vec3(0, 0, 1), qB)
     };
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++)
+    {
         axisA[i] = VMath::normalize(axisA[i]);
         axisB[i] = VMath::normalize(axisB[i]);
     }
@@ -127,7 +132,8 @@ bool Collision::CheckOBBOBBCollision(const Actor2D& boxA, const Actor2D& boxB, V
     const float EPS = 1e-5f;
 
     for (int i = 0; i < 3; i++)
-        for (int j = 0; j < 3; j++) {
+        for (int j = 0; j < 3; j++)
+        {
             R[i][j] = VMath::dot(axisA[i], axisB[j]);
             AbsR[i][j] = std::fabs(R[i][j]) + EPS;
         }
@@ -142,24 +148,27 @@ bool Collision::CheckOBBOBBCollision(const Actor2D& boxA, const Actor2D& boxB, V
     float minPen = FLT_MAX;
     Vec3 bestAxis = Vec3(0, 0, 0);
 
-    auto CheckAxis = [&](const Vec3& axis, float dist, float ra, float rb) {
+    auto CheckAxis = [&](const Vec3& axis, float dist, float ra, float rb)
+    {
         float overlap = ra + rb - std::fabs(dist);
         if (overlap < 0.0f)
             return false;
 
-        if (overlap < minPen) {
+        if (overlap < minPen)
+        {
             minPen = overlap;
 
             // normal must point from A → B
             bestAxis = (dist < 0.0f ? -axis : axis);
         }
         return true;
-        };
+    };
 
     float ra, rb, dist;
 
     // Axes A0, A1, A2
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++)
+    {
         ra = halfExtA[i];
         rb = halfExtB.x * AbsR[i][0] +
             halfExtB.y * AbsR[i][1] +
@@ -171,7 +180,8 @@ bool Collision::CheckOBBOBBCollision(const Actor2D& boxA, const Actor2D& boxB, V
     }
 
     // Axes B0, B1, B2
-    for (int j = 0; j < 3; j++) {
+    for (int j = 0; j < 3; j++)
+    {
         ra = halfExtA.x * AbsR[0][j] +
             halfExtA.y * AbsR[1][j] +
             halfExtA.z * AbsR[2][j];
@@ -188,7 +198,8 @@ bool Collision::CheckOBBOBBCollision(const Actor2D& boxA, const Actor2D& boxB, V
 
     // Cross products Ai × Bj
     for (int i = 0; i < 3; i++)
-        for (int j = 0; j < 3; j++) {
+        for (int j = 0; j < 3; j++)
+        {
             Vec3 axis = VMath::cross(axisA[i], axisB[j]);
             if (VMath::mag(axis) < 1e-5f) continue; // parallel
 
@@ -321,55 +332,64 @@ bool Collision::CheckOBBOBBCollision(const Actor2D& boxA, const Actor2D& boxB)
     radiusA = halfExtentsA.y * absRotationDotMatrix[2][0] + halfExtentsA.z * absRotationDotMatrix[1][0];
     radiusB = halfExtentsB.y * absRotationDotMatrix[0][2] + halfExtentsB.z * absRotationDotMatrix[0][1];
     if (std::fabs(translationInA.z * rotationDotMatrix[1][0] - translationInA.y * rotationDotMatrix[2][0]) > radiusA +
-        radiusB) return false;
+        radiusB)
+        return false;
 
     // A0 x B1
     radiusA = halfExtentsA.y * absRotationDotMatrix[2][1] + halfExtentsA.z * absRotationDotMatrix[1][1];
     radiusB = halfExtentsB.x * absRotationDotMatrix[0][2] + halfExtentsB.z * absRotationDotMatrix[0][0];
     if (std::fabs(translationInA.z * rotationDotMatrix[1][1] - translationInA.y * rotationDotMatrix[2][1]) > radiusA +
-        radiusB) return false;
+        radiusB)
+        return false;
 
     // A0 x B2
     radiusA = halfExtentsA.y * absRotationDotMatrix[2][2] + halfExtentsA.z * absRotationDotMatrix[1][2];
     radiusB = halfExtentsB.x * absRotationDotMatrix[0][1] + halfExtentsB.y * absRotationDotMatrix[0][0];
     if (std::fabs(translationInA.z * rotationDotMatrix[1][2] - translationInA.y * rotationDotMatrix[2][2]) > radiusA +
-        radiusB) return false;
+        radiusB)
+        return false;
 
     // A1 x B0
     radiusA = halfExtentsA.x * absRotationDotMatrix[2][0] + halfExtentsA.z * absRotationDotMatrix[0][0];
     radiusB = halfExtentsB.y * absRotationDotMatrix[1][2] + halfExtentsB.z * absRotationDotMatrix[1][1];
     if (std::fabs(translationInA.x * rotationDotMatrix[2][0] - translationInA.z * rotationDotMatrix[0][0]) > radiusA +
-        radiusB) return false;
+        radiusB)
+        return false;
 
     // A1 x B1
     radiusA = halfExtentsA.x * absRotationDotMatrix[2][1] + halfExtentsA.z * absRotationDotMatrix[0][1];
     radiusB = halfExtentsB.x * absRotationDotMatrix[1][2] + halfExtentsB.z * absRotationDotMatrix[1][0];
     if (std::fabs(translationInA.x * rotationDotMatrix[2][1] - translationInA.z * rotationDotMatrix[0][1]) > radiusA +
-        radiusB) return false;
+        radiusB)
+        return false;
 
     // A1 x B2
     radiusA = halfExtentsA.x * absRotationDotMatrix[2][2] + halfExtentsA.z * absRotationDotMatrix[0][2];
     radiusB = halfExtentsB.x * absRotationDotMatrix[1][1] + halfExtentsB.y * absRotationDotMatrix[1][0];
     if (std::fabs(translationInA.x * rotationDotMatrix[2][2] - translationInA.z * rotationDotMatrix[0][2]) > radiusA +
-        radiusB) return false;
+        radiusB)
+        return false;
 
     // A2 x B0
     radiusA = halfExtentsA.x * absRotationDotMatrix[1][0] + halfExtentsA.y * absRotationDotMatrix[0][0];
     radiusB = halfExtentsB.y * absRotationDotMatrix[2][2] + halfExtentsB.z * absRotationDotMatrix[2][1];
     if (std::fabs(translationInA.y * rotationDotMatrix[0][0] - translationInA.x * rotationDotMatrix[1][0]) > radiusA +
-        radiusB) return false;
+        radiusB)
+        return false;
 
     // A2 x B1
     radiusA = halfExtentsA.x * absRotationDotMatrix[1][1] + halfExtentsA.y * absRotationDotMatrix[0][1];
     radiusB = halfExtentsB.x * absRotationDotMatrix[2][2] + halfExtentsB.z * absRotationDotMatrix[2][0];
     if (std::fabs(translationInA.y * rotationDotMatrix[0][1] - translationInA.x * rotationDotMatrix[1][1]) > radiusA +
-        radiusB) return false;
+        radiusB)
+        return false;
 
     // A2 x B2
     radiusA = halfExtentsA.x * absRotationDotMatrix[1][2] + halfExtentsA.y * absRotationDotMatrix[0][2];
     radiusB = halfExtentsB.x * absRotationDotMatrix[2][1] + halfExtentsB.y * absRotationDotMatrix[2][0];
     if (std::fabs(translationInA.y * rotationDotMatrix[0][2] - translationInA.x * rotationDotMatrix[1][2]) > radiusA +
-        radiusB) return false;
+        radiusB)
+        return false;
 
     return true;
 }

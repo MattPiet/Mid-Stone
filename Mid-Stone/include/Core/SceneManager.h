@@ -8,7 +8,13 @@
 class Scene;
 class Timer;
 class Window;
-class GuiWindow;  // <-- add this
+class GuiWindow;
+
+enum class Scene_number : uint8_t {
+	scene0_g = 0,
+	scene_level_1,
+	animation_scene,
+};
 
 class SceneManager {
 public:
@@ -20,13 +26,10 @@ public:
 	void HandleEvents();
 
 private:
-	enum class Scene_number : uint8_t {
-		scene0_g = 0,
-		scene_level_1,
-		animation_scene,
-	};
+
 
 	Scene* currentScene;
+	Scene_number currentSceneId{ Scene_number::scene_level_1 };
 	Timer* timer;
 
 	Window* window;       // <-- legacy SDL/OpenGL window
@@ -37,6 +40,24 @@ private:
 	bool fullScreen;
 
 	bool BuildNewScene(Scene_number scene_);
+	/**
+	 * Handles pending scene requests and processes them based on their type.
+	 *
+	 * This method checks the current scene for any requests related to scene
+	 * transitions or application-level operations and takes appropriate action.
+	 * The possible requests include:
+	 *
+	 * - `Scene_request_type::none`: No action is taken.
+	 * - `Scene_request_type::quit_application`: Signals the application to stop running.
+	 * - `Scene_request_type::restart_scene`: Restarts the current scene by
+	 *   rebuilding it with the same scene ID.
+	 * - `Scene_request_type::change_scene`: Transitions to a different scene
+	 *   as specified by the request's `targetScene`.
+	 *
+	 * If no current scene is active (i.e., `currentScene` is `nullptr`), the method
+	 * returns without performing any operations.
+	 */
+	void HandleSceneRequest();
 
 	void DestroyScene();
 };
