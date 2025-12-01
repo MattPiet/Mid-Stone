@@ -130,36 +130,64 @@ bool SceneLevel2::OnCreate()
     mainPlayerController->SetPossessedActor(mainPlayerActor.get());
 
     /** Terrain Objects **/
-
-    // Terrain Size 25.6
-    //const std::vector terrain4Positions = {
-    //    std::make_pair(Vec3(-30.0f, 30.0f, 0.0f), 0.0f),
-    //    std::make_pair(Vec3(-4.4f, 30.0f, 0.0f), 0.0f),
-    //    std::make_pair(Vec3(21.2f, 30.0f, 0.0f), 0.0f),
-    //    std::make_pair(Vec3(46.8f, 30.0f, 0.0f), 0.0f),
-    //    std::make_pair(Vec3(40.0f, -20.0f, 0.0f), 0.0f),
-    //    std::make_pair(Vec3(0.0f, -10.0f, 0.0f), 90.0f),
-    //    std::make_pair(Vec3(0.0f, -35.5f, 0.0f), 90.0f),
-    //    std::make_pair(Vec3(60.0f, 0.0f, 0.0f), 90.0f),
-    //    std::make_pair(Vec3(60.0f, 25.6f, 0.0f), 90.0f),
-
-    //};
-
+	//Postions for 1x3 terrain pieces
+    const std::vector terrain3Positions = {
+        std::make_pair(Vec3(-96.f, 41.6f, 0.f), -90.f),
+        std::make_pair(Vec3(-96.f, -41.6f, 0.f), -90.f),
+        std::make_pair(Vec3(96.f, 41.6f, 0.f), -90.f),
+        std::make_pair(Vec3(96.f, -41.6f, 0.f), -90.f),
+    };
+	//Positions for 1x10 terrain pieces
+    const std::vector terrain10Positions = {
+		std::make_pair(Vec3(-96.f, 0.f, 0.f), 90.f),
+        std::make_pair(Vec3(96.f, 0.f, 0.f), 90.f),
+    };
+	// Positions for 1x20 terrain pieces
     const std::vector terrain20Positions = {
-        std::make_pair(Vec3(-96.f, 0.f, 0.f), 0.f),
-        
+        std::make_pair(Vec3(-32.f, 54.f, 0.f), 0.f),
+        std::make_pair(Vec3(32.f, 54.f, 0.f), 0.f),
+        std::make_pair(Vec3(-32.f, -54.f, 0.f), 0.f),
+        std::make_pair(Vec3(32.f, -54.f, 0.f), 0.f),
     };
 
     /** Terrain Setup **/
+    //Terrain Setup for 1x3 pieces
+    for (const auto& position : terrain3Positions) 
+    {
+        auto terrain = std::make_unique<Actor2D>();
+        terrain->OnCreate("sprites/rock_wall_1x3.png");
+        terrain->GetEntity()->SetPosition(position.first);
+        terrain->GetEntity()->SetOrientation(
+            terrain->GetEntity()->GetOrientation() * QMath::angleAxisRotation(position.second, Vec3(0.0f, 0.0f, 1.0f)));
+        terrain->GetEntity()->SetScale(Vec3(1.f, 1.f, 1.f));
+        terrain->ReBuildAll("sprites/rock_wall_1x3.png");
+        terrain->isStatic = true;
+        terrainActors.emplace_back(std::move(terrain));
+    }
+	//Terrain Setup for 1x10 pieces
+    for (const auto& position : terrain10Positions)
+    {
+        auto terrain = std::make_unique<Actor2D>();
+        terrain->OnCreate("sprites/rock_wall_1x10.png");
+        terrain->GetEntity()->SetPosition(position.first);
+        terrain->GetEntity()->SetOrientation(
+			terrain->GetEntity()->GetOrientation() * QMath::angleAxisRotation(position.second, Vec3(0.0f, 0.0f, 1.0f)));
+        terrain->GetEntity()->SetScale(Vec3(1.f, 1.f, 1.f));
+        terrain->ReBuildAll("sprites/rock_wall_1x10.png");
+        terrain->isStatic = true;
+        terrainActors.emplace_back(std::move(terrain));
+    }
+
+    //Terrain Setup for 1x20 pieces
     for (const auto& position : terrain20Positions)
     {
         auto terrain = std::make_unique<Actor2D>();
-        terrain->OnCreate("sprites/rock_wall_1x2.png");
+        terrain->OnCreate("sprites/rock_wall_1x20.png");
         terrain->GetEntity()->SetPosition(position.first);
         terrain->GetEntity()->SetOrientation(
             terrain->GetEntity()->GetOrientation() * QMath::angleAxisRotation(position.second, Vec3(0.0f, 0.0f, 1.0f)));
         terrain->GetEntity()->SetScale(Vec3(1.0f, 1.0f, 1.0f));
-        terrain->ReBuildAll("sprites/rock_wall_1x2.png");
+        terrain->ReBuildAll("sprites/rock_wall_1x20.png");
         terrain->isStatic = true;
          //terrain->draw_Hitbox = true;
         terrainActors.emplace_back(std::move(terrain));
