@@ -5,6 +5,7 @@
 #include "Scene.h"
 #include "Graphics/CameraController.h"
 #include "Managers/PlayerController.h"
+#include <UI/UIManager.h>
 
 class SceneLevel1 : public Scene
 {
@@ -29,7 +30,8 @@ private:
     /** Entity Spawn Queue **/
     std::queue<std::unique_ptr<Actor2D>> spawnQueue;
     
-    
+    std::vector<std::unique_ptr<Actor2D>> impacts;
+    bool canShoot = true;
 public:
     explicit SceneLevel1();
     virtual ~SceneLevel1();
