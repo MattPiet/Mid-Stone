@@ -29,9 +29,6 @@ void SceneLevel2::OnDestroy()
     mainPlayerActor.reset();
     mainPlayerController.reset();
 
-    /** Destroy Target **/
-    target.reset();
-
     /** Camera **/
     cameraController.reset();
     camera.reset();
@@ -133,7 +130,7 @@ bool SceneLevel2::OnCreate()
 	//Positions for 1x1 terrain pieces
     const std::vector terrain1Positions = {
         std::make_pair(Vec3(-48.0f, -50.6f, 0.f), 0.f),
-		std::make_pair(Vec3(-22.6f, 20.6f, 0.f), 0.f),
+		std::make_pair(Vec3(-22.6f, 26.f, 0.f), 0.f),
     };
 	//Positions for 1x5 terrain pieces
     const std::vector terrain3Positions = {
@@ -224,15 +221,20 @@ bool SceneLevel2::OnCreate()
     }
 
     /** Target Setup **/
-	const std::vector<Vec3> targetPositions = {
+	const std::vector<Vec3> targetData = {
         {Vec3(-48.0f, -44.0f, 0.0f)},
-        {Vec3(-22.6f, 26.6f, 0.f)},
+        {Vec3(-22.6f, 32.6f, 0.f)},
     };
     
     
-    for (const auto& data : targetPositions)
+    for (const auto& data : targetData)
     {
         auto target = std::make_unique<Actor2D>();
+        if (!target->OnCreate("sprites/guy_tilesheet.png", 2, 17))
+        {
+            std::cout << "Failed to create test actor spritesheet\n";
+            return false;
+        }
         const auto targetPlayerClipIdle = new AnimationClip(
             AnimationClip::Play_mode::pingpong,
             0.2f,
@@ -263,6 +265,7 @@ bool SceneLevel2::OnCreate()
             2, 17,
             3, 7
         );
+        // TODO, The clip not being directly related to the spritesheet is weird no?
         target->GetAnimator()->AddDefaultAnimationClip("Idle", targetPlayerClipIdle);
         target->GetAnimator()->AddAnimationClip("Run", targetPlayerClipRun);
         target->GetAnimator()->AddAnimationClip("Attack", targetPlayerClipAttack);
@@ -281,11 +284,9 @@ bool SceneLevel2::OnCreate()
             });
         target->isStatic = true;
         target->GetEntity()->SetPosition(data);
-		targets.emplace_back(std::move(target));
+        targets.emplace_back(std::move(target));
         // target->draw_Hitbox = true;
-
     }
-
 
     /** Camera **/
     camera = std::make_unique<Camera>();
@@ -312,13 +313,22 @@ void SceneLevel2::Update(const float deltaTime)
                        [](const std::unique_ptr<Actor2D>& e) { return e->HasExpired(); }),
         actors.end()
     );
-    if (target != nullptr && target->HasExpired()) target.reset();
+    /* Target Cleanup */
+    targets.erase(
+        std::remove_if(targets.begin(), targets.end(),
+            [](const std::unique_ptr<Actor2D>& e) { return e->HasExpired(); }),
+        targets.end()
+    );
 
 
     /** Update Main Player and Target **/
     mainPlayerActor->Update(deltaTime);
-    if (target != nullptr) target->Update(deltaTime);
-
+    
+    /* Update Targets */
+    for (const auto& target : targets)
+    {
+        target->Update(deltaTime);
+	}
 
     /** Update Actors **/
     for (const auto& actor : actors)
@@ -333,8 +343,10 @@ void SceneLevel2::Update(const float deltaTime)
         {
             Collision::CollisionResponse(*actor, *terrainActor);
         }
-        if (target != nullptr)
+        for (const auto& target : targets)
+        {
             Collision::CollisionResponse(*actor, *target);
+		}
     }
 
 
@@ -448,9 +460,10 @@ void SceneLevel2::Render() const
         actor->Render(camera->GetViewMatrix(), camera->GetProjectionMatrix());
     }
     /** Render Target **/
-    if (target != nullptr)
+   /* Regular Loop for Rendering Players */
+    for (auto& targetActor : targets)
     {
-        target->Render(camera->GetViewMatrix(), camera->GetProjectionMatrix());
+        targetActor->Render(camera->GetViewMatrix(), camera->GetProjectionMatrix());
     }
 
 

@@ -25,6 +25,8 @@ private:
     std::vector<std::unique_ptr<Actor2D>> actors;
     std::vector<std::unique_ptr<Actor2D>> terrainActors;
     std::vector<std::unique_ptr<Actor2D>> targets;
+    std::vector<std::unique_ptr<Actor2D>> impacts;
+
 
     /** Entity Spawn Queue **/
     std::queue<std::unique_ptr<Actor2D>> spawnQueue;
