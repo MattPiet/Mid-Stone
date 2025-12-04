@@ -32,6 +32,11 @@ private:
     
     std::vector<std::unique_ptr<Actor2D>> impacts;
     bool canShoot = true;
+
+    /** Audio **/
+    MIX_Mixer* mixer = nullptr;
+    float master_volume = 1.0f;
+	bool PauseAudio = true;
 public:
     explicit SceneLevel1();
     virtual ~SceneLevel1();

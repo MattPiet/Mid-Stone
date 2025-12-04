@@ -33,6 +33,12 @@ void SceneLevel1::OnDestroy()
     /** Camera **/
     cameraController.reset();
     camera.reset();
+    //// Turn off audio
+    if (mixer)
+    {
+        MIX_DestroyMixer(mixer);
+        MIX_Quit();
+    }
 }
 
 void SceneLevel1::PlayerShoot()
@@ -241,7 +247,24 @@ bool SceneLevel1::OnCreate()
         // target->draw_Hitbox = true;
     }
 
+    /** Audio **/
+     /** Load and play music **/
+        /** Initiate Libraries **/
+    SDL_Init(SDL_INIT_AUDIO);
+    MIX_Init();
+    mixer = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, nullptr);
+    if (!mixer)
+    {
+        std::cout << "Failed to create mixer: %s\n", SDL_GetError();
+        return false;
+    }
 
+    MIX_Audio* Music = MIX_LoadAudio(mixer, "Audio/CrabRave.wav", true);
+    MIX_SetMasterGain(mixer, master_volume);
+    MIX_PlayAudio(mixer, Music);
+    MIX_DestroyAudio(Music);
+	mainPlayerActor->GetGuns()->SetMixer(mixer);
+	mainPlayerActor->GetGuns()->funnyNoises = true;
     /** Camera **/
     camera = std::make_unique<Camera>();
     cameraController = std::make_unique<CameraController>(camera.get());
@@ -459,22 +482,42 @@ void SceneLevel1::RenderGUI()
     ImVec4 r = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
     ImVec4 g = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
     ImVec4 b = ImVec4(0.0f, 0.0f, 1.0f, 1.0f);
+
+    UIManager::StartInvisibleWindow("Hidden Window1", ImVec2(0, 0)); // we start an invisible window here
+
+    UIManager::PushButtonStyle(b, g, r, 90.0f); // pushing button style
+
+    if (ImGui::Button("Mute Audio")) { // making a button to toggle hitbox drawing
+        PauseAudio = !PauseAudio;
+    }
+
+    if (PauseAudio)  MIX_SetMasterGain(mixer, 0);
+    if (!PauseAudio) MIX_SetMasterGain(mixer, master_volume);
+
+    UIManager::PushSliderStyle(b, g, r, 90.0f); // pushing slider style
+
+    if (mixer && !PauseAudio)
+    {
+        ImGui::SliderFloat("Master Volume", &master_volume, 0.0f, 1.0f);
+    }
+    UIManager::PopSliderStyle(); // popping slider style
+    UIManager::PopButtonStyle(); // popping button style
+
+    UIManager::EndWindow(); // end the invisible window
+
     // Invisible window for gun selection
     UIManager::StartInvisibleWindow("GunSelector", ImVec2(0, 1000));
     UIManager::PushButtonStyle(b, g, r, 5.0f);
 
-    if (ImGui::Button("Pistol"))
-    {
+    if (ImGui::Button("Pistol")) {
         mainPlayerActor->GetGuns()->SetGunType(Guns::Gun_type::pistol);
     }
 
-    if (ImGui::Button("Shotgun"))
-    {
+    if (ImGui::Button("Shotgun")) {
         mainPlayerActor->GetGuns()->SetGunType(Guns::Gun_type::shotgun);
     }
 
-    if (ImGui::Button("Rifle"))
-    {
+    if (ImGui::Button("Rifle")) {
         mainPlayerActor->GetGuns()->SetGunType(Guns::Gun_type::rifle);
     }
 

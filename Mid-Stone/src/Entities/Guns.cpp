@@ -108,30 +108,36 @@ std::vector<std::unique_ptr<Actor2D>> Guns::Shoot(PlayerController* controller,
 
     case Guns::Gun_type::rifle:
         {
+        for (int i = 0; i < 3; ++i) {
             // Rifle is a faster single bullet with longer lifespan and higher speed
+
+            Vec3 spreadPos = pos + Vec3(i * 6,i * 6 ,0.0f);
+
             const Vec3 velocity = quat * forward * QMath::inverse(quat) * 200.0f; // faster bullet
 
             auto bullet = std::make_unique<Actor2D>();
             bullet->OnCreate("sprites/fatty_clicked.png");
-            bullet->GetEntity()->SetPosition(pos);
+            bullet->GetEntity()->SetPosition(spreadPos);
             bullet->GetEntity()->AdjustOrientation(quat);
             bullet->GetEntity()->SetVelocity(velocity);
             bullet->SetTag(Actor_tags::bullets);
             bullet->ConfigureLifeSpan(8.0f);
 
             bullet->RegisterExpiredCallback([&impacts](const Actor2D& actor)
-            {
-                auto impact = std::make_unique<Actor2D>();
-                impact->OnCreate("sprites/impact.png", 2, 4);
-                impact->GetEntity()->SetPosition(actor.GetEntity()->GetPosition());
-                impact->ConfigureLifeSpan(0.27f);
-                const auto clip = new AnimationClip(AnimationClip::Play_mode::once, 0.03f, 2, 4, 0, 7);
-                impact->GetAnimator()->AddDefaultAnimationClip("Idle", clip);
-                impact->GetAnimator()->PlayAnimationClip("Idle");
-                impacts.push_back(std::move(impact));
-            });
+                {
+                    auto impact = std::make_unique<Actor2D>();
+                    impact->OnCreate("sprites/impact.png", 2, 4);
+                    impact->GetEntity()->SetPosition(actor.GetEntity()->GetPosition());
+                    impact->ConfigureLifeSpan(0.27f);
+                    const auto clip = new AnimationClip(AnimationClip::Play_mode::once, 0.03f, 2, 4, 0, 7);
+                    impact->GetAnimator()->AddDefaultAnimationClip("Idle", clip);
+                    impact->GetAnimator()->PlayAnimationClip("Idle");
+                    impacts.push_back(std::move(impact));
+                });
+
             if (funnyNoises) { PlayShootSound(); }
             bullets.push_back(std::move(bullet));
+        }
             break;
         }
 
