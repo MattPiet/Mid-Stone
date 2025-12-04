@@ -38,7 +38,7 @@ std::vector<std::unique_ptr<Actor2D>> Guns::Shoot(PlayerController* controller,
 {
     std::vector<std::unique_ptr<Actor2D>> bullets;
 
-    const Vec3 pos = controller->GetPossessedActor()->GetEntity()->GetPosition();
+    const Vec3 pos = controller->GetCrossHairsPosition();
     const auto quat = controller->GetCrossHairsRotation();
     const Vec3 forward(1.0f, 0.0f, 0.0f);
 
@@ -80,7 +80,7 @@ std::vector<std::unique_ptr<Actor2D>> Guns::Shoot(PlayerController* controller,
                 Vec3 spreadPos = pos + Vec3(static_cast<float>(rand() % 21 - 10), static_cast<float>(rand() % 21 - 10),
                                             0.0f);
                 const Vec3 velocity = quat * forward * QMath::inverse(quat) * 100.0f;
-
+           
                 auto bullet = std::make_unique<Actor2D>();
                 bullet->OnCreate("sprites/fatty_clicked.png");
                 bullet->GetEntity()->SetPosition(spreadPos);

@@ -290,27 +290,6 @@ void SceneLevel1::Update(const float deltaTime)
     {
         targetActor->Update(deltaTime);
     }
-
-    /** Update Actors **/
-    for (const auto& actor : actors)
-    {
-        actor->Update(deltaTime);
-        actor->FaceVelocity(deltaTime);
-    }
-
-    for (const auto& actor : actors)
-    {
-        for (const auto& terrainActor : terrainActors)
-        {
-            Collision::CollisionResponse(*actor, *terrainActor);
-        }
-        for (const auto& target : targets)
-        {
-            Collision::CollisionResponse(*actor, *target);
-        }
-    }
-
-
     /** Spawn Queue **/
     while (!spawnQueue.empty())
     {
@@ -323,6 +302,46 @@ void SceneLevel1::Update(const float deltaTime)
     {
         levelFinished = true;
     }
+    /** Update Actors **/
+    for (const auto& actor : actors)
+    {
+     
+        //actor->Update(deltaTime);
+        // --- 1. compute intended movement ---
+        Vec3 oldPos = actor->GetEntity()->GetPosition();
+        actor->Update(deltaTime);  // updates velocity
+        Vec3 newPos = actor->GetEntity()->GetPosition();
+
+        Vec3 movement = newPos - oldPos;
+        float dist = VMath::mag(movement);
+
+        const float maxStep = 1.0f;
+        int steps = (dist > 0.0f) ? ceil(dist / maxStep) : 1;
+
+        Vec3 stepVec = movement / (float)steps;
+
+        // Reset to old position
+        Vec3 pos = oldPos;
+
+        for (int i = 0; i < steps; i++)
+        {
+            // move attempt
+            Vec3 attempt = pos + stepVec;
+            actor->GetEntity()->SetPosition(attempt);
+
+            // collisions
+            for (const auto& terrain : terrainActors)
+                Collision::CollisionResponse(*actor, *terrain);
+
+            for (const auto& target : targets)
+                Collision::CollisionResponse(*actor, *target);
+
+            // IMPORTANT: update pos to whatever collision resolved
+            pos = actor->GetEntity()->GetPosition();
+        }
+        actor->FaceVelocity(deltaTime);
+    }
+  
 }
 
 void SceneLevel1::HandleEvents(const SDL_Event& sdlEvent)

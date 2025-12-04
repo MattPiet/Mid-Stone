@@ -50,7 +50,7 @@ private:
     Guns* gun;
 
 public:
-	
+   
     Actor2D();
     virtual ~Actor2D();
     
