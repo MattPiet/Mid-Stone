@@ -273,7 +273,8 @@ bool SceneLevel3::OnCreate()
         std::cout << "Failed to create mixer: %s\n", SDL_GetError();
         return false;
     }
-
+    PlayAudio = SceneManager::GetAudioStateStatic();
+    master_volume = SceneManager::GetMasterVolumeStatic();
     MIX_Audio* Music = MIX_LoadAudio(mixer, "Audio/CrabRave.wav", true);
     MIX_SetMasterGain(mixer, master_volume);
     MIX_PlayAudio(mixer, Music);
@@ -492,7 +493,7 @@ void SceneLevel3::RenderGUI()
         }
         ImGui::EndPopup();
     }
-    
+
 
     ImVec4 r = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
     ImVec4 g = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
@@ -503,17 +504,19 @@ void SceneLevel3::RenderGUI()
     UIManager::PushButtonStyle(b, g, r, 90.0f); // pushing button style
 
     if (ImGui::Button("Mute Audio")) { // making a button to toggle hitbox drawing
-        PauseAudio = !PauseAudio;
+        PlayAudio = !PlayAudio;
+        Scene::RequestChangeAudioState(PlayAudio);
     }
 
-    if (PauseAudio)  MIX_SetMasterGain(mixer, 0);
-    if (!PauseAudio) MIX_SetMasterGain(mixer, master_volume);
+    if (!PlayAudio)  MIX_SetMasterGain(mixer, 0);
+    if (PlayAudio) MIX_SetMasterGain(mixer, master_volume);
 
     UIManager::PushSliderStyle(b, g, r, 90.0f); // pushing slider style
 
-    if (mixer && !PauseAudio)
+    if (mixer && PlayAudio)
     {
         ImGui::SliderFloat("Master Volume", &master_volume, 0.0f, 1.0f);
+        SceneManager::SetMasterVolumeStatic(master_volume);
     }
     UIManager::PopSliderStyle(); // popping slider style
     UIManager::PopButtonStyle(); // popping button style

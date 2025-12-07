@@ -12,15 +12,13 @@
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_opengl3.h>
 #include <UI/UIManager.h>
-
 #include "Scenes/SceneLevel1.h"
-<<<<<<< HEAD
 #include "Scenes/SceneLevel3.h"
-=======
+
 
 bool SceneManager::setAudioOn = true;
 float SceneManager::master_volume = 1.0f;
->>>>>>> master
+
 
 SceneManager::SceneManager() :
     currentScene{nullptr},
@@ -95,11 +93,7 @@ bool SceneManager::Initialize(std::string name_, int width_, int height_)
     }
 
     /********************************   Default first scene   ***********************/
-<<<<<<< HEAD
-    BuildNewScene(Scene_number::scene_level_3);
-=======
     BuildNewScene(Scene_number::MainMenu);
->>>>>>> master
     /********************************************************************************/
     return true;
 }
