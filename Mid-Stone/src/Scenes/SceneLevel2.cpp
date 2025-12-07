@@ -125,6 +125,7 @@ bool SceneLevel2::OnCreate()
     mainPlayerController = std::make_unique<PlayerController>();
     mainPlayerController->OnCreate("sprites/crosshairs.png");
     mainPlayerController->SetPossessedActor(mainPlayerActor.get());
+    mainPlayerController->MoveAim(45.f);
 
     /** Terrain Objects **/
 	//Positions for 1x1 terrain pieces
