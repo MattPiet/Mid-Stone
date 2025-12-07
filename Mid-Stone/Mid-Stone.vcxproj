@@ -235,6 +235,7 @@
     </ClCompile>
     <ClCompile Include="src\Physics\Collisions.cpp" />
     <ClCompile Include="src\Scenes\AnimationScene.cpp" />
+    <ClCompile Include="src\Scenes\MainMenu.cpp" />
     <ClCompile Include="src\Scenes\Scene0g.cpp" />
     <ClCompile Include="src\Scenes\SceneLevel1.cpp">
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -350,6 +351,7 @@
     <ClInclude Include="include\Managers\PlayerController.h" />
     <ClInclude Include="include\Physics\Collisions.h" />
     <ClInclude Include="include\Scenes\AnimationScene.h" />
+    <ClInclude Include="include\Scenes\MainMenu.h" />
     <ClInclude Include="include\Scenes\Scene.h" />
     <ClInclude Include="include\Scenes\Scene0g.h" />
     <ClInclude Include="include\Scenes\SceneLevel1.h" />
