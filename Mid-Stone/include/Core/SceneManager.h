@@ -14,19 +14,22 @@ enum class Scene_number : uint8_t {
 	scene0_g = 0,
 	scene_level_1,
 	animation_scene,
+	MainMenu
 };
 
 class SceneManager {
 public:
 	SceneManager();
 	~SceneManager();
-
 	void Run();
 	bool Initialize(std::string name_, int width_, int height_);
 	void HandleEvents();
-
+	static bool GetAudioStateStatic() { return setAudioOn; }
+	static float GetMasterVolumeStatic() { return master_volume; } // Placeholder for actual volume retrieval
+	static void SetMasterVolumeStatic(float volume) { master_volume = volume; } // Placeholder for actual volume setting
 private:
-
+	static bool setAudioOn; 
+	static float master_volume;
 
 	Scene* currentScene;
 	Scene_number currentSceneId{ Scene_number::scene_level_1 };
@@ -63,3 +66,5 @@ private:
 };
 
 #endif // SCENEMANAGER_H
+
+

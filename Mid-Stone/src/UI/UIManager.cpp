@@ -50,6 +50,13 @@ void UIManager::PushSliderStyle(ImVec4 normal, ImVec4 hovered, ImVec4 active, fl
 
 }
 
+void UIManager::PushTextStyle(ImVec4 color, float size){
+	ImGui::PushStyleColor(ImGuiCol_Text, color);
+	if (size > 0.0f) {
+		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]); // Assuming the first font is the default font
+	}
+}
+
 void UIManager::PopButtonStyle()
 {
 	ImGui::PopStyleColor(3); // Pop 3 colors
@@ -61,6 +68,11 @@ void UIManager::PopSliderStyle()
 	ImGui::PopStyleColor(5); // Pop 5 colors
 	ImGui::PopStyleVar(2);   // Pop 1 style var
 
+}
+
+void UIManager::PopTextStyle(){
+	ImGui::PopStyleColor(1); // Pop 1 color
+	ImGui::PopFont();
 }
 
 

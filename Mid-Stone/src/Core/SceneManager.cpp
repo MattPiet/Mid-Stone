@@ -6,14 +6,17 @@
 #include <Core/Window.h>
 #include <UI/GuiWindow.h>
 #include <Scenes/Scene0g.h>
-#include <Scenes/AnimationScene.h>>
-
+#include <Scenes/AnimationScene.h>
+#include <Scenes/MainMenu.h>
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_opengl3.h>
+#include <UI/UIManager.h>
 
 #include "Scenes/SceneLevel1.h"
 
+bool SceneManager::setAudioOn = true;
+float SceneManager::master_volume = 1.0f;
 
 SceneManager::SceneManager() :
     currentScene{nullptr},
@@ -88,7 +91,7 @@ bool SceneManager::Initialize(std::string name_, int width_, int height_)
     }
 
     /********************************   Default first scene   ***********************/
-    BuildNewScene(Scene_number::scene_level_1);
+    BuildNewScene(Scene_number::MainMenu);
     /********************************************************************************/
     return true;
 }
@@ -121,16 +124,24 @@ void SceneManager::Run()
         // --- Global debug GUI ---
         if (imguiWin)
         {
-            ImGui::Begin("Debug Info");
+            ImVec4 r = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+            ImVec4 g = ImVec4(0.0f, 1.0f, 0.0f, 0.7f);
+            ImVec4 b = ImVec4(0.0f, 0.0f, 1.0f, 1.0f);
+            ImVec4 text = ImVec4(0.95f, 0.95f, 1.0f, 1.0f); // very light blue-white
 
+            UIManager::StartInvisibleWindow("Hidden WindowSceneManager", ImVec2(1845, 0)); // we start an invisible window here
+            UIManager::PushButtonStyle(b, g, r, 90.0f); // pushing button style
+            UIManager::PushTextStyle(text, 20.0f); // pushing text style
             ImGuiIO& io = ImGui::GetIO();
             ImGui::Text("FPS: %1.f", io.Framerate);
-            ImGui::Text("DeltaTime: %.3f", timer->GetDeltaTime());
-            if (ImGui::Button("Quit"))
+            if (ImGui::Button("MainMenu"))
             {
-                isRunning = false;
+				BuildNewScene(Scene_number::MainMenu);
             }
-            ImGui::End();
+     
+			UIManager::PopButtonStyle(); // popping button style
+			UIManager::PopTextStyle(); // popping text style
+            UIManager::EndWindow(); // end the invisible window
         }
 
         if (imguiWin)
@@ -232,6 +243,10 @@ bool SceneManager::BuildNewScene(Scene_number scene)
         currentScene = new SceneLevel1();
         status = currentScene->OnCreate();
         break;
+	case Scene_number::MainMenu:
+		currentScene = new MainMenu();
+		status = currentScene->OnCreate();
+		break;
 
     default:
         Debug::Error("Incorrect scene number assigned in the manager", __FILE__, __LINE__);
@@ -275,6 +290,9 @@ void SceneManager::HandleSceneRequest()
 
     case Scene_request_type::change_scene:
         BuildNewScene(request.targetScene);
+        break;
+	case Scene_request_type::change_audio_state:
+		setAudioOn = !setAudioOn;
         break;
     }
 }

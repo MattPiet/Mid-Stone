@@ -38,7 +38,8 @@ Scene0g::~Scene0g()
 bool Scene0g::OnCreate()
 {
     Debug::Info("Loading assets Scene0: ", __FILE__, __LINE__);
-
+    PlayAudio = SceneManager::GetAudioStateStatic();
+    master_volume = SceneManager::GetMasterVolumeStatic();
     /** Initiate Libraries **/
     SDL_Init(SDL_INIT_AUDIO);
     MIX_Init();
@@ -138,6 +139,7 @@ bool Scene0g::OnCreate()
    NewOBJ->GetEntity()->SetPosition(Vec3(50.0f, 0.0f, 0.0f));
    NewOBJ->isStatic = true;
    objects.emplace_back(std::move(NewOBJ));
+ 
 
     return true;
 }
@@ -280,15 +282,16 @@ void Scene0g::RenderGUI()
     }
 	
     if (ImGui::Button("Mute Audio")) { // making a button to toggle hitbox drawing
-        PauseAudio = !PauseAudio;
+        PlayAudio = !PlayAudio;
+		Scene::RequestChangeAudioState(PlayAudio);
     }
     
-    if (PauseAudio)  MIX_SetMasterGain(mixer, 0);
-	if (!PauseAudio) MIX_SetMasterGain(mixer, master_volume);
+    if (!PlayAudio)  MIX_SetMasterGain(mixer, 0);
+	if (PlayAudio) MIX_SetMasterGain(mixer, master_volume);
 
     UIManager::PushSliderStyle(b, g, r, 90.0f); // pushing slider style
 
-    if (mixer && !PauseAudio)
+    if (mixer && PlayAudio)
     {
         ImGui::SliderFloat("Master Volume", &master_volume, 0.0f, 1.0f);
     }
