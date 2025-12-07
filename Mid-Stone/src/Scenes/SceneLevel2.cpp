@@ -51,7 +51,7 @@ void SceneLevel2::PlayerShoot()
     bullet->GetEntity()->AdjustOrientation(crossHairsQuaternion);
     bullet->GetEntity()->SetVelocity(finalVelocity);
     // bullet->draw_Hitbox = true;
-    bullet->ConfigureLifeSpan(4.0f);
+    bullet->ConfigureLifeSpan(5.5f);
     bullet->SetTag(Actor_tags::bullets);
     bullet->RegisterExpiredCallback([this](const Actor2D& actor)
     {
@@ -129,8 +129,12 @@ bool SceneLevel2::OnCreate()
     /** Terrain Objects **/
 	//Positions for 1x1 terrain pieces
     const std::vector terrain1Positions = {
-        std::make_pair(Vec3(-48.0f, -50.6f, 0.f), 0.f),
-		std::make_pair(Vec3(-22.6f, 26.f, 0.f), 0.f),
+        std::make_pair(Vec3(-48.f, -50.6f, 0.f), 0.f),
+		std::make_pair(Vec3(-22.4f, 26.f, 0.f), 0.f),
+        std::make_pair(Vec3(3.2f, -50.6f, 0.f), 0.f),
+        std::make_pair(Vec3(28.8f, 26.f, 0.f), 0.f),
+        std::make_pair(Vec3(54.4f, -50.6f, 0.f), 0.f),
+        std::make_pair(Vec3(80.f, 26.f, 0.f), 0.f),
     };
 	//Positions for 1x5 terrain pieces
     const std::vector terrain5Positions = {
@@ -146,15 +150,25 @@ bool SceneLevel2::OnCreate()
         std::make_pair(Vec3(-35.2f, 44.4f, 0.f), 45.f),
 		std::make_pair(Vec3(-9.6f, 44.4f, 0.f), -45.f),
         std::make_pair(Vec3(-9.6f, -44.4f, 0.f), -45.f),
+        std::make_pair(Vec3(16.f, -44.4f, 0.f), 45.f),
+        std::make_pair(Vec3(16.f,  44.4f, 0.f), 45.f),
+        std::make_pair(Vec3(41.6, 44.4f , 0.f), -45.f),
+        std::make_pair(Vec3(41.6, -44.4f, 0.f), -45.f),
+        std::make_pair(Vec3(67.2, -44.4f, 0.f), 45.f),
+        std::make_pair(Vec3(67.2,  44.4f, 0.f), 45.f),
         
     };
 	//Positions for 1x10 terrain pieces
     const std::vector terrain10Positions = {
 		std::make_pair(Vec3(-96.f, 0.f, 0.f), 90.f),
         std::make_pair(Vec3(96.f, 0.f, 0.f), 90.f),
-        std::make_pair(Vec3(-73.4f, -22.f, 0.f), 90.f),
-        std::make_pair(Vec3(-48.0f, 22.f, 0.f), 90.f),
-        std::make_pair(Vec3(-22.6f, -22.f, 0.f), 90.f),
+        std::make_pair(Vec3(-73.6f, -22.f, 0.f), 90.f),
+        std::make_pair(Vec3(-48.f, 22.f, 0.f), 90.f),
+        std::make_pair(Vec3(-22.4f, -22.f, 0.f), 90.f),
+        std::make_pair(Vec3(3.2f, 22.f, 0.f), 90.f),
+        std::make_pair(Vec3(28.8f, -22.f, 0.f), 90.f),
+        std::make_pair(Vec3(54.4f, 22.f, 0.f), 90.f),
+        std::make_pair(Vec3(80.f, -22.f, 0.f), 90.f),
     };
 	// Positions for 1x20 terrain pieces
     const std::vector terrain20Positions = {
@@ -222,8 +236,12 @@ bool SceneLevel2::OnCreate()
 
     /** Target Setup **/
 	const std::vector<Vec3> targetData = {
-        {Vec3(-48.0f, -44.0f, 0.0f)},
-        {Vec3(-22.6f, 32.6f, 0.f)},
+        {Vec3(-48.f, -44.0f, 0.0f)},
+        {Vec3(-22.4f, 32.6f, 0.f)},
+        {Vec3(3.2f, -44.0f, 0.f)},
+        {Vec3(28.8f, 32.6f, 0.f)},
+        {Vec3(54.4f, -44.0f, 0.f)},
+        {Vec3(80.0f, 32.6f, 0.f)},
     };
     
     
@@ -335,6 +353,12 @@ void SceneLevel2::Update(const float deltaTime)
     {
         actors.emplace_back(std::move(spawnQueue.front()));
         spawnQueue.pop();
+    }
+
+    /** Check Targets Destroyed **/
+    if (targets.empty())
+    {
+        levelFinished = true;
     }
 
     /** Update Actors **/
@@ -452,6 +476,35 @@ void SceneLevel2::HandleEvents(const SDL_Event& sdlEvent)
 
 void SceneLevel2::RenderGUI()
 {
+    /** Level Finish Popup **/
+    if (levelFinished)
+        ImGui::OpenPopup("Level Finished!");
+
+    if (ImGui::BeginPopupModal("Level Finished!", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        ImGui::Text("Congratulations, all targets have been hit");
+        ImGui::Separator();
+
+        if (ImGui::Button("Go to next level", ImVec2(120, 0)))
+        {
+            ImGui::CloseCurrentPopup();
+            RequestChangeScene(Scene_number::scene_level_1);
+        }
+        ImGui::SetItemDefaultFocus();
+        ImGui::SameLine();
+        if (ImGui::Button("Restart Level", ImVec2(120, 0)))
+        {
+            ImGui::CloseCurrentPopup();
+            RequestRestartScene();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Quit Game", ImVec2(120, 0)))
+        {
+            ImGui::CloseCurrentPopup();
+            RequestQuitApplication();
+        }
+        ImGui::EndPopup();
+    }
 }
 
 

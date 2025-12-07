@@ -460,7 +460,7 @@ void SceneLevel1::RenderGUI()
         if (ImGui::Button("Go to next level", ImVec2(120, 0)))
         {
             ImGui::CloseCurrentPopup();
-            RequestChangeScene(Scene_number::scene0_g);
+            RequestChangeScene(Scene_number::scene_level_2);
         }
         ImGui::SetItemDefaultFocus();
         ImGui::SameLine();

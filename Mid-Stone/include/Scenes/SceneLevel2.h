@@ -5,6 +5,7 @@
 #include "Scene.h"
 #include "Graphics/CameraController.h"
 #include "Managers/PlayerController.h"
+#include <UI/UIManager.h>
 
 class SceneLevel2 : public Scene
 {
