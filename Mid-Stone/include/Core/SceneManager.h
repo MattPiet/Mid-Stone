@@ -30,7 +30,7 @@ private:
 
 
 	Scene* currentScene;
-	Scene_number currentSceneId{ Scene_number::scene_level_1 };
+	Scene_number currentSceneId{ Scene_number::scene_level_2 };
 	Timer* timer;
 
 	Window* window;       // <-- legacy SDL/OpenGL window

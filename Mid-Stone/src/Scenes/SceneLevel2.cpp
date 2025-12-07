@@ -133,7 +133,7 @@ bool SceneLevel2::OnCreate()
 		std::make_pair(Vec3(-22.6f, 26.f, 0.f), 0.f),
     };
 	//Positions for 1x5 terrain pieces
-    const std::vector terrain3Positions = {
+    const std::vector terrain5Positions = {
         std::make_pair(Vec3(-96.f, 41.6f, 0.f), -90.f),
         std::make_pair(Vec3(-96.f, -41.6f, 0.f), -90.f),
         std::make_pair(Vec3(96.f, 41.6f, 0.f), -90.f),
@@ -174,20 +174,20 @@ bool SceneLevel2::OnCreate()
         terrain->GetEntity()->SetOrientation(
             terrain->GetEntity()->GetOrientation() * QMath::angleAxisRotation(position.second, Vec3(0.0f, 0.0f, 1.0f)));
         terrain->GetEntity()->SetScale(Vec3(1.f, 1.f, 1.f));
-        terrain->ReBuildAll("sprites/rock_wall_1_x_1.png");
+        terrain->ReBuildAll("sprites/walls/rock_wall_1_x_1.png");
         terrain->isStatic = true;
         terrainActors.emplace_back(std::move(terrain));
     }
     //Terrain Setup for 1x5 pieces
-    for (const auto& position : terrain3Positions) 
+    for (const auto& position : terrain5Positions) 
     {
         auto terrain = std::make_unique<Actor2D>();
-        terrain->OnCreate("sprites/rock_wall_1_x_5.png");
+        terrain->OnCreate("sprites/walls/rock_wall_1_x_5.png");
         terrain->GetEntity()->SetPosition(position.first);
         terrain->GetEntity()->SetOrientation(
             terrain->GetEntity()->GetOrientation() * QMath::angleAxisRotation(position.second, Vec3(0.0f, 0.0f, 1.0f)));
         terrain->GetEntity()->SetScale(Vec3(1.f, 1.f, 1.f));
-        terrain->ReBuildAll("sprites/rock_wall_1_x_5.png");
+        terrain->ReBuildAll("sprites/walls/rock_wall_1_x_5.png");
         terrain->isStatic = true;
         terrainActors.emplace_back(std::move(terrain));
     }
@@ -195,12 +195,12 @@ bool SceneLevel2::OnCreate()
     for (const auto& position : terrain10Positions)
     {
         auto terrain = std::make_unique<Actor2D>();
-        terrain->OnCreate("sprites/rock_wall_1_x_10.png");
+        terrain->OnCreate("sprites/walls/rock_wall_1_x_10.png");
         terrain->GetEntity()->SetPosition(position.first);
         terrain->GetEntity()->SetOrientation(
 			terrain->GetEntity()->GetOrientation() * QMath::angleAxisRotation(position.second, Vec3(0.0f, 0.0f, 1.0f)));
         terrain->GetEntity()->SetScale(Vec3(1.f, 1.f, 1.f));
-        terrain->ReBuildAll("sprites/rock_wall_1_x_10.png");
+        terrain->ReBuildAll("sprites/walls/rock_wall_1_x_10.png");
         terrain->isStatic = true;
         terrainActors.emplace_back(std::move(terrain));
     }
@@ -209,12 +209,12 @@ bool SceneLevel2::OnCreate()
     for (const auto& position : terrain20Positions)
     {
         auto terrain = std::make_unique<Actor2D>();
-        terrain->OnCreate("sprites/rock_wall_1_x_20.png");
+        terrain->OnCreate("sprites/walls/rock_wall_1_x_20.png");
         terrain->GetEntity()->SetPosition(position.first);
         terrain->GetEntity()->SetOrientation(
             terrain->GetEntity()->GetOrientation() * QMath::angleAxisRotation(position.second, Vec3(0.0f, 0.0f, 1.0f)));
         terrain->GetEntity()->SetScale(Vec3(1.0f, 1.0f, 1.0f));
-        terrain->ReBuildAll("sprites/rock_wall_1_x_20.png");
+        terrain->ReBuildAll("sprites/walls/rock_wall_1_x_20.png");
         terrain->isStatic = true;
          //terrain->draw_Hitbox = true;
         terrainActors.emplace_back(std::move(terrain));
@@ -330,32 +330,53 @@ void SceneLevel2::Update(const float deltaTime)
         target->Update(deltaTime);
 	}
 
-    /** Update Actors **/
-    for (const auto& actor : actors)
-    {
-        actor->Update(deltaTime);
-        actor->FaceVelocity(deltaTime);
-    }
-
-    for (const auto& actor : actors)
-    {
-        for (const auto& terrainActor : terrainActors)
-        {
-            Collision::CollisionResponse(*actor, *terrainActor);
-        }
-        for (const auto& target : targets)
-        {
-            Collision::CollisionResponse(*actor, *target);
-		}
-    }
-
-
     /** Spawn Queue **/
     while (!spawnQueue.empty())
     {
         actors.emplace_back(std::move(spawnQueue.front()));
         spawnQueue.pop();
     }
+
+    /** Update Actors **/
+    for (const auto& actor : actors)
+    {
+
+        //actor->Update(deltaTime);
+        // --- 1. compute intended movement ---
+        Vec3 oldPos = actor->GetEntity()->GetPosition();
+        actor->Update(deltaTime);  // updates velocity
+        Vec3 newPos = actor->GetEntity()->GetPosition();
+
+        Vec3 movement = newPos - oldPos;
+        float dist = VMath::mag(movement);
+
+        const float maxStep = 1.0f;
+        int steps = (dist > 0.0f) ? ceil(dist / maxStep) : 1;
+
+        Vec3 stepVec = movement / (float)steps;
+
+        // Reset to old position
+        Vec3 pos = oldPos;
+
+        for (int i = 0; i < steps; i++)
+        {
+            // move attempt
+            Vec3 attempt = pos + stepVec;
+            actor->GetEntity()->SetPosition(attempt);
+
+            // collisions
+            for (const auto& terrain : terrainActors)
+                Collision::CollisionResponse(*actor, *terrain);
+
+            for (const auto& target : targets)
+                Collision::CollisionResponse(*actor, *target);
+
+            // IMPORTANT: update pos to whatever collision resolved
+            pos = actor->GetEntity()->GetPosition();
+        }
+        actor->FaceVelocity(deltaTime);
+    }
+
 }
 
 void SceneLevel2::HandleEvents(const SDL_Event& sdlEvent)
