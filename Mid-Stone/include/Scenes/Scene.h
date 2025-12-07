@@ -24,7 +24,8 @@ enum class Scene_request_type : uint8_t
     none = 0,
     quit_application,
     restart_scene,
-    change_scene
+    change_scene,
+    change_audio_state
 };
 
 /**
@@ -114,6 +115,11 @@ protected:
         pendingRequest.type = Scene_request_type::change_scene;
         pendingRequest.targetScene = target;
     }
+    void RequestChangeAudioState(bool audioOn)
+    {
+		pendingRequest.type = Scene_request_type::change_audio_state;
+	}
+
 public:
     bool levelFinished = false;
 

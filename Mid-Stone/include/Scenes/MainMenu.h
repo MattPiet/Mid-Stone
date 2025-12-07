@@ -1,5 +1,4 @@
-#ifndef SCENE0_H
-#define SCENE0_H
+#pragma once
 #include "Scene.h"
 #include "Vector.h"
 #include <Matrix.h>
@@ -25,17 +24,14 @@ using namespace MATH;
 
 /// Forward declarations 
 union SDL_Event;
-class Body;
 class Mesh;
 class Shader;
 class SpriteMesh;
 class SpriteRenderer;
-class AnimationClip;
-class Animator;
 class Actor2D;
 class UIManager;
 
-class Scene0g : public Scene
+class MainMenu : public Scene
 {
 private:
     /** Scene Components **/
@@ -53,35 +49,13 @@ private:
     std::unique_ptr<Camera> camera;
     std::unique_ptr<CameraController> cameraController;
 
-    /** Player Controller **/
-    std::unique_ptr<PlayerController> mainPlayerController;
-    std::unique_ptr<Actor2D> mainPlayerActor;
-
-    /** Actor Containers **/
-    std::vector<std::unique_ptr<Actor2D>> visualEffects;
-
-
-    /** Entity containers **/
-    std::vector<std::unique_ptr<Actor2D>> actors;
-
-	std::vector<std::unique_ptr<Actor2D>> objects;
-
     ImFont* MainFont;
-
-    /** Entity Spawn Queue **/
-    std::queue<std::unique_ptr<Actor2D>> spawnQueue;
-
-    std::vector<std::unique_ptr<Actor2D>> impacts;
-
-	bool canShoot = true;
 	
 	bool PlayAudio = true;
-
-    bool globalDrawHitboxes = false;
-
+	bool ShowLevelSelect = false;
 public:
-    explicit Scene0g();
-    virtual ~Scene0g();
+    explicit MainMenu();
+    virtual ~MainMenu();
 
     virtual bool OnCreate() override;
     virtual void OnDestroy() override;
@@ -91,6 +65,3 @@ public:
     virtual void RenderGUI() override;
 
 };
-
-
-#endif // SCENE0_H

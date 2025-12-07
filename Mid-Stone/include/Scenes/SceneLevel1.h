@@ -36,7 +36,7 @@ private:
     /** Audio **/
     MIX_Mixer* mixer = nullptr;
     float master_volume = 1.0f;
-	bool PauseAudio = true;
+	bool PlayAudio = true;
 public:
     explicit SceneLevel1();
     virtual ~SceneLevel1();

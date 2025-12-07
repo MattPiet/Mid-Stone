@@ -98,7 +98,11 @@
     <ClCompile Include="src\Entities\Guns.cpp">
       <Filter>Source\Entities</Filter>
     </ClCompile>
+<<<<<<< HEAD
     <ClCompile Include="src\Scenes\SceneLevel3.cpp">
+=======
+    <ClCompile Include="src\Scenes\MainMenu.cpp">
+>>>>>>> master
       <Filter>Source\Scenes</Filter>
     </ClCompile>
   </ItemGroup>
@@ -217,7 +221,11 @@
     <ClInclude Include="include\Entities\Guns.h">
       <Filter>Headers\Entities</Filter>
     </ClInclude>
+<<<<<<< HEAD
     <ClInclude Include="include\Scenes\SceneLevel3.h">
+=======
+    <ClInclude Include="include\Scenes\MainMenu.h">
+>>>>>>> master
       <Filter>Headers\Scenes</Filter>
     </ClInclude>
   </ItemGroup>
