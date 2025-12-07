@@ -98,6 +98,9 @@
     <ClCompile Include="src\Entities\Guns.cpp">
       <Filter>Source\Entities</Filter>
     </ClCompile>
+    <ClCompile Include="src\Scenes\SceneLevel3.cpp">
+      <Filter>Source\Scenes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\GameDevM\imgui\imconfig.h">
@@ -213,6 +216,9 @@
     </ClInclude>
     <ClInclude Include="include\Entities\Guns.h">
       <Filter>Headers\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scenes\SceneLevel3.h">
+      <Filter>Headers\Scenes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
