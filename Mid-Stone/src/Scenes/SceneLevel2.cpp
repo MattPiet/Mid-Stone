@@ -169,12 +169,12 @@ bool SceneLevel2::OnCreate()
     for (const auto& position : terrain1Positions)
     {
         auto terrain = std::make_unique<Actor2D>();
-        terrain->OnCreate("sprites/rock_wall_1x1.png");
+        terrain->OnCreate("sprites/walls/rock_wall_1_x_1.png");
         terrain->GetEntity()->SetPosition(position.first);
         terrain->GetEntity()->SetOrientation(
             terrain->GetEntity()->GetOrientation() * QMath::angleAxisRotation(position.second, Vec3(0.0f, 0.0f, 1.0f)));
         terrain->GetEntity()->SetScale(Vec3(1.f, 1.f, 1.f));
-        terrain->ReBuildAll("sprites/rock_wall_1x1.png");
+        terrain->ReBuildAll("sprites/rock_wall_1_x_1.png");
         terrain->isStatic = true;
         terrainActors.emplace_back(std::move(terrain));
     }
@@ -182,12 +182,12 @@ bool SceneLevel2::OnCreate()
     for (const auto& position : terrain3Positions) 
     {
         auto terrain = std::make_unique<Actor2D>();
-        terrain->OnCreate("sprites/rock_wall_1x5.png");
+        terrain->OnCreate("sprites/rock_wall_1_x_5.png");
         terrain->GetEntity()->SetPosition(position.first);
         terrain->GetEntity()->SetOrientation(
             terrain->GetEntity()->GetOrientation() * QMath::angleAxisRotation(position.second, Vec3(0.0f, 0.0f, 1.0f)));
         terrain->GetEntity()->SetScale(Vec3(1.f, 1.f, 1.f));
-        terrain->ReBuildAll("sprites/rock_wall_1x5.png");
+        terrain->ReBuildAll("sprites/rock_wall_1_x_5.png");
         terrain->isStatic = true;
         terrainActors.emplace_back(std::move(terrain));
     }
@@ -195,12 +195,12 @@ bool SceneLevel2::OnCreate()
     for (const auto& position : terrain10Positions)
     {
         auto terrain = std::make_unique<Actor2D>();
-        terrain->OnCreate("sprites/rock_wall_1x10.png");
+        terrain->OnCreate("sprites/rock_wall_1_x_10.png");
         terrain->GetEntity()->SetPosition(position.first);
         terrain->GetEntity()->SetOrientation(
 			terrain->GetEntity()->GetOrientation() * QMath::angleAxisRotation(position.second, Vec3(0.0f, 0.0f, 1.0f)));
         terrain->GetEntity()->SetScale(Vec3(1.f, 1.f, 1.f));
-        terrain->ReBuildAll("sprites/rock_wall_1x10.png");
+        terrain->ReBuildAll("sprites/rock_wall_1_x_10.png");
         terrain->isStatic = true;
         terrainActors.emplace_back(std::move(terrain));
     }
@@ -209,12 +209,12 @@ bool SceneLevel2::OnCreate()
     for (const auto& position : terrain20Positions)
     {
         auto terrain = std::make_unique<Actor2D>();
-        terrain->OnCreate("sprites/rock_wall_1x20.png");
+        terrain->OnCreate("sprites/rock_wall_1_x_20.png");
         terrain->GetEntity()->SetPosition(position.first);
         terrain->GetEntity()->SetOrientation(
             terrain->GetEntity()->GetOrientation() * QMath::angleAxisRotation(position.second, Vec3(0.0f, 0.0f, 1.0f)));
         terrain->GetEntity()->SetScale(Vec3(1.0f, 1.0f, 1.0f));
-        terrain->ReBuildAll("sprites/rock_wall_1x20.png");
+        terrain->ReBuildAll("sprites/rock_wall_1_x_20.png");
         terrain->isStatic = true;
          //terrain->draw_Hitbox = true;
         terrainActors.emplace_back(std::move(terrain));
