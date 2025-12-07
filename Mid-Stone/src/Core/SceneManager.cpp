@@ -143,6 +143,8 @@ void SceneManager::Run()
             SDL_GL_SwapWindow(window->GetWindow());
         }
 
+        HandleSceneRequest();
+
         SDL_Delay(timer->GetSleepTime(fps));
     }
 }
@@ -217,6 +219,8 @@ bool SceneManager::BuildNewScene(Scene_number scene)
         currentScene = nullptr;
     }
 
+    currentSceneId = scene;
+
     switch (scene)
     {
     case Scene_number::scene0_g:
@@ -256,3 +260,32 @@ void SceneManager::DestroyScene()
         currentScene = nullptr;
     }
 }
+
+void SceneManager::HandleSceneRequest()
+{
+    if (currentScene == nullptr)
+    {
+        return;
+    }
+
+    SceneRequest request = currentScene->ConsumeSceneRequest();
+
+    switch (request.type)
+    {
+    case Scene_request_type::none:
+        break;
+
+    case Scene_request_type::quit_application:
+        isRunning = false;
+        break;
+
+    case Scene_request_type::restart_scene:
+        BuildNewScene(currentSceneId);
+        break;
+
+    case Scene_request_type::change_scene:
+        BuildNewScene(request.targetScene);
+        break;
+    }
+}
+
