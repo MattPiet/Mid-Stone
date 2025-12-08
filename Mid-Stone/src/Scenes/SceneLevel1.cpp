@@ -83,6 +83,7 @@ void SceneLevel1::PlayerShoot()
 
 bool SceneLevel1::OnCreate()
 {
+    canShoot = true;
     Debug::Info("On Create Scene Level 1: ", __FILE__, __LINE__);
 
     /** Main Player **/
