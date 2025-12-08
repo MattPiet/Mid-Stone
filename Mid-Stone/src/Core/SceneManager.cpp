@@ -190,18 +190,22 @@ void SceneManager::HandleEvents()
             case SDL_SCANCODE_F1:
                 DestroyScene();
                 BuildNewScene(Scene_number::scene0_g);
+                timer->Start();
                 break;
             case SDL_SCANCODE_F2:
                 DestroyScene();
                 BuildNewScene(Scene_number::animation_scene);
+                timer->Start();
                 break;
             case SDL_SCANCODE_F3:
                 DestroyScene();
                 BuildNewScene(Scene_number::scene_level_1);
+                timer->Start();
                 break;
             case SDL_SCANCODE_F4:
                 DestroyScene();
                 BuildNewScene(Scene_number::scene_level_2);
+                timer->Start();
                 break;
             case SDL_SCANCODE_F5:
                 break;
