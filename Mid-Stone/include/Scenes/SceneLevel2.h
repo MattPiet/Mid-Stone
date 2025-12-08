@@ -31,6 +31,13 @@ private:
 
     /** Entity Spawn Queue **/
     std::queue<std::unique_ptr<Actor2D>> spawnQueue;
+
+    /** Audio **/
+    MIX_Mixer* mixer = nullptr;
+    float master_volume = 1.0f;
+    bool PlayAudio = true;
+
+    bool canShoot = true;
     
     
 public:

@@ -78,6 +78,8 @@ bool SceneLevel2::OnCreate()
 {
     Debug::Info("On Create Scene Level 2: ", __FILE__, __LINE__);
 
+    canShoot = true;
+
     /** Main Player **/
     /** Main Actor **/
     mainPlayerActor = std::make_unique<Actor2D>();
@@ -86,6 +88,10 @@ bool SceneLevel2::OnCreate()
         std::cout << "Failed to create test actor spritesheet\n";
         return false;
     }
+    mainPlayerActor->GetGuns()->SetGunType(Guns::Gun_type::pistol);
+    mainPlayerActor->GetGuns()->setBulletSprite("sprites/punch.png");
+    mainPlayerActor->GetGuns()->setPistolExpiration(5.5f);
+    mainPlayerActor->GetGuns()->setSpriteScale(0.3);
     const auto mainPlayerClipIdle = new AnimationClip(
         AnimationClip::Play_mode::pingpong,
         0.2f,
@@ -307,6 +313,26 @@ bool SceneLevel2::OnCreate()
         // target->draw_Hitbox = true;
     }
 
+    /** Audio **/
+     /** Load and play music **/
+        /** Initiate Libraries **/
+    SDL_Init(SDL_INIT_AUDIO);
+    MIX_Init();
+    mixer = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, nullptr);
+    if (!mixer)
+    {
+        std::cout << "Failed to create mixer: %s\n", SDL_GetError();
+        return false;
+    }
+    PlayAudio = SceneManager::GetAudioStateStatic();
+    master_volume = SceneManager::GetMasterVolumeStatic();
+    MIX_Audio* Music = MIX_LoadAudio(mixer, "Audio/CrabRave.wav", true);
+    MIX_SetMasterGain(mixer, master_volume);
+    MIX_PlayAudio(mixer, Music);
+    MIX_DestroyAudio(Music);
+    mainPlayerActor->GetGuns()->SetMixer(mixer);
+    mainPlayerActor->GetGuns()->funnyNoises = true;
+
     /** Camera **/
     camera = std::make_unique<Camera>();
     cameraController = std::make_unique<CameraController>(camera.get());
@@ -348,6 +374,13 @@ void SceneLevel2::Update(const float deltaTime)
     {
         target->Update(deltaTime);
 	}
+
+    for (auto& impact : impacts) spawnQueue.emplace(std::move(impact));
+    if (impacts.size() > 0)
+    {
+        impacts.clear();
+        canShoot = true;
+    }
 
     /** Spawn Queue **/
     while (!spawnQueue.empty())
@@ -431,8 +464,16 @@ void SceneLevel2::HandleEvents(const SDL_Event& sdlEvent)
             break;
         case SDL_SCANCODE_SPACE:
             {
-                PlayerShoot();
-                break;
+            if (canShoot)
+            {
+                mainPlayerActor->GetAnimator()->PlayAnimationClip("Attack");
+                //PlayerShoot();
+                auto bullets = mainPlayerActor->GetGuns()->Shoot(mainPlayerController.get(), impacts);
+                for (auto& bullet : bullets) spawnQueue.emplace(std::move(bullet));
+                canShoot = false;
+                
+            }
+            break;
             }
 
         default: ;
@@ -489,7 +530,7 @@ void SceneLevel2::RenderGUI()
         if (ImGui::Button("Go to next level", ImVec2(120, 0)))
         {
             ImGui::CloseCurrentPopup();
-            RequestChangeScene(Scene_number::scene_level_1);
+            RequestChangeScene(Scene_number::scene_level_2);
         }
         ImGui::SetItemDefaultFocus();
         ImGui::SameLine();
@@ -506,6 +547,54 @@ void SceneLevel2::RenderGUI()
         }
         ImGui::EndPopup();
     }
+
+
+    ImVec4 r = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+    ImVec4 g = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
+    ImVec4 b = ImVec4(0.0f, 0.0f, 1.0f, 1.0f);
+
+    UIManager::StartInvisibleWindow("Hidden Window1", ImVec2(0, 0)); // we start an invisible window here
+
+    UIManager::PushButtonStyle(b, g, r, 90.0f); // pushing button style
+
+    if (ImGui::Button("Mute Audio")) { // making a button to toggle hitbox drawing
+        PlayAudio = !PlayAudio;
+        Scene::RequestChangeAudioState(PlayAudio);
+    }
+
+    if (!PlayAudio)  MIX_SetMasterGain(mixer, 0);
+    if (PlayAudio) MIX_SetMasterGain(mixer, master_volume);
+
+    UIManager::PushSliderStyle(b, g, r, 90.0f); // pushing slider style
+
+    if (mixer && PlayAudio)
+    {
+        ImGui::SliderFloat("Master Volume", &master_volume, 0.0f, 1.0f);
+        SceneManager::SetMasterVolumeStatic(master_volume);
+    }
+    UIManager::PopSliderStyle(); // popping slider style
+    UIManager::PopButtonStyle(); // popping button style
+
+    UIManager::EndWindow(); // end the invisible window
+
+    // Invisible window for gun selection
+    UIManager::StartInvisibleWindow("GunSelector", ImVec2(0, 1000));
+    UIManager::PushButtonStyle(b, g, r, 5.0f);
+
+    if (ImGui::Button("Pistol")) {
+        mainPlayerActor->GetGuns()->SetGunType(Guns::Gun_type::pistol);
+    }
+
+    if (ImGui::Button("Shotgun")) {
+        mainPlayerActor->GetGuns()->SetGunType(Guns::Gun_type::shotgun);
+    }
+
+    if (ImGui::Button("Rifle")) {
+        mainPlayerActor->GetGuns()->SetGunType(Guns::Gun_type::rifle);
+    }
+
+    UIManager::PopButtonStyle();
+    UIManager::EndWindow();
 }
 
 
