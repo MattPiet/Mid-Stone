@@ -75,7 +75,9 @@ bool MainMenu::OnCreate()
 void MainMenu::OnDestroy()
 {
     Debug::Info("Deleting assets Scene0: ", __FILE__, __LINE__);
-  
+    
+	cameraController.reset();
+	camera.reset();
 
     //// Turn off audio
     if (mixer)
