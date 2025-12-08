@@ -102,7 +102,7 @@ bool MainMenu::OnCreate()
 
 
     /** Load and play music **/
-    MIX_Audio* Music = MIX_LoadAudio(mixer, "Audio/CrabRave.wav", true);
+    MIX_Audio* Music = MIX_LoadAudio(mixer, "Audio/MainMenuMusic.mp3", true);
     MIX_SetMasterGain(mixer, master_volume);
     MIX_PlayAudio(mixer, Music);
     MIX_DestroyAudio(Music);
@@ -121,6 +121,9 @@ bool MainMenu::OnCreate()
 void MainMenu::OnDestroy()
 {
     Debug::Info("Deleting assets Scene0: ", __FILE__, __LINE__);
+    
+	cameraController.reset();
+	camera.reset();
 
     backgroundActor.reset();
    /* mainMenuButton.reset();*/

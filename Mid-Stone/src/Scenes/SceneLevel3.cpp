@@ -236,7 +236,7 @@ bool SceneLevel3::OnCreate()
     }
     PlayAudio = SceneManager::GetAudioStateStatic();
     master_volume = SceneManager::GetMasterVolumeStatic();
-    MIX_Audio* Music = MIX_LoadAudio(mixer, "Audio/CrabRave.wav", true);
+    MIX_Audio* Music = MIX_LoadAudio(mixer, "Audio/level3Music.mp3", true);
     MIX_SetMasterGain(mixer, master_volume);
     MIX_PlayAudio(mixer, Music);
     MIX_DestroyAudio(Music);

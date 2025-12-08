@@ -104,9 +104,8 @@
     <ClCompile Include="src\Scenes\MainMenu.cpp">
       <Filter>Source\Scenes</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scenes\SceneLevel2.cpp" />
-    <ClCompile Include="src\Graphics\Texture.cpp">
-      <Filter>Source\Graphics</Filter>
+    <ClCompile Include="src\Scenes\SceneLevel2.cpp">
+      <Filter>Source\Scenes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -230,9 +229,8 @@
     <ClInclude Include="include\Scenes\MainMenu.h">
       <Filter>Headers\Scenes</Filter>
     </ClInclude>
-    <ClInclude Include="include\Scenes\SceneLevel2.h" />
-    <ClInclude Include="include\Graphics\Texture.h">
-      <Filter>Headers\Graphics</Filter>
+    <ClInclude Include="include\Scenes\SceneLevel2.h">
+      <Filter>Headers\Scenes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
