@@ -45,6 +45,29 @@ private:
     bool pressingLeft = false;
     bool pressingRight = false;
 
+    /** Entity containers **/
+    std::vector<std::unique_ptr<Actor2D>> actors;
+
+    std::vector<std::unique_ptr<Actor2D>> objects;
+
+    // For the Background
+    std::unique_ptr<Actor2D> backgroundActor;
+
+    // For the png buttons
+    std::unique_ptr<Actor2D> mainMenuButton;
+    std::unique_ptr<Actor2D> loadButton;
+    std::unique_ptr<Actor2D> muteButton;
+    std::unique_ptr<Actor2D> quitButton;
+
+
+    Mesh* bulletMesh;
+    Matrix4 BulletModelMatrix;
+    
+
+    // For Button States
+    bool isDraggingVolume = false;
+    float buttonHoverAlpha = 0.8f;  // Alpha for hover effect
+
     /** Camera **/
     std::unique_ptr<Camera> camera;
     std::unique_ptr<CameraController> cameraController;
@@ -63,5 +86,6 @@ public:
     virtual void Render() const override;
     virtual void HandleEvents(const SDL_Event& sdlEvent) override;
     virtual void RenderGUI() override;
+
 
 };
