@@ -41,45 +41,6 @@ void SceneLevel1::OnDestroy()
     }
 }
 
-void SceneLevel1::PlayerShoot()
-{
-    mainPlayerActor->GetAnimator()->PlayAnimationClip("Attack");
-    const Vec3 currentCrossHairsPosition = mainPlayerController->GetCrossHairsPosition();
-    auto bullet = std::make_unique<Actor2D>();
-    bullet->OnCreate("sprites/punch.png");
-    bullet->GetEntity()->SetPosition(currentCrossHairsPosition);
-    const auto crossHairsQuaternion = mainPlayerController->GetCrossHairsRotation();
-    const auto forward = Vec3(1.0f, 0.0f, 0.0f);
-    const Vec3 rotatedVector = crossHairsQuaternion * forward * QMath::inverse(crossHairsQuaternion); // QPQ-1 Formula
-    const Vec3 finalVelocity = rotatedVector * 100.0f;
-    // TODO We have to rebuild after adjusting Scale, change this
-    bullet->GetEntity()->SetScale(Vec3(0.3f, 0.3f, 0.3f));
-    bullet->ReBuildAll("sprites/punch.png");
-    bullet->GetEntity()->AdjustOrientation(crossHairsQuaternion);
-    bullet->GetEntity()->SetVelocity(finalVelocity);
-    // bullet->draw_Hitbox = true;
-    bullet->ConfigureLifeSpan(4.0f);
-    bullet->SetTag(Actor_tags::bullets);
-    bullet->RegisterExpiredCallback([this](const Actor2D& actor)
-    {
-        auto impact = std::make_unique<Actor2D>();
-        impact->OnCreate("sprites/impact.png", 2, 4);
-        impact->GetEntity()->SetPosition(actor.GetEntity()->GetPosition());
-        impact->ConfigureLifeSpan(0.27f);
-        const auto clip = new AnimationClip(AnimationClip::Play_mode::once, 0.03f, 2, 4, 0, 7);
-        impact->GetAnimator()->AddDefaultAnimationClip("Idle", clip);
-        impact->GetAnimator()->PlayAnimationClip("Idle");
-        spawnQueue.emplace(std::move(impact));
-    });
-    bullet->RegisterCollisionCallback([this](Actor2D& actor, const Actor2D& otherActor)
-    {
-        if (otherActor.Tag() == Actor_tags::target)
-        {
-            actor.ConfigureLifeSpan(0.01f);
-        }
-    });
-    spawnQueue.emplace(std::move(bullet));
-}
 
 bool SceneLevel1::OnCreate()
 {

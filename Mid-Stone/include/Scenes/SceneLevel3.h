@@ -48,8 +48,4 @@ public:
     bool OnCreate() override;
     void RenderGUI() override;
     void OnDestroy() override;
-
-    /** Gameplay Functions **/
-    void PlayerShoot();
-    
 };
