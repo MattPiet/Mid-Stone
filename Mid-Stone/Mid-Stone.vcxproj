@@ -154,7 +154,6 @@
     <ClCompile Include="src\Graphics\Shader.cpp" />
     <ClCompile Include="src\Graphics\SpriteMesh.cpp" />
     <ClCompile Include="src\Graphics\SpriteRenderer.cpp" />
-    <ClCompile Include="src\Graphics\Texture.cpp" />
     <ClCompile Include="src\Managers\2DActor.cpp" />
     <ClCompile Include="src\Managers\PlayerController.cpp">
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -348,7 +347,6 @@
     <ClInclude Include="include\Graphics\Shader.h" />
     <ClInclude Include="include\Graphics\SpriteMesh.h" />
     <ClInclude Include="include\Graphics\SpriteRenderer.h" />
-    <ClInclude Include="include\Graphics\Texture.h" />
     <ClInclude Include="include\Managers\2DActor.h" />
     <ClInclude Include="include\Managers\Actor.h" />
     <ClInclude Include="include\Managers\PlayerController.h" />
