@@ -5,6 +5,11 @@ Guns::Guns()
 {
     currentGunType = Guns::Gun_type::pistol;
     mixer = nullptr;
+    bulletsSprite = "sprites/fatty_clicked.png";
+    pistolExpiration = 5.0f;
+    shotgunExpiration = 5.0f;
+    rifleExpiration = 8.0f;
+    scale.set(1.f, 1.f, 1.f);
 }
 
 Guns::~Guns()
@@ -49,12 +54,14 @@ std::vector<std::unique_ptr<Actor2D>> Guns::Shoot(PlayerController* controller,
             const Vec3 velocity = quat * forward * QMath::inverse(quat) * 100.0f;
 
             auto bullet = std::make_unique<Actor2D>();
-            bullet->OnCreate("sprites/fatty_clicked.png");
+            bullet->OnCreate(bulletsSprite);
+            bullet->GetEntity()->SetScale(scale);
+            bullet->ReBuildAll(bulletsSprite);
             bullet->GetEntity()->SetPosition(pos);
             bullet->GetEntity()->AdjustOrientation(quat);
             bullet->GetEntity()->SetVelocity(velocity);
             bullet->SetTag(Actor_tags::bullets);
-            bullet->ConfigureLifeSpan(5.0f);
+            bullet->ConfigureLifeSpan(pistolExpiration);
 
             bullet->RegisterExpiredCallback([&impacts](const Actor2D& actor)
             {
@@ -82,12 +89,14 @@ std::vector<std::unique_ptr<Actor2D>> Guns::Shoot(PlayerController* controller,
                 const Vec3 velocity = quat * forward * QMath::inverse(quat) * 100.0f;
            
                 auto bullet = std::make_unique<Actor2D>();
-                bullet->OnCreate("sprites/fatty_clicked.png");
+                bullet->OnCreate(bulletsSprite);
+                bullet->GetEntity()->SetScale(scale);
+                bullet->ReBuildAll(bulletsSprite);
                 bullet->GetEntity()->SetPosition(spreadPos);
                 bullet->GetEntity()->AdjustOrientation(quat);
                 bullet->GetEntity()->SetVelocity(velocity);
                 bullet->SetTag(Actor_tags::bullets);
-                bullet->ConfigureLifeSpan(5.0f);
+                bullet->ConfigureLifeSpan(shotgunExpiration);
 
                 bullet->RegisterExpiredCallback([&impacts](const Actor2D& actor)
                 {
@@ -116,12 +125,14 @@ std::vector<std::unique_ptr<Actor2D>> Guns::Shoot(PlayerController* controller,
             const Vec3 velocity = quat * forward * QMath::inverse(quat) * 200.0f; // faster bullet
 
             auto bullet = std::make_unique<Actor2D>();
-            bullet->OnCreate("sprites/fatty_clicked.png");
+            bullet->OnCreate(bulletsSprite);
+            bullet->GetEntity()->SetScale(scale);
+            bullet->ReBuildAll(bulletsSprite);
             bullet->GetEntity()->SetPosition(spreadPos);
             bullet->GetEntity()->AdjustOrientation(quat);
             bullet->GetEntity()->SetVelocity(velocity);
             bullet->SetTag(Actor_tags::bullets);
-            bullet->ConfigureLifeSpan(8.0f);
+            bullet->ConfigureLifeSpan(rifleExpiration);
 
             bullet->RegisterExpiredCallback([&impacts](const Actor2D& actor)
                 {

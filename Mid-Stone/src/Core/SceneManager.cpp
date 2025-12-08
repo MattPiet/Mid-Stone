@@ -13,6 +13,7 @@
 #include <imgui_impl_opengl3.h>
 #include <UI/UIManager.h>
 #include "Scenes/SceneLevel1.h"
+#include "Scenes/SceneLevel2.h"
 #include "Scenes/SceneLevel3.h"
 
 
@@ -197,7 +198,11 @@ void SceneManager::HandleEvents()
             case SDL_SCANCODE_F3:
                 DestroyScene();
                 BuildNewScene(Scene_number::scene_level_1);
+                break;
             case SDL_SCANCODE_F4:
+                DestroyScene();
+                BuildNewScene(Scene_number::scene_level_2);
+                break;
             case SDL_SCANCODE_F5:
                 break;
 
@@ -249,6 +254,11 @@ bool SceneManager::BuildNewScene(Scene_number scene)
 		currentScene = new MainMenu();
 		status = currentScene->OnCreate();
 		break;
+
+    case Scene_number::scene_level_2:
+        currentScene = new SceneLevel2();
+        status = currentScene->OnCreate();
+        break;
 
     case Scene_number::scene_level_3:
         currentScene = new SceneLevel3();

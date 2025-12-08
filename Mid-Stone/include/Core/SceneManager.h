@@ -13,6 +13,7 @@ class GuiWindow;
 enum class Scene_number : uint8_t {
 	scene0_g = 0,
 	scene_level_1,
+	scene_level_2,
 	scene_level_3,
 	animation_scene,
 	MainMenu
@@ -33,7 +34,7 @@ private:
 	static float master_volume;
 
 	Scene* currentScene;
-	Scene_number currentSceneId{ Scene_number::scene_level_1 };
+	Scene_number currentSceneId{ Scene_number::scene_level_2 };
 	Timer* timer;
 
 	Window* window;       // <-- legacy SDL/OpenGL window

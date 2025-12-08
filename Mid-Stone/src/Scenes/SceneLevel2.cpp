@@ -1,8 +1,7 @@
 #include <glew.h>
 
-#include "Scenes/SceneLevel1.h"
+#include "Scenes/SceneLevel2.h"
 
-#include <map>
 #include <queue>
 
 #include "Graphics/CameraController.h"
@@ -12,19 +11,19 @@
 #include "Physics/Collisions.h"
 
 
-SceneLevel1::SceneLevel1()
+SceneLevel2::SceneLevel2()
 {
-    Debug::Info("Created Scene Level 1: ", __FILE__, __LINE__);
+    Debug::Info("Created Scene Level 2: ", __FILE__, __LINE__);
 }
 
-SceneLevel1::~SceneLevel1()
+SceneLevel2::~SceneLevel2()
 {
-    Debug::Info("Deleted Scene Level 1: ", __FILE__, __LINE__);
+    Debug::Info("Deleted Scene Level 2: ", __FILE__, __LINE__);
 }
 
-void SceneLevel1::OnDestroy()
+void SceneLevel2::OnDestroy()
 {
-    Debug::Info("OnDestroy Scene Level 1: ", __FILE__, __LINE__);
+    Debug::Info("OnDestroy Scene Level 2: ", __FILE__, __LINE__);
 
     /** Delete Main Player **/
     mainPlayerActor.reset();
@@ -33,15 +32,9 @@ void SceneLevel1::OnDestroy()
     /** Camera **/
     cameraController.reset();
     camera.reset();
-    //// Turn off audio
-    if (mixer)
-    {
-        MIX_DestroyMixer(mixer);
-        MIX_Quit();
-    }
 }
 
-void SceneLevel1::PlayerShoot()
+void SceneLevel2::PlayerShoot()
 {
     mainPlayerActor->GetAnimator()->PlayAnimationClip("Attack");
     const Vec3 currentCrossHairsPosition = mainPlayerController->GetCrossHairsPosition();
@@ -51,14 +44,14 @@ void SceneLevel1::PlayerShoot()
     const auto crossHairsQuaternion = mainPlayerController->GetCrossHairsRotation();
     const auto forward = Vec3(1.0f, 0.0f, 0.0f);
     const Vec3 rotatedVector = crossHairsQuaternion * forward * QMath::inverse(crossHairsQuaternion); // QPQ-1 Formula
-    const Vec3 finalVelocity = rotatedVector * 100.0f;
+    const Vec3 finalVelocity = rotatedVector * 150.0f;\
     // TODO We have to rebuild after adjusting Scale, change this
     bullet->GetEntity()->SetScale(Vec3(0.3f, 0.3f, 0.3f));
     bullet->ReBuildAll("sprites/punch.png");
     bullet->GetEntity()->AdjustOrientation(crossHairsQuaternion);
     bullet->GetEntity()->SetVelocity(finalVelocity);
     // bullet->draw_Hitbox = true;
-    bullet->ConfigureLifeSpan(4.0f);
+    bullet->ConfigureLifeSpan(5.5f);
     bullet->SetTag(Actor_tags::bullets);
     bullet->RegisterExpiredCallback([this](const Actor2D& actor)
     {
@@ -81,10 +74,11 @@ void SceneLevel1::PlayerShoot()
     spawnQueue.emplace(std::move(bullet));
 }
 
-bool SceneLevel1::OnCreate()
+bool SceneLevel2::OnCreate()
 {
+    Debug::Info("On Create Scene Level 2: ", __FILE__, __LINE__);
+
     canShoot = true;
-    Debug::Info("On Create Scene Level 1: ", __FILE__, __LINE__);
 
     /** Main Player **/
     /** Main Actor **/
@@ -94,9 +88,10 @@ bool SceneLevel1::OnCreate()
         std::cout << "Failed to create test actor spritesheet\n";
         return false;
     }
-    mainPlayerActor->GetGuns()->SetGunType(Guns::Gun_type::shotgun);
-    // mainPlayerActor->GetGuns()->setMixer(mixer);
-    // mainPlayerActor->GetGuns()->funnyNoises = true;
+    mainPlayerActor->GetGuns()->SetGunType(Guns::Gun_type::pistol);
+    mainPlayerActor->GetGuns()->setBulletSprite("sprites/punch.png");
+    mainPlayerActor->GetGuns()->setPistolExpiration(5.5f);
+    mainPlayerActor->GetGuns()->setSpriteScale(0.3);
     const auto mainPlayerClipIdle = new AnimationClip(
         AnimationClip::Play_mode::pingpong,
         0.2f,
@@ -128,7 +123,7 @@ bool SceneLevel1::OnCreate()
     mainPlayerActor->GetAnimator()->AddAnimationClip("Hurt", mainPlayerClipHurt);
     mainPlayerActor->GetAnimator()->PlayAnimationClip("Idle");
 
-    mainPlayerActor->GetEntity()->SetPosition(Vec3(-80.0f, -40.0f, 0.0f));
+    mainPlayerActor->GetEntity()->SetPosition(Vec3(-90.0f, -40.0f, 0.0f));
     // mainPlayerActor->draw_Hitbox = true;
 
     /** Main Player Controller **/
@@ -136,57 +131,127 @@ bool SceneLevel1::OnCreate()
     mainPlayerController = std::make_unique<PlayerController>();
     mainPlayerController->OnCreate("sprites/crosshairs.png");
     mainPlayerController->SetPossessedActor(mainPlayerActor.get());
+    mainPlayerController->MoveAim(45.f);
 
     /** Terrain Objects **/
-
-    std::map<int, std::string> terrainFilenameMap = {
-        {20, "sprites/walls/rock_wall_1_x_20.png"},
-        {10, "sprites/walls/rock_wall_1_x_10.png"},
-        {5, "sprites/walls/rock_wall_1_x_5.png"},
-        {4, "sprites/walls/rock_wall_1_x_4.png"},
-        {3, "sprites/walls/rock_wall_1_x_3.png"}
+	//Positions for 1x1 terrain pieces
+    const std::vector terrain1Positions = {
+        std::make_pair(Vec3(-48.f, -50.6f, 0.f), 0.f),
+		std::make_pair(Vec3(-22.4f, 26.f, 0.f), 0.f),
+        std::make_pair(Vec3(3.2f, -50.6f, 0.f), 0.f),
+        std::make_pair(Vec3(28.8f, 26.f, 0.f), 0.f),
+        std::make_pair(Vec3(54.4f, -50.6f, 0.f), 0.f),
+        std::make_pair(Vec3(80.f, 26.f, 0.f), 0.f),
     };
+	//Positions for 1x5 terrain pieces
+    const std::vector terrain5Positions = {
+        std::make_pair(Vec3(-96.f, 41.6f, 0.f), -90.f),
+        std::make_pair(Vec3(-96.f, -41.6f, 0.f), -90.f),
+        std::make_pair(Vec3(96.f, 41.6f, 0.f), -90.f),
+        std::make_pair(Vec3(96.f, -41.6f, 0.f), -90.f),
 
-    const std::vector<std::tuple<Vec3, float, int>> terrainData = {
-        {Vec3(-30.0f, 50.0f, 0.0f), 0.0f, 20}, // Top Wall
-        {Vec3(66.0f, 50.0f, 0.0f), 0.0f, 10}, // Top Wall
-        {Vec3(-30.0f, -50.0f, 0.0f), 0.0f, 20}, // Bottom Wall
-        {Vec3(66.0f, -50.0f, 0.0f), 0.0f, 10}, // Bottom Wall
-        {Vec3(-97.2f, 0.0f, 0.0f), 90.0f, 20}, // Left Wall
-        {Vec3(101.2f, 0.0f, 0.0f), 90.0f, 20}, // Right Wall
-        {Vec3(-62.0f, -3.2f, 0.0f), 0.0f, 10}, // Left Platform
-        {Vec3(66.0f, -3.2f, 0.0f), 0.0f, 10}, // Right Platform
-        {Vec3(5.2f, -43.6f, 0.0f), 0.0f, 5}, // Middle PLatform
-        {Vec3(62.8f, -43.6f, 0.0f), 0.0f, 5}, // Bottom Right Platform
+        std::make_pair(Vec3(-86.4f, 44.4f, 0.f), 45.f),
+        std::make_pair(Vec3(-60.8f, 44.4f, 0.f), -45.f),
+        std::make_pair(Vec3(-60.8f, -44.4f, 0.f), -45.f),
+        std::make_pair(Vec3(-35.2f, -44.4f, 0.f), 45.f),
+        std::make_pair(Vec3(-35.2f, 44.4f, 0.f), 45.f),
+		std::make_pair(Vec3(-9.6f, 44.4f, 0.f), -45.f),
+        std::make_pair(Vec3(-9.6f, -44.4f, 0.f), -45.f),
+        std::make_pair(Vec3(16.f, -44.4f, 0.f), 45.f),
+        std::make_pair(Vec3(16.f,  44.4f, 0.f), 45.f),
+        std::make_pair(Vec3(41.6, 44.4f , 0.f), -45.f),
+        std::make_pair(Vec3(41.6, -44.4f, 0.f), -45.f),
+        std::make_pair(Vec3(67.2, -44.4f, 0.f), 45.f),
+        std::make_pair(Vec3(67.2,  44.4f, 0.f), 45.f),
+        
+    };
+	//Positions for 1x10 terrain pieces
+    const std::vector terrain10Positions = {
+		std::make_pair(Vec3(-96.f, 0.f, 0.f), 90.f),
+        std::make_pair(Vec3(96.f, 0.f, 0.f), 90.f),
+        std::make_pair(Vec3(-73.6f, -22.f, 0.f), 90.f),
+        std::make_pair(Vec3(-48.f, 22.f, 0.f), 90.f),
+        std::make_pair(Vec3(-22.4f, -22.f, 0.f), 90.f),
+        std::make_pair(Vec3(3.2f, 22.f, 0.f), 90.f),
+        std::make_pair(Vec3(28.8f, -22.f, 0.f), 90.f),
+        std::make_pair(Vec3(54.4f, 22.f, 0.f), 90.f),
+        std::make_pair(Vec3(80.f, -22.f, 0.f), 90.f),
+    };
+	// Positions for 1x20 terrain pieces
+    const std::vector terrain20Positions = {
+        std::make_pair(Vec3(-32.f, 54.f, 0.f), 0.f),
+        std::make_pair(Vec3(32.f, 54.f, 0.f), 0.f),
+        std::make_pair(Vec3(-32.f, -54.f, 0.f), 0.f),
+        std::make_pair(Vec3(32.f, -54.f, 0.f), 0.f),
     };
 
     /** Terrain Setup **/
-    for (const auto& data : terrainData)
+    //Terrain Setup for 1x1 pieces
+    for (const auto& position : terrain1Positions)
     {
         auto terrain = std::make_unique<Actor2D>();
-        std::string terrainFilename = terrainFilenameMap[std::get<2>(data)];
-        terrain->OnCreate(terrainFilename.c_str());
-        terrain->GetEntity()->SetPosition(std::get<0>(data));
+        terrain->OnCreate("sprites/walls/rock_wall_1_x_1.png");
+        terrain->GetEntity()->SetPosition(position.first);
         terrain->GetEntity()->SetOrientation(
-            terrain->GetEntity()->GetOrientation() *
-            QMath::angleAxisRotation(std::get<1>(data), Vec3(0.0f, 0.0f, 1.0f)));
-        terrain->GetEntity()->SetScale(Vec3(1.0f, 1.0f, 1.0f));
-        terrain->ReBuildAll(terrainFilename.c_str());
+            terrain->GetEntity()->GetOrientation() * QMath::angleAxisRotation(position.second, Vec3(0.0f, 0.0f, 1.0f)));
+        terrain->GetEntity()->SetScale(Vec3(1.f, 1.f, 1.f));
+        terrain->ReBuildAll("sprites/walls/rock_wall_1_x_1.png");
         terrain->isStatic = true;
-        // terrain->draw_Hitbox = true;
+        terrainActors.emplace_back(std::move(terrain));
+    }
+    //Terrain Setup for 1x5 pieces
+    for (const auto& position : terrain5Positions) 
+    {
+        auto terrain = std::make_unique<Actor2D>();
+        terrain->OnCreate("sprites/walls/rock_wall_1_x_5.png");
+        terrain->GetEntity()->SetPosition(position.first);
+        terrain->GetEntity()->SetOrientation(
+            terrain->GetEntity()->GetOrientation() * QMath::angleAxisRotation(position.second, Vec3(0.0f, 0.0f, 1.0f)));
+        terrain->GetEntity()->SetScale(Vec3(1.f, 1.f, 1.f));
+        terrain->ReBuildAll("sprites/walls/rock_wall_1_x_5.png");
+        terrain->isStatic = true;
+        terrainActors.emplace_back(std::move(terrain));
+    }
+	//Terrain Setup for 1x10 pieces
+    for (const auto& position : terrain10Positions)
+    {
+        auto terrain = std::make_unique<Actor2D>();
+        terrain->OnCreate("sprites/walls/rock_wall_1_x_10.png");
+        terrain->GetEntity()->SetPosition(position.first);
+        terrain->GetEntity()->SetOrientation(
+			terrain->GetEntity()->GetOrientation() * QMath::angleAxisRotation(position.second, Vec3(0.0f, 0.0f, 1.0f)));
+        terrain->GetEntity()->SetScale(Vec3(1.f, 1.f, 1.f));
+        terrain->ReBuildAll("sprites/walls/rock_wall_1_x_10.png");
+        terrain->isStatic = true;
         terrainActors.emplace_back(std::move(terrain));
     }
 
+    //Terrain Setup for 1x20 pieces
+    for (const auto& position : terrain20Positions)
+    {
+        auto terrain = std::make_unique<Actor2D>();
+        terrain->OnCreate("sprites/walls/rock_wall_1_x_20.png");
+        terrain->GetEntity()->SetPosition(position.first);
+        terrain->GetEntity()->SetOrientation(
+            terrain->GetEntity()->GetOrientation() * QMath::angleAxisRotation(position.second, Vec3(0.0f, 0.0f, 1.0f)));
+        terrain->GetEntity()->SetScale(Vec3(1.0f, 1.0f, 1.0f));
+        terrain->ReBuildAll("sprites/walls/rock_wall_1_x_20.png");
+        terrain->isStatic = true;
+         //terrain->draw_Hitbox = true;
+        terrainActors.emplace_back(std::move(terrain));
+    }
 
     /** Target Setup **/
-
-    const std::vector<Vec3> targetData = {
-        {Vec3(-70.0f, 3.2f, 0.0f)},
-        {Vec3(70.2f, 3.2f, 0.0f)},
-        {Vec3(67.0f, -37.2f, 0.0f)},
-        {Vec3(0.0f, -37.2f, 0.0f)},
+	const std::vector<Vec3> targetData = {
+        {Vec3(-48.f, -44.0f, 0.0f)},
+        {Vec3(-22.4f, 32.6f, 0.f)},
+        {Vec3(3.2f, -44.0f, 0.f)},
+        {Vec3(28.8f, 32.6f, 0.f)},
+        {Vec3(54.4f, -44.0f, 0.f)},
+        {Vec3(80.0f, 32.6f, 0.f)},
     };
-
+    
+    
     for (const auto& data : targetData)
     {
         auto target = std::make_unique<Actor2D>();
@@ -235,13 +300,13 @@ bool SceneLevel1::OnCreate()
         target->SetHealth(1);
         target->SetTag(Actor_tags::target);
         target->RegisterCollisionCallback([this](Actor2D& actor, const Actor2D& otherActor)
-        {
-            if (otherActor.Tag() == Actor_tags::bullets)
             {
-                actor.GetAnimator()->PlayAnimationClip("Hurt");
-                actor.TakeDamage(1);
-            }
-        });
+                if (otherActor.Tag() == Actor_tags::bullets)
+                {
+                    actor.GetAnimator()->PlayAnimationClip("Hurt");
+                    actor.TakeDamage(1);
+                }
+            });
         target->isStatic = true;
         target->GetEntity()->SetPosition(data);
         targets.emplace_back(std::move(target));
@@ -260,13 +325,14 @@ bool SceneLevel1::OnCreate()
         return false;
     }
     PlayAudio = SceneManager::GetAudioStateStatic();
-	master_volume = SceneManager::GetMasterVolumeStatic();
+    master_volume = SceneManager::GetMasterVolumeStatic();
     MIX_Audio* Music = MIX_LoadAudio(mixer, "Audio/CrabRave.wav", true);
     MIX_SetMasterGain(mixer, master_volume);
     MIX_PlayAudio(mixer, Music);
     MIX_DestroyAudio(Music);
-	mainPlayerActor->GetGuns()->SetMixer(mixer);
-	mainPlayerActor->GetGuns()->funnyNoises = true;
+    mainPlayerActor->GetGuns()->SetMixer(mixer);
+    mainPlayerActor->GetGuns()->funnyNoises = true;
+
     /** Camera **/
     camera = std::make_unique<Camera>();
     cameraController = std::make_unique<CameraController>(camera.get());
@@ -274,7 +340,7 @@ bool SceneLevel1::OnCreate()
 }
 
 
-void SceneLevel1::Update(const float deltaTime)
+void SceneLevel2::Update(const float deltaTime)
 {
     /** Main Player Controller **/
     if (leftPressed && !rightPressed)
@@ -292,16 +358,22 @@ void SceneLevel1::Update(const float deltaTime)
                        [](const std::unique_ptr<Actor2D>& e) { return e->HasExpired(); }),
         actors.end()
     );
-
-    /** Target Cleanup **/
+    /* Target Cleanup */
     targets.erase(
         std::remove_if(targets.begin(), targets.end(),
-                       [](const std::unique_ptr<Actor2D>& e) { return e->HasExpired(); }),
+            [](const std::unique_ptr<Actor2D>& e) { return e->HasExpired(); }),
         targets.end()
     );
 
-    /** Update Main Player **/
+
+    /** Update Main Player and Target **/
     mainPlayerActor->Update(deltaTime);
+    
+    /* Update Targets */
+    for (const auto& target : targets)
+    {
+        target->Update(deltaTime);
+	}
 
     for (auto& impact : impacts) spawnQueue.emplace(std::move(impact));
     if (impacts.size() > 0)
@@ -310,11 +382,6 @@ void SceneLevel1::Update(const float deltaTime)
         canShoot = true;
     }
 
-    /** Update Targets **/
-    for (const auto& targetActor : targets)
-    {
-        targetActor->Update(deltaTime);
-    }
     /** Spawn Queue **/
     while (!spawnQueue.empty())
     {
@@ -327,10 +394,11 @@ void SceneLevel1::Update(const float deltaTime)
     {
         levelFinished = true;
     }
+
     /** Update Actors **/
     for (const auto& actor : actors)
     {
-     
+
         //actor->Update(deltaTime);
         // --- 1. compute intended movement ---
         Vec3 oldPos = actor->GetEntity()->GetPosition();
@@ -366,10 +434,10 @@ void SceneLevel1::Update(const float deltaTime)
         }
         actor->FaceVelocity(deltaTime);
     }
-  
+
 }
 
-void SceneLevel1::HandleEvents(const SDL_Event& sdlEvent)
+void SceneLevel2::HandleEvents(const SDL_Event& sdlEvent)
 {
     switch (sdlEvent.type)
     {
@@ -396,16 +464,16 @@ void SceneLevel1::HandleEvents(const SDL_Event& sdlEvent)
             break;
         case SDL_SCANCODE_SPACE:
             {
-                if (canShoot)
-                {
-                    mainPlayerActor->GetAnimator()->PlayAnimationClip("Attack");
-                    //PlayerShoot();
-                    auto bullets = mainPlayerActor->GetGuns()->Shoot(mainPlayerController.get(), impacts);
-                    for (auto& bullet : bullets) spawnQueue.emplace(std::move(bullet));
-                    canShoot = false;
-                    /** Load and play music **/
-                }
-                break;
+            if (canShoot)
+            {
+                mainPlayerActor->GetAnimator()->PlayAnimationClip("Attack");
+                //PlayerShoot();
+                auto bullets = mainPlayerActor->GetGuns()->Shoot(mainPlayerController.get(), impacts);
+                for (auto& bullet : bullets) spawnQueue.emplace(std::move(bullet));
+                canShoot = false;
+                
+            }
+            break;
             }
 
         default: ;
@@ -448,7 +516,7 @@ void SceneLevel1::HandleEvents(const SDL_Event& sdlEvent)
 }
 
 
-void SceneLevel1::RenderGUI()
+void SceneLevel2::RenderGUI()
 {
     /** Level Finish Popup **/
     if (levelFinished)
@@ -479,7 +547,7 @@ void SceneLevel1::RenderGUI()
         }
         ImGui::EndPopup();
     }
-    
+
 
     ImVec4 r = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
     ImVec4 g = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
@@ -502,7 +570,7 @@ void SceneLevel1::RenderGUI()
     if (mixer && PlayAudio)
     {
         ImGui::SliderFloat("Master Volume", &master_volume, 0.0f, 1.0f);
-		SceneManager::SetMasterVolumeStatic(master_volume);
+        SceneManager::SetMasterVolumeStatic(master_volume);
     }
     UIManager::PopSliderStyle(); // popping slider style
     UIManager::PopButtonStyle(); // popping button style
@@ -530,10 +598,10 @@ void SceneLevel1::RenderGUI()
 }
 
 
-void SceneLevel1::Render() const
+void SceneLevel2::Render() const
 {
     /** Render Setup **/
-    glClearColor(0.241f, 0.265f, 0.422f, 1.0f);
+    glClearColor(0.541f, 0.765f, 0.922f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     glEnable(GL_BLEND);
@@ -555,11 +623,13 @@ void SceneLevel1::Render() const
     {
         actor->Render(camera->GetViewMatrix(), camera->GetProjectionMatrix());
     }
-    /* Regular Loop for Rendering Players */
+    /** Render Target **/
+   /* Regular Loop for Rendering Players */
     for (auto& targetActor : targets)
     {
         targetActor->Render(camera->GetViewMatrix(), camera->GetProjectionMatrix());
     }
+
 
     glUseProgram(0);
 }
