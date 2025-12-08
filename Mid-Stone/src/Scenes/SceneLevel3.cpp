@@ -1,28 +1,24 @@
 #include <glew.h>
-
-#include "Scenes/SceneLevel1.h"
-
+#include "Scenes/SceneLevel3.h"
 #include <map>
 #include <queue>
-
 #include "Graphics/CameraController.h"
 #include "Utils/Debug.h"
 #include <Utils/MemoryMonitor.h>
-
 #include "Physics/Collisions.h"
 
 
-SceneLevel1::SceneLevel1()
+SceneLevel3::SceneLevel3()
 {
     Debug::Info("Created Scene Level 1: ", __FILE__, __LINE__);
 }
 
-SceneLevel1::~SceneLevel1()
+SceneLevel3::~SceneLevel3()
 {
     Debug::Info("Deleted Scene Level 1: ", __FILE__, __LINE__);
 }
 
-void SceneLevel1::OnDestroy()
+void SceneLevel3::OnDestroy()
 {
     Debug::Info("OnDestroy Scene Level 1: ", __FILE__, __LINE__);
 
@@ -41,7 +37,7 @@ void SceneLevel1::OnDestroy()
     }
 }
 
-void SceneLevel1::PlayerShoot()
+void SceneLevel3::PlayerShoot()
 {
     mainPlayerActor->GetAnimator()->PlayAnimationClip("Attack");
     const Vec3 currentCrossHairsPosition = mainPlayerController->GetCrossHairsPosition();
@@ -81,9 +77,8 @@ void SceneLevel1::PlayerShoot()
     spawnQueue.emplace(std::move(bullet));
 }
 
-bool SceneLevel1::OnCreate()
+bool SceneLevel3::OnCreate()
 {
-    canShoot = true;
     Debug::Info("On Create Scene Level 1: ", __FILE__, __LINE__);
 
     /** Main Player **/
@@ -128,7 +123,9 @@ bool SceneLevel1::OnCreate()
     mainPlayerActor->GetAnimator()->AddAnimationClip("Hurt", mainPlayerClipHurt);
     mainPlayerActor->GetAnimator()->PlayAnimationClip("Idle");
 
-    mainPlayerActor->GetEntity()->SetPosition(Vec3(-80.0f, -40.0f, 0.0f));
+    mainPlayerActor->GetEntity()->SetPosition(Vec3(-30.0f, 8.0f, 0.0f));
+    mainPlayerActor->GetGuns()->SetGunType(Guns::Gun_type::pistol);
+
     // mainPlayerActor->draw_Hitbox = true;
 
     /** Main Player Controller **/
@@ -148,16 +145,31 @@ bool SceneLevel1::OnCreate()
     };
 
     const std::vector<std::tuple<Vec3, float, int>> terrainData = {
+       
+        {Vec3(-30.0f, 0.0f, 0.0f), 0.0f, 10}, //Starting Platform
+        {Vec3(11.8f, 0.0f, 0.0f), 0.0f, 5}, //Starting Platform
         {Vec3(-30.0f, 50.0f, 0.0f), 0.0f, 20}, // Top Wall
         {Vec3(66.0f, 50.0f, 0.0f), 0.0f, 10}, // Top Wall
-        {Vec3(-30.0f, -50.0f, 0.0f), 0.0f, 20}, // Bottom Wall
-        {Vec3(66.0f, -50.0f, 0.0f), 0.0f, 10}, // Bottom Wall
+        {Vec3(-30.0f, -51.0f, 0.0f), 0.0f, 20}, // Bottom Wall
+        {Vec3(66.0f, -51.0f, 0.0f), 0.0f, 10}, // Bottom Wall
         {Vec3(-97.2f, 0.0f, 0.0f), 90.0f, 20}, // Left Wall
-        {Vec3(101.2f, 0.0f, 0.0f), 90.0f, 20}, // Right Wall
-        {Vec3(-62.0f, -3.2f, 0.0f), 0.0f, 10}, // Left Platform
-        {Vec3(66.0f, -3.2f, 0.0f), 0.0f, 10}, // Right Platform
-        {Vec3(5.2f, -43.6f, 0.0f), 0.0f, 5}, // Middle PLatform
-        {Vec3(62.8f, -43.6f, 0.0f), 0.0f, 5}, // Bottom Right Platform
+        {Vec3(97.2f, 0.0f, 0.0f), 90.0f, 20}, // Right Wall
+
+		{Vec3(-67.0f, -30.0f, 0.0f), 0.0f, 3}, //Bottom Left Platform
+        {Vec3(-50.5f, -35.0f, 0.0f), 90.0f, 10}, //Bottom Left Wall
+        {Vec3(-65.0f, 31.2f, 0.0f), 0.0f, 3}, //Top Left Platform
+        {Vec3(-65.0f, 37.4f, 0.0f), 0.0f, 3}, //Top Left Platform
+        {Vec3(-65.0f, 43.6f, 0.0f), 0.0f, 3}, //Top Left Platform
+
+        {Vec3(15.0f, 30.8f, 0.0f), 0.0f, 3}, //Floating Middle 
+        {Vec3(2.2f, 37.2f, 0.0f), 90.0f, 3}, //Top Middle Wall
+        {Vec3(-24.5f, -35.0f, 0.0f), 90.0f, 10}, //Bottom Middle Wall
+        {Vec3(31.0f, -12.8f, 0.0f), 90.0f, 5}, //Floating Middle Wall
+        {Vec3(24.6f, -12.8f, 0.0f), 90.0f, 5}, //Floating Middle Wall
+        {Vec3(12.0f, -25.4f, 0.0f), 0.0f, 3}, //Bottom Middle Platform
+        
+        {Vec3(84.6f, 15.9f, 0.0f), 0.0f, 5}, //Floating Right Platform
+
     };
 
     /** Terrain Setup **/
@@ -181,10 +193,12 @@ bool SceneLevel1::OnCreate()
     /** Target Setup **/
 
     const std::vector<Vec3> targetData = {
-        {Vec3(-70.0f, 3.2f, 0.0f)},
-        {Vec3(70.2f, 3.2f, 0.0f)},
-        {Vec3(67.0f, -37.2f, 0.0f)},
-        {Vec3(0.0f, -37.2f, 0.0f)},
+        {Vec3(-67.0f, -22.0f, 0.0f)},
+        {Vec3(40.2f, -43.2f, 0.0f)},
+        {Vec3(13.0f, -18.0f, 0.0f)},
+        {Vec3(79.0f, 23.0f, 0.0f)},
+        {Vec3(15.0f, 38.0f, 0.0f)},
+
     };
 
     for (const auto& data : targetData)
@@ -260,7 +274,7 @@ bool SceneLevel1::OnCreate()
         return false;
     }
     PlayAudio = SceneManager::GetAudioStateStatic();
-	master_volume = SceneManager::GetMasterVolumeStatic();
+    master_volume = SceneManager::GetMasterVolumeStatic();
     MIX_Audio* Music = MIX_LoadAudio(mixer, "Audio/CrabRave.wav", true);
     MIX_SetMasterGain(mixer, master_volume);
     MIX_PlayAudio(mixer, Music);
@@ -274,7 +288,7 @@ bool SceneLevel1::OnCreate()
 }
 
 
-void SceneLevel1::Update(const float deltaTime)
+void SceneLevel3::Update(const float deltaTime)
 {
     /** Main Player Controller **/
     if (leftPressed && !rightPressed)
@@ -369,7 +383,7 @@ void SceneLevel1::Update(const float deltaTime)
   
 }
 
-void SceneLevel1::HandleEvents(const SDL_Event& sdlEvent)
+void SceneLevel3::HandleEvents(const SDL_Event& sdlEvent)
 {
     switch (sdlEvent.type)
     {
@@ -448,7 +462,7 @@ void SceneLevel1::HandleEvents(const SDL_Event& sdlEvent)
 }
 
 
-void SceneLevel1::RenderGUI()
+void SceneLevel3::RenderGUI()
 {
     /** Level Finish Popup **/
     if (levelFinished)
@@ -462,7 +476,7 @@ void SceneLevel1::RenderGUI()
         if (ImGui::Button("Go to next level", ImVec2(120, 0)))
         {
             ImGui::CloseCurrentPopup();
-            RequestChangeScene(Scene_number::scene_level_2);
+            RequestChangeScene(Scene_number::scene0_g);
         }
         ImGui::SetItemDefaultFocus();
         ImGui::SameLine();
@@ -479,7 +493,7 @@ void SceneLevel1::RenderGUI()
         }
         ImGui::EndPopup();
     }
-    
+
 
     ImVec4 r = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
     ImVec4 g = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
@@ -502,7 +516,7 @@ void SceneLevel1::RenderGUI()
     if (mixer && PlayAudio)
     {
         ImGui::SliderFloat("Master Volume", &master_volume, 0.0f, 1.0f);
-		SceneManager::SetMasterVolumeStatic(master_volume);
+        SceneManager::SetMasterVolumeStatic(master_volume);
     }
     UIManager::PopSliderStyle(); // popping slider style
     UIManager::PopButtonStyle(); // popping button style
@@ -530,7 +544,7 @@ void SceneLevel1::RenderGUI()
 }
 
 
-void SceneLevel1::Render() const
+void SceneLevel3::Render() const
 {
     /** Render Setup **/
     glClearColor(0.241f, 0.265f, 0.422f, 1.0f);

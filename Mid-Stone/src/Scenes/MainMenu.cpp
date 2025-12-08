@@ -192,7 +192,7 @@ void MainMenu::RenderGUI()
             RequestChangeScene(Scene_number::scene_level_2);
         }
         if (ImGui::Button("Level 3", ImVec2(200, 60))) { // making a button to toggle hitbox drawing
-          //  RequestChangeScene(Scene_number::sceneLevel3);
+            RequestChangeScene(Scene_number::scene_level_3);
         }
     }
     UIManager::PopButtonStyle(); // popping button style

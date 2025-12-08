@@ -14,6 +14,7 @@ enum class Scene_number : uint8_t {
 	scene0_g = 0,
 	scene_level_1,
 	scene_level_2,
+	scene_level_3,
 	animation_scene,
 	MainMenu
 };

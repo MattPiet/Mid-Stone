@@ -12,12 +12,14 @@
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_opengl3.h>
 #include <UI/UIManager.h>
-
 #include "Scenes/SceneLevel1.h"
 #include "Scenes/SceneLevel2.h"
+#include "Scenes/SceneLevel3.h"
+
 
 bool SceneManager::setAudioOn = true;
 float SceneManager::master_volume = 1.0f;
+
 
 SceneManager::SceneManager() :
     currentScene{nullptr},
@@ -258,6 +260,10 @@ bool SceneManager::BuildNewScene(Scene_number scene)
         status = currentScene->OnCreate();
         break;
 
+    case Scene_number::scene_level_3:
+        currentScene = new SceneLevel3();
+        status = currentScene->OnCreate();
+        break;
     default:
         Debug::Error("Incorrect scene number assigned in the manager", __FILE__, __LINE__);
         currentScene = nullptr;
