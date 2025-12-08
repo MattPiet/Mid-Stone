@@ -1,5 +1,6 @@
 #include <UI/UIManager.h>
 #include <Utils/Debug.h>
+//#include <vector>
 
  ///ImGui includes
 #include <imgui.h>
@@ -50,7 +51,7 @@ void UIManager::PushSliderStyle(ImVec4 normal, ImVec4 hovered, ImVec4 active, fl
 
 }
 
-void UIManager::PushTextStyle(ImVec4 color, float size){
+void UIManager::PushTextStyle(ImVec4 color, float size) {
 	ImGui::PushStyleColor(ImGuiCol_Text, color);
 	if (size > 0.0f) {
 		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]); // Assuming the first font is the default font
